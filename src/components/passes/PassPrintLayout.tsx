@@ -1,29 +1,13 @@
 import { VisitorPassWithDetails } from '@/hooks/usePasses';
-import { generateQRCodeDataURL, generateQRPayload } from '@/lib/qr';
 import { format } from 'date-fns';
-import { useEffect, useState } from 'react';
 
 interface PassPrintLayoutProps {
     pass: VisitorPassWithDetails;
 }
 
 export function PassPrintLayout({ pass }: PassPrintLayoutProps) {
-    const [qrUrl, setQrUrl] = useState<string>('');
-
-    useEffect(() => {
-        async function loadQR() {
-            if (pass.status === 'ACTIVE') {
-                try {
-                    const payload = generateQRPayload(pass.id);
-                    const url = await generateQRCodeDataURL(payload);
-                    setQrUrl(url);
-                } catch (e) {
-                    console.error(e);
-                }
-            }
-        }
-        loadQR();
-    }, [pass]);
+    // Use the server-generated QR code URL directly
+    const qrUrl = pass.qrCodeUrl || '';
 
     // This component handles exactly what happens on the printed page
     return (
@@ -41,8 +25,8 @@ export function PassPrintLayout({ pass }: PassPrintLayoutProps) {
                     </div>
                 </div>
                 <div className="text-right">
-                    <div className="font-mono text-xl font-bold uppercase">No. {pass.id.split('-')[0]}</div>
-                    <div className="text-sm mt-1">Issued: {format(new Date(), 'dd/MM/yyyy HH:mm')}</div>
+                    <div className="font-mono text-xl font-bold uppercase">No. {pass.passNumber || pass.id.split('-')[0]}</div>
+                    <div className="text-sm mt-1">Issued: {format(new Date(pass.createdAt), 'dd/MM/yyyy HH:mm')}</div>
                 </div>
             </div>
 
@@ -63,7 +47,7 @@ export function PassPrintLayout({ pass }: PassPrintLayoutProps) {
 
                         <div>
                             <span className="text-sm font-bold uppercase text-slate-500 block mb-1">Mobile</span>
-                            <span className="text-lg">{pass.mobileNumber || 'N/A'}</span>
+                            <span className="text-lg">{pass.visitorMobile || 'N/A'}</span>
                         </div>
 
                         <div className="col-span-2">
@@ -71,10 +55,24 @@ export function PassPrintLayout({ pass }: PassPrintLayoutProps) {
                             <span className="text-lg">{pass.purpose}</span>
                         </div>
 
-                        {pass.hostName && (
+                        {pass.pointOfContact && (
                             <div className="col-span-2">
                                 <span className="text-sm font-bold uppercase text-slate-500 block mb-1">Host / Point of Contact</span>
-                                <span className="text-lg font-semibold">{pass.hostName}</span>
+                                <span className="text-lg font-semibold">{pass.pointOfContact}</span>
+                            </div>
+                        )}
+
+                        {pass.visitorRelation && (
+                            <div className="col-span-2">
+                                <span className="text-sm font-bold uppercase text-slate-500 block mb-1">Relation to Host</span>
+                                <span className="text-lg">{pass.visitorRelation}</span>
+                            </div>
+                        )}
+
+                        {pass.hostelName && (
+                            <div className="col-span-2">
+                                <span className="text-sm font-bold uppercase text-slate-500 block mb-1">Hostel</span>
+                                <span className="text-lg">{pass.hostelName}</span>
                             </div>
                         )}
                     </div>
@@ -86,7 +84,7 @@ export function PassPrintLayout({ pass }: PassPrintLayoutProps) {
                                 <span className="block font-bold text-lg">{format(new Date(pass.visitFrom), 'dd MMM yyyy')}</span>
                                 <span className="block mt-1 font-mono">{format(new Date(pass.visitFrom), 'HH:mm')}</span>
                             </div>
-                            <div className="text-2xl font-bold text-slate-300 py-1">→</div>
+                            <div className="text-2xl font-bold text-slate-300 py-1">&rarr;</div>
                             <div className="text-center w-1/2">
                                 <span className="block font-bold text-lg">{format(new Date(pass.visitTo), 'dd MMM yyyy')}</span>
                                 <span className="block mt-1 font-mono">{format(new Date(pass.visitTo), 'HH:mm')}</span>
@@ -94,9 +92,9 @@ export function PassPrintLayout({ pass }: PassPrintLayoutProps) {
                         </div>
                     </div>
 
-                    {pass.idType && (
+                    {pass.visitorIdType && (
                         <div className="text-sm text-center italic mt-4 mb-2">
-                            Identity verified via {pass.idType} ({pass.idNumber})
+                            Identity verified via {pass.visitorIdType} ({pass.visitorIdNumber})
                         </div>
                     )}
 
@@ -105,9 +103,9 @@ export function PassPrintLayout({ pass }: PassPrintLayoutProps) {
                 {/* Right Col - QR & Photo & Signatures */}
                 <div className="w-72 flex flex-col items-center">
 
-                    {pass.photoUrl && (
+                    {pass.visitorPhotoUrl && (
                         <div className="w-48 h-48 bg-slate-200 border-2 border-slate-400 mb-6 overflow-hidden flex items-center justify-center">
-                            <img src={pass.photoUrl} alt="Visitor" className="w-full h-full object-cover" />
+                            <img src={pass.visitorPhotoUrl} alt="Visitor" className="w-full h-full object-cover" />
                         </div>
                     )}
 

@@ -1,19 +1,40 @@
-import { requireRole } from '@/lib/auth-utils';
+'use client';
+
 import { StatsCards } from '@/components/dashboard/StatsCards';
-import { RecentActivity } from '@/components/dashboard/RecentActivity';
+import { RecentActivity, ActivityItem } from '@/components/dashboard/RecentActivity';
 import { FileText, ScanLine, UserPlus, Users } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
+import { useDashboard, SecurityDashboardStats, DashboardRecentScan } from '@/hooks/useDashboard';
+import { formatDistanceToNow } from 'date-fns';
 
-export default async function SecurityDashboardPage() {
-    await requireRole(['SECURITY', 'ADMIN']);
+function mapScansToActivity(scans: DashboardRecentScan[]): ActivityItem[] {
+    return scans.map((scan) => ({
+        id: scan.id,
+        visitorName: scan.pass.visitorName,
+        passType: scan.pass.passType,
+        status: 'ACTIVE' as const,
+        time: formatDistanceToNow(new Date(scan.scannedAt), { addSuffix: true }),
+        initials: scan.pass.visitorName.split(' ').map((n) => n[0]).join('').substring(0, 2).toUpperCase(),
+        description: `${scan.scanType} at ${scan.gateLocation || 'Main Gate'}`,
+    }));
+}
 
-    const mockStats = [
-        { title: 'Scans Today', value: '142', icon: ScanLine, trend: { value: 12, label: 'vs yesterday', positive: true } },
-        { title: 'Walk-ins Created', value: '18', icon: UserPlus },
-        { title: 'Active on Campus', value: '45', icon: Users, description: 'Based on un-exited scans' },
-        { title: 'Flagged Passes', value: '0', icon: FileText },
+export default function SecurityDashboardPage() {
+    const { data: dashData, isLoading } = useDashboard();
+
+    const stats = dashData as SecurityDashboardStats | undefined;
+
+    const totalScans = (stats?.todayEntries ?? 0) + (stats?.todayExits ?? 0);
+
+    const statsCards = [
+        { title: 'Scans Today', value: totalScans || '-', icon: ScanLine, description: `${stats?.todayEntries ?? 0} entries, ${stats?.todayExits ?? 0} exits` },
+        { title: 'Active Passes', value: stats?.activePasses ?? '-', icon: Users, description: 'Currently valid' },
+        { title: 'Entries Today', value: stats?.todayEntries ?? '-', icon: UserPlus },
+        { title: 'Exits Today', value: stats?.todayExits ?? '-', icon: FileText },
     ];
+
+    const activityItems = stats?.recentScans ? mapScansToActivity(stats.recentScans) : [];
 
     return (
         <div className="space-y-6">
@@ -38,12 +59,19 @@ export default async function SecurityDashboardPage() {
                 </div>
             </div>
 
-            <StatsCards stats={mockStats} />
+            {isLoading ? (
+                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+                    {[1, 2, 3, 4].map((i) => (
+                        <div key={i} className="h-24 bg-slate-100 rounded-xl animate-pulse" />
+                    ))}
+                </div>
+            ) : (
+                <StatsCards stats={statsCards} />
+            )}
 
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-7">
                 <div className="lg:col-span-4">
-                    {/* This would be ScanLogs later */}
-                    <RecentActivity items={[]} title="Recent Scans" />
+                    <RecentActivity items={activityItems} title="Recent Scans" />
                 </div>
                 <div className="lg:col-span-3">
                     <div className="rounded-xl border bg-slate-900 text-white shadow p-6 flex flex-col items-center justify-center text-center space-y-4 h-full min-h-[250px]">

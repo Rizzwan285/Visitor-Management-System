@@ -1,5 +1,3 @@
-import QRCode from 'qrcode';
-
 interface PassQRCodeProps {
     dataUrl: string;
     size?: number;

@@ -10,6 +10,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from 'sonner';
 import { useCreatePass } from '@/hooks/usePasses';
+import { api } from '@/services/api';
 
 export function WalkinPassForm() {
     const router = useRouter();
@@ -20,7 +21,9 @@ export function WalkinPassForm() {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const [stream, setStream] = useState<MediaStream | null>(null);
     const [photoDataUrl, setPhotoDataUrl] = useState<string | null>(null);
+    const [uploadedPhotoUrl, setUploadedPhotoUrl] = useState<string | null>(null);
     const [isCameraActive, setIsCameraActive] = useState(false);
+    const [isUploading, setIsUploading] = useState(false);
 
     // Form State
     const [idType, setIdType] = useState('AADHAR');
@@ -48,7 +51,7 @@ export function WalkinPassForm() {
         setIsCameraActive(false);
     };
 
-    const capturePhoto = () => {
+    const capturePhoto = async () => {
         if (videoRef.current && canvasRef.current) {
             const context = canvasRef.current.getContext('2d');
             if (context) {
@@ -58,39 +61,55 @@ export function WalkinPassForm() {
                 const dataUrl = canvasRef.current.toDataURL('image/jpeg');
                 setPhotoDataUrl(dataUrl);
                 stopCamera();
+
+                // Upload the photo to the server
+                try {
+                    setIsUploading(true);
+                    const blob = await (await fetch(dataUrl)).blob();
+                    const formData = new FormData();
+                    formData.append('photo', blob, 'visitor-photo.jpg');
+                    const result = await api.upload<{ url: string }>('/api/upload/photo', formData);
+                    setUploadedPhotoUrl(result.url);
+                    toast.success('Photo captured and uploaded');
+                } catch (err: any) {
+                    toast.error(err.message || 'Failed to upload photo');
+                    setUploadedPhotoUrl(null);
+                } finally {
+                    setIsUploading(false);
+                }
             }
         }
     };
 
     const retakePhoto = () => {
         setPhotoDataUrl(null);
+        setUploadedPhotoUrl(null);
         startCamera();
     };
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        if (!photoDataUrl) {
-            toast.error('A photograph is mandatory for walk-in passes.');
+        if (!uploadedPhotoUrl) {
+            toast.error('A photograph is mandatory for walk-in passes. Please capture and upload a photo.');
             return;
         }
 
         const formData = new FormData(e.currentTarget);
 
-        // Quick manual serialization
         const data = {
             passType: 'WALKIN' as const,
             visitorName: formData.get('visitorName') as string,
             visitorSex: visitorSex as 'MALE' | 'FEMALE' | 'OTHER',
             visitorAge: parseInt(formData.get('visitorAge') as string, 10),
             purpose: formData.get('purpose') as string,
-            mobileNumber: formData.get('mobileNumber') as string,
-            idType: idType as 'AADHAR' | 'PAN' | 'DRIVING_LICENSE' | 'PASSPORT' | 'OTHER',
-            idNumber: formData.get('idNumber') as string,
-            hostName: formData.get('hostName') as string, // Specific to Walkin
+            visitorMobile: formData.get('visitorMobile') as string,
+            visitorIdType: idType,
+            visitorIdNumber: formData.get('visitorIdNumber') as string,
+            pointOfContact: formData.get('pointOfContact') as string,
+            phoneConfirmedBy: formData.get('phoneConfirmedBy') as string,
+            visitorPhotoUrl: uploadedPhotoUrl,
             visitFrom: new Date(formData.get('visitFrom') as string).toISOString(),
             visitTo: new Date(formData.get('visitTo') as string).toISOString(),
-            // The photo URL will be handled by sending base64 to an upload API in a real scenario
-            // photoUrl: photoDataUrl 
         };
 
         try {
@@ -140,7 +159,9 @@ export function WalkinPassForm() {
                         )}
                         {isCameraActive && (
                             <>
-                                <Button type="button" variant="default" className="bg-green-600 hover:bg-green-700" onClick={capturePhoto}>Capture Photo</Button>
+                                <Button type="button" variant="default" className="bg-green-600 hover:bg-green-700" onClick={capturePhoto} disabled={isUploading}>
+                                    {isUploading ? 'Uploading...' : 'Capture Photo'}
+                                </Button>
                                 <Button type="button" variant="destructive" onClick={stopCamera}>Cancel Camera</Button>
                             </>
                         )}
@@ -161,8 +182,8 @@ export function WalkinPassForm() {
                 </div>
 
                 <div className="space-y-2">
-                    <Label htmlFor="mobileNumber">Mobile Number</Label>
-                    <Input id="mobileNumber" name="mobileNumber" type="tel" pattern="[0-9]{10}" placeholder="10-digit number" required />
+                    <Label htmlFor="visitorMobile">Mobile Number</Label>
+                    <Input id="visitorMobile" name="visitorMobile" type="tel" pattern="[0-9]{10}" placeholder="10-digit number" required />
                 </div>
 
                 <div className="space-y-2">
@@ -200,16 +221,23 @@ export function WalkinPassForm() {
                 </div>
 
                 <div className="space-y-2">
-                    <Label htmlFor="idNumber">ID Number</Label>
-                    <Input id="idNumber" name="idNumber" placeholder={`Enter ${idType} number`} required />
+                    <Label htmlFor="visitorIdNumber">ID Number</Label>
+                    <Input id="visitorIdNumber" name="visitorIdNumber" placeholder={`Enter ${idType} number`} required />
                 </div>
             </div>
 
             {/* 4. Visit Details */}
             <div className="space-y-4">
-                <div className="space-y-2">
-                    <Label htmlFor="hostName">Who are they visiting? (Point of Contact)</Label>
-                    <Input id="hostName" name="hostName" placeholder="Name of faculty, staff, or department" required />
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-2">
+                        <Label htmlFor="pointOfContact">Who are they visiting? (Point of Contact)</Label>
+                        <Input id="pointOfContact" name="pointOfContact" placeholder="Name of faculty, staff, or department" required />
+                    </div>
+
+                    <div className="space-y-2">
+                        <Label htmlFor="phoneConfirmedBy">Phone Confirmed By</Label>
+                        <Input id="phoneConfirmedBy" name="phoneConfirmedBy" placeholder="Name of person who confirmed by phone" required />
+                    </div>
                 </div>
 
                 <div className="space-y-2">
@@ -230,7 +258,7 @@ export function WalkinPassForm() {
             </div>
 
             <div className="flex justify-end pt-4">
-                <Button type="submit" size="lg" disabled={isPending}>
+                <Button type="submit" size="lg" disabled={isPending || isUploading}>
                     {isPending ? 'Generating Pass...' : 'Generate Walk-in Pass'}
                 </Button>
             </div>

@@ -9,36 +9,40 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from 'sonner';
 import { useCreatePass } from '@/hooks/usePasses';
+import { useUsers } from '@/hooks/useUsers';
 
 export function StudentGuestPassForm() {
     const router = useRouter();
     const { mutateAsync: createPass, isPending } = useCreatePass();
-    const [approverEmail, setApproverEmail] = useState(''); // Simple input for now instead of full dropdown search
+    const [approverId, setApproverId] = useState('');
+
+    // Fetch ADMIN users as potential approvers
+    const { data: adminsData, isLoading: isLoadingAdmins } = useUsers({ role: 'ADMIN', limit: 50 });
+    const admins = adminsData?.users || [];
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        if (!approverEmail) {
-            toast.error('Please specify a faculty approver email.');
+        if (!approverId) {
+            toast.error('Please select a faculty approver.');
             return;
         }
 
         const formData = new FormData(e.currentTarget);
 
-        // Quick manual serialization
         const data = {
             passType: 'STUDENT_GUEST' as const,
             visitorName: formData.get('visitorName') as string,
             visitorSex: formData.get('visitorSex') as 'MALE' | 'FEMALE' | 'OTHER',
             visitorAge: parseInt(formData.get('visitorAge') as string, 10),
             purpose: formData.get('purpose') as string,
-            relation: formData.get('relation') as string,
+            visitorRelation: formData.get('visitorRelation') as string,
             visitFrom: new Date(formData.get('visitFrom') as string).toISOString(),
             visitTo: new Date(formData.get('visitTo') as string).toISOString(),
+            approverId,
         };
 
         try {
-            const result = await createPass(data);
-            // Wait for backend to receive the approver details properly via another action or inline query
+            await createPass(data);
             toast.success('Pass submitted for faculty approval');
             router.push('/student');
         } catch (error: any) {
@@ -68,14 +72,21 @@ export function StudentGuestPassForm() {
                 {/* Approver Selection */}
                 <div className="space-y-2 p-4 border rounded-md bg-slate-50">
                     <Label htmlFor="approver" className="font-semibold text-blue-800">Assign Faculty Approver *</Label>
-                    <Input
-                        id="approver"
-                        type="email"
-                        placeholder="Faculty email (e.g., professor@iitpkd.ac.in)"
-                        value={approverEmail}
-                        onChange={(e) => setApproverEmail(e.target.value)}
-                        required
-                    />
+                    <Select value={approverId} onValueChange={setApproverId} required>
+                        <SelectTrigger>
+                            <SelectValue placeholder={isLoadingAdmins ? 'Loading approvers...' : 'Select an approver'} />
+                        </SelectTrigger>
+                        <SelectContent>
+                            {admins.map((admin) => (
+                                <SelectItem key={admin.id} value={admin.id}>
+                                    {admin.name || admin.email} ({admin.email})
+                                </SelectItem>
+                            ))}
+                            {admins.length === 0 && !isLoadingAdmins && (
+                                <SelectItem value="none" disabled>No approvers available</SelectItem>
+                            )}
+                        </SelectContent>
+                    </Select>
                     <p className="text-xs text-slate-500">The assigned faculty member will receive an email to approve this pass.</p>
                 </div>
 
@@ -105,8 +116,8 @@ export function StudentGuestPassForm() {
                 </div>
 
                 <div className="space-y-2">
-                    <Label htmlFor="relation">Relation to Student</Label>
-                    <Input id="relation" name="relation" placeholder="e.g., Father, Mother, Brother" required />
+                    <Label htmlFor="visitorRelation">Relation to Student</Label>
+                    <Input id="visitorRelation" name="visitorRelation" placeholder="e.g., Father, Mother, Brother" required />
                 </div>
 
                 <div className="space-y-2">

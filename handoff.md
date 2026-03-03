@@ -89,7 +89,50 @@ Key files created:
 | Phase | Status |
 |-------|--------|
 | Phase 0 — Scaffold | ✅ Complete |
-| Phase 1 — Backend | ⏳ Ready to start |
-| Phase 2 — Frontend | ⏳ Ready to start (can run parallel with Phase 1) |
-| Phase 3 — Integration | ⏳ After 1 & 2 |
-| Phase 4 — Local Deployment | ⏳ Last |
+| Phase 1 — Backend | ✅ Complete |
+| Phase 2 — Frontend | ✅ Complete |
+| Phase 3 — Integration | ✅ Complete |
+| Phase 4 — Local Deployment | ✅ Complete |
+
+---
+
+## Phase 3 & 4 — Integration & Local Deployment
+
+In Phase 3 and Phase 4, the application was tested end-to-end to ensure that all workflows function simultaneously and efficiently on the backend.
+
+### What Was Built
+- **End-to-End Wiring**: Replaced mocked React Query API calls with actual integrated services. Verified all 5 workflows functioning correctly with real database entries.
+- **Repository Setup**: Initialized and updated all `package.json` scripts, installing required dependencies.
+- **Documentation**: Rewrote the global documentation in `README.md` to detail instructions for cloning the repo, deploying the PostgreSQL docker instance, migrating/resetting the Database, seeding mock users/data, and booting up the `localhost:3000` test server.
+- **Error Checks**: Addressed all major Next.js `useEffect` / async routing bugs and successfully passed a clean `tsc --noEmit` and `npm run build` command checks.
+
+---
+
+## Phase 2 — Frontend UI & Dashboards
+
+
+In Phase 2, we built out the complete frontend interface for the Visitor Management System using Next.js App Router, Tailwind CSS, Shadcn Components, and React Query for asynchronous data fetching.
+
+### What Was Built
+- **Authentication Pages**: Created a responsive two-column Login view featuring OAuth buttons and a fallback credentials form for Security Staff.
+- **Role-Based Layouts**: Implemented the main dashboard layout with a collapsible Next.js-aware sidebar, contextual header, and session-based navigation links.
+- **Personalized Dashboards**: Built specific overview dashboards for `/employee`, `/student`, `/official`, `/security`, and `/admin`. Each dashboard features a `StatsCards` widget dynamically fetching user-scoped statistics and a `RecentActivity` table.
+- **Pass Creation Forms**: Implemented 5 complete workflows for pass generation:
+  - Employee Guest Pass Form
+  - Official Guest Pass Form
+  - **Student Guest Pass Form** (includes faculty approver selection fields and notices).
+  - **Walk-in Pass Form** (features a live HTML5 WebRTC webcam integration so security can capture visitor photos on-site).
+  - **Student Exit Pass Form** (self-requested validation mapping to host hostels).
+- **Pass Verification & Details**:
+  - `PassDetail` view displaying full payload metadata.
+  - `PassQRCode` generator.
+  - `@media print` CSS utility and a `PassPrintLayout` component that enables physical pass generation complete with signature blocks and standard print formatting.
+- **QR Scanner & Approvals**: 
+  - Integrated `html5-qrcode` to allow Security to continuously scan passes using phone/tablet cameras. The `ScanResultModal` immediately parses backend results and allows quick "Log Entry" or "Log Exit" actions.
+  - `AdminApprovalsPage` featuring specialized `ApprovalCard` widgets for administrators or faculty to swiftly approve or reject pending requests.
+
+### Technical Achievements
+- Eliminated all static rendering export issues (like wrapping Next 15 `useSearchParams` in `<Suspense>`).
+- Completely resolved the mismatched `Promise<Params>` breaking typings from Next.js 15 Route Handlers generated in Phase 1's API middlewares.
+- Added comprehensive frontend data types that fulfill empty relations returned from Prisma limits in the mock backend schemas.
+- Completed a successful `npm run build` with zero TypeScript or edge-runtime compilation errors.

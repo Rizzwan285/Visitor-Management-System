@@ -9,11 +9,13 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from 'sonner';
 import { useCreatePass } from '@/hooks/usePasses';
+import { useState } from 'react';
 
 export function StudentExitPassForm() {
     const router = useRouter();
     const { data: session } = useSession();
     const { mutateAsync: createPass, isPending } = useCreatePass();
+    const [hostelName, setHostelName] = useState('');
 
     const studentName = session?.user?.name || 'Loading...';
 
@@ -33,12 +35,17 @@ export function StudentExitPassForm() {
             return;
         }
 
+        if (!hostelName) {
+            toast.error('Please select your hostel.');
+            return;
+        }
+
         const data = {
             passType: 'STUDENT_EXIT' as const,
-            visitorName: studentName, // Self
+            visitorName: studentName,
             visitorSex: 'OTHER' as const,
             purpose: formData.get('purpose') as string,
-            hostName: formData.get('hostelName') as string, // Misusing hostName for mapping hostel
+            hostelName,
             visitFrom: visitFrom.toISOString(),
             visitTo: visitTo.toISOString(),
         };
@@ -62,7 +69,7 @@ export function StudentExitPassForm() {
 
                 <div className="space-y-2">
                     <Label htmlFor="hostelName">Hostel</Label>
-                    <Select name="hostelName" required>
+                    <Select value={hostelName} onValueChange={setHostelName} required>
                         <SelectTrigger>
                             <SelectValue placeholder="Select your hostel" />
                         </SelectTrigger>

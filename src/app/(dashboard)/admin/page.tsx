@@ -1,24 +1,38 @@
-import { requireRole } from '@/lib/auth-utils';
+'use client';
+
 import { StatsCards } from '@/components/dashboard/StatsCards';
-import { RecentActivity } from '@/components/dashboard/RecentActivity';
+import { RecentActivity, ActivityItem } from '@/components/dashboard/RecentActivity';
 import { Activity, Users, CheckSquare, ShieldAlert } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
+import { useDashboard, AdminDashboardStats, DashboardRecentPass } from '@/hooks/useDashboard';
+import { formatDistanceToNow } from 'date-fns';
 
-export default async function AdminDashboardPage() {
-    await requireRole(['ADMIN']);
+function mapRecentToActivity(recent: DashboardRecentPass[]): ActivityItem[] {
+    return recent.map((pass) => ({
+        id: pass.id,
+        visitorName: pass.visitorName,
+        passType: pass.passType,
+        status: pass.status as ActivityItem['status'],
+        time: formatDistanceToNow(new Date(pass.createdAt), { addSuffix: true }),
+        initials: pass.visitorName.split(' ').map((n) => n[0]).join('').substring(0, 2).toUpperCase(),
+        description: `${pass.passType.replace('_', ' ')} - ${pass.purpose}`,
+    }));
+}
 
-    const mockStats = [
-        { title: 'Total Active Passes', value: '87', icon: Activity, trend: { value: 5, label: 'vs yesterday', positive: true } },
-        { title: 'Pending Approvals', value: '12', icon: CheckSquare, description: 'Requires review' },
-        { title: 'Security Scans', value: '342', icon: ShieldAlert, trend: { value: 18, label: 'vs yesterday', positive: true } },
-        { title: 'System Users', value: '1.2k', icon: Users },
+export default function AdminDashboardPage() {
+    const { data: dashData, isLoading } = useDashboard();
+
+    const stats = dashData as AdminDashboardStats | undefined;
+
+    const statsCards = [
+        { title: 'Total Active Passes', value: stats?.active ?? '-', icon: Activity },
+        { title: 'Pending Approvals', value: stats?.pendingApproval ?? '-', icon: CheckSquare, description: 'Requires review' },
+        { title: 'Security Scans Today', value: stats?.todayScans ?? '-', icon: ShieldAlert },
+        { title: 'Total Passes', value: stats?.total ?? '-', icon: Users },
     ];
 
-    const mockActivity = [
-        { id: '1', visitorName: 'Ravi Shankar', passType: 'WALKIN', status: 'ACTIVE' as const, time: '10m ago', initials: 'RS', description: 'Scanned ENTRY at Main Gate' },
-        { id: '2', visitorName: 'Lakshmi Kumar', passType: 'STUDENT_GUEST', status: 'PENDING_APPROVAL' as const, time: '12m ago', initials: 'LK', description: 'Student: Arjun Kumar' },
-    ];
+    const activityItems = stats?.recentPasses ? mapRecentToActivity(stats.recentPasses) : [];
 
     return (
         <div className="space-y-6">
@@ -40,17 +54,28 @@ export default async function AdminDashboardPage() {
                 </div>
             </div>
 
-            <StatsCards stats={mockStats} />
+            {isLoading ? (
+                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+                    {[1, 2, 3, 4].map((i) => (
+                        <div key={i} className="h-24 bg-slate-100 rounded-xl animate-pulse" />
+                    ))}
+                </div>
+            ) : (
+                <StatsCards stats={statsCards} />
+            )}
 
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-7">
                 <div className="lg:col-span-4">
-                    <RecentActivity items={mockActivity} title="System-wide Activity" />
+                    <RecentActivity items={activityItems} title="System-wide Activity" />
                 </div>
                 <div className="lg:col-span-3 space-y-6">
-                    {/* Admin specific widgets */}
                     <div className="rounded-xl border bg-card text-card-foreground shadow p-6">
                         <h3 className="font-semibold leading-none tracking-tight mb-4">Approval Queue</h3>
-                        <p className="text-sm text-slate-500 mb-4">You have 12 guest passes waiting for your approval.</p>
+                        <p className="text-sm text-slate-500 mb-4">
+                            {stats?.pendingApproval
+                                ? `You have ${stats.pendingApproval} guest pass${stats.pendingApproval !== 1 ? 'es' : ''} waiting for your approval.`
+                                : 'No pending approvals.'}
+                        </p>
                         <Link href="/admin/approvals">
                             <Button variant="secondary" className="w-full">Review Now</Button>
                         </Link>

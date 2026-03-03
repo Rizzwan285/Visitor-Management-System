@@ -3,13 +3,10 @@
 import { PassQRCode } from '@/components/passes/PassQRCode';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Separator } from '@/components/ui/separator';
 import { VisitorPassWithDetails, useCancelPass } from '@/hooks/usePasses';
-import { generateQRCodeDataURL, generateQRPayload } from '@/lib/qr';
 import { format } from 'date-fns';
 import { CalendarIcon, Clock, MapPin, Printer, UserX, Share2, Phone } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
 interface PassDetailProps {
@@ -19,24 +16,10 @@ interface PassDetailProps {
 
 export function PassDetail({ pass, role }: PassDetailProps) {
     const router = useRouter();
-    const [qrUrl, setQrUrl] = useState<string>('');
     const { mutateAsync: cancelPass, isPending: isCancelling } = useCancelPass();
 
-    useEffect(() => {
-        async function loadQR() {
-            if (pass.status === 'ACTIVE') {
-                try {
-                    // Secret is mocked for client side demo, normally generated server side
-                    const payload = generateQRPayload(pass.id);
-                    const url = await generateQRCodeDataURL(payload);
-                    setQrUrl(url);
-                } catch (e) {
-                    console.error('QR Gen Failed', e);
-                }
-            }
-        }
-        loadQR();
-    }, [pass]);
+    // Use the server-generated QR code URL (already a data URL)
+    const qrUrl = pass.qrCodeUrl || '';
 
     const handlePrint = () => {
         window.print();
@@ -56,11 +39,11 @@ export function PassDetail({ pass, role }: PassDetailProps) {
 
     const getStatusColor = (status: string) => {
         switch (status) {
-            case 'ACTIVE': return 'default'; // primary color
-            case 'PENDING_APPROVAL': return 'secondary'; // yellow-ish
-            case 'REJECTED': return 'destructive'; // red
+            case 'ACTIVE': return 'default';
+            case 'PENDING_APPROVAL': return 'secondary';
+            case 'REJECTED': return 'destructive';
             case 'CANCELLED':
-            case 'EXPIRED': return 'outline'; // grey
+            case 'EXPIRED': return 'outline';
             default: return 'outline';
         }
     };
@@ -77,6 +60,9 @@ export function PassDetail({ pass, role }: PassDetailProps) {
                         </Badge>
                     </div>
                     <p className="text-slate-500 font-medium">{pass.passType.replace('_', ' ')}</p>
+                    {pass.passNumber && (
+                        <p className="text-sm text-slate-400 font-mono mt-1">{pass.passNumber}</p>
+                    )}
                 </div>
 
                 <div className="flex gap-2 w-full md:w-auto">
@@ -109,31 +95,45 @@ export function PassDetail({ pass, role }: PassDetailProps) {
                         <h3 className="text-lg font-semibold mb-4 border-b pb-2">Pass Details</h3>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-6 gap-x-4">
                             <div>
-                                <span className="text-sm text-slate-500 block">Pass ID</span>
-                                <span className="font-medium font-mono text-sm">{pass.id.split('-')[0].toUpperCase()}</span>
+                                <span className="text-sm text-slate-500 block">Pass Number</span>
+                                <span className="font-medium font-mono text-sm">{pass.passNumber || pass.id.split('-')[0].toUpperCase()}</span>
                             </div>
 
                             <div>
                                 <span className="text-sm text-slate-500 block">Host / Point of Contact</span>
-                                <span className="font-medium">{pass.hostName || pass.createdBy?.name || 'N/A'}</span>
+                                <span className="font-medium">{pass.pointOfContact || pass.createdBy?.name || 'N/A'}</span>
                             </div>
 
                             <div>
                                 <span className="text-sm text-slate-500 block">Age & Sex</span>
-                                <span className="font-medium capitalize">{pass.visitorAge || 'N/A'} • {pass.visitorSex.toLowerCase()}</span>
+                                <span className="font-medium capitalize">{pass.visitorAge || 'N/A'} / {pass.visitorSex.toLowerCase()}</span>
                             </div>
 
-                            {pass.mobileNumber && (
+                            {pass.visitorMobile && (
                                 <div>
                                     <span className="text-sm text-slate-500 flex items-center gap-1 mb-1"><Phone className="h-3 w-3" /> Mobile Number</span>
-                                    <span className="font-medium">{pass.mobileNumber}</span>
+                                    <span className="font-medium">{pass.visitorMobile}</span>
                                 </div>
                             )}
 
-                            {pass.idType && (
+                            {pass.visitorRelation && (
+                                <div>
+                                    <span className="text-sm text-slate-500 block">Relation</span>
+                                    <span className="font-medium">{pass.visitorRelation}</span>
+                                </div>
+                            )}
+
+                            {pass.hostelName && (
+                                <div>
+                                    <span className="text-sm text-slate-500 block">Hostel</span>
+                                    <span className="font-medium">{pass.hostelName}</span>
+                                </div>
+                            )}
+
+                            {pass.visitorIdType && (
                                 <div className="sm:col-span-2">
                                     <span className="text-sm text-slate-500 block">Identity Proof</span>
-                                    <span className="font-medium">{pass.idType} - {pass.idNumber}</span>
+                                    <span className="font-medium">{pass.visitorIdType} - {pass.visitorIdNumber}</span>
                                 </div>
                             )}
 
@@ -175,9 +175,8 @@ export function PassDetail({ pass, role }: PassDetailProps) {
                             <div className="text-sm text-slate-500 py-4 italic">No scans recorded yet.</div>
                         ) : (
                             <div className="space-y-4 relative before:absolute before:inset-0 before:ml-5 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-slate-300 before:to-transparent">
-                                {/* The timeline items go here — mocked for display */}
-                                {pass.scanLogs.map((log: any, i) => (
-                                    <div key={i} className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
+                                {pass.scanLogs.map((log: any, i: number) => (
+                                    <div key={log.id || i} className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
                                         <div className="flex items-center justify-center w-10 h-10 rounded-full border border-white bg-slate-300 group-[.is-active]:bg-blue-500 text-slate-50 group-[.is-active]:text-emerald-50 shadow shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 z-10">
                                             <Clock className="h-4 w-4" />
                                         </div>
@@ -215,15 +214,15 @@ export function PassDetail({ pass, role }: PassDetailProps) {
                             <div className="text-slate-500 space-y-3">
                                 <UserX className="w-12 h-12 mx-auto text-red-500 opacity-50" />
                                 <p className="font-medium text-slate-700">Pass Inactive</p>
-                                <p className="text-sm">This pass is {pass.status.toLowerCase()}.</p>
+                                <p className="text-sm">This pass is {pass.status.toLowerCase().replace('_', ' ')}.</p>
                             </div>
                         )}
                     </div>
 
-                    {pass.photoUrl && (
+                    {pass.visitorPhotoUrl && (
                         <div className="w-full">
                             <h4 className="text-sm font-semibold mb-2">Visitor Photo</h4>
-                            <img src={pass.photoUrl} alt="Visitor" className="w-full aspect-video object-cover rounded-md border" />
+                            <img src={pass.visitorPhotoUrl} alt="Visitor" className="w-full aspect-video object-cover rounded-md border" />
                         </div>
                     )}
                 </div>

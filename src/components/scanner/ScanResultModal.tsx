@@ -6,7 +6,7 @@ import { toast } from 'sonner';
 interface ScanResultModalProps {
     isOpen: boolean;
     onClose: () => void;
-    passData: any; // Mapped from the backend verify response
+    passData: any; // The full pass object returned from GET /api/passes/verify
 }
 
 export function ScanResultModal({ isOpen, onClose, passData }: ScanResultModalProps) {
@@ -19,10 +19,10 @@ export function ScanResultModal({ isOpen, onClose, passData }: ScanResultModalPr
             await logScan.mutateAsync({
                 passId: passData.id,
                 scanType,
-                gateLocation: 'Main Gate', // Could be dynamic based on security guard's signed-in location
+                gateLocation: 'Main Gate',
             });
             toast.success(`${scanType} logged successfully for ${passData.visitorName}`);
-            onClose(); // Parent will handle resuming scanner!
+            onClose();
         } catch (err: any) {
             toast.error(err.message || `Failed to log ${scanType.toLowerCase()}`);
         }
@@ -39,17 +39,13 @@ export function ScanResultModal({ isOpen, onClose, passData }: ScanResultModalPr
 
                 <div className="flex flex-col items-center space-y-6 pt-4">
                     <div className="text-center space-y-2 w-full border-b pb-4">
-                        <div className="w-16 h-16 rounded-full mx-auto flex items-center justify-center font-bold text-2xl mb-2
-              ${isActive ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}"
-                        >
-                            {isActive ? '✓' : '✗'}
+                        <div className={`w-16 h-16 rounded-full mx-auto flex items-center justify-center font-bold text-2xl mb-2 ${isActive ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                            {isActive ? '\u2713' : '\u2717'}
                         </div>
                         <h3 className="text-xl font-bold">{passData.visitorName}</h3>
                         <p className="text-sm font-medium text-slate-500 uppercase tracking-wider">{passData.passType.replace('_', ' ')}</p>
 
-                        <div className={`inline-block px-3 py-1 rounded-full text-sm font-bold mt-2
-              ${isActive ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}
-                        >
+                        <div className={`inline-block px-3 py-1 rounded-full text-sm font-bold mt-2 ${isActive ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
                             {passData.status}
                         </div>
                     </div>
@@ -57,23 +53,23 @@ export function ScanResultModal({ isOpen, onClose, passData }: ScanResultModalPr
                     <div className="w-full grid grid-cols-2 gap-4 text-sm">
                         <div className="space-y-1">
                             <span className="text-slate-500 font-semibold block">Host / To Visit</span>
-                            <span>{passData.hostName || passData.createdBy?.name || 'N/A'}</span>
+                            <span>{passData.pointOfContact || passData.createdBy?.name || 'N/A'}</span>
                         </div>
                         <div className="space-y-1">
                             <span className="text-slate-500 font-semibold block">Purpose</span>
                             <span>{passData.purpose}</span>
                         </div>
 
-                        {passData.mobileNumber && (
+                        {passData.visitorMobile && (
                             <div className="space-y-1 col-span-2">
                                 <span className="text-slate-500 font-semibold block">Mobile</span>
-                                <span>{passData.mobileNumber}</span>
+                                <span>{passData.visitorMobile}</span>
                             </div>
                         )}
 
-                        {passData.photoUrl && (
+                        {passData.visitorPhotoUrl && (
                             <div className="col-span-2 mt-2">
-                                <img src={passData.photoUrl} alt="Visitor" className="w-full max-h-48 object-cover rounded-md border" />
+                                <img src={passData.visitorPhotoUrl} alt="Visitor" className="w-full max-h-48 object-cover rounded-md border" />
                             </div>
                         )}
                     </div>

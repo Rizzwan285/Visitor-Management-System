@@ -1,25 +1,38 @@
-import { requireRole } from '@/lib/auth-utils';
+'use client';
+
 import { StatsCards } from '@/components/dashboard/StatsCards';
-import { RecentActivity } from '@/components/dashboard/RecentActivity';
+import { RecentActivity, ActivityItem } from '@/components/dashboard/RecentActivity';
 import { FileText, Users, Clock, LogOut } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
+import { useDashboard, BaseDashboardStats, DashboardRecentPass } from '@/hooks/useDashboard';
+import { formatDistanceToNow } from 'date-fns';
 
-export default async function StudentDashboardPage() {
-    await requireRole(['STUDENT', 'ADMIN']);
+function mapRecentToActivity(recent: DashboardRecentPass[]): ActivityItem[] {
+    return recent.map((pass) => ({
+        id: pass.id,
+        visitorName: pass.visitorName,
+        passType: pass.passType,
+        status: pass.status as ActivityItem['status'],
+        time: formatDistanceToNow(new Date(pass.createdAt), { addSuffix: true }),
+        initials: pass.visitorName.split(' ').map((n) => n[0]).join('').substring(0, 2).toUpperCase(),
+        description: pass.purpose,
+    }));
+}
 
-    // Mock data mapping UI
-    const mockStats = [
-        { title: 'Active Guest Passes', value: '0', icon: Users, description: 'No active guests' },
-        { title: 'Pending Approval', value: '1', icon: Clock, description: 'Waiting for faculty' },
-        { title: 'Recent Exits', value: '2', icon: LogOut, description: 'This month' },
-        { title: 'Total Passes', value: '14', icon: FileText },
+export default function StudentDashboardPage() {
+    const { data: dashData, isLoading } = useDashboard();
+
+    const stats = dashData as BaseDashboardStats | undefined;
+
+    const statsCards = [
+        { title: 'Active Guest Passes', value: stats?.active ?? '-', icon: Users, description: stats?.active === 0 ? 'No active guests' : undefined },
+        { title: 'Pending Approval', value: stats?.pending ?? '-', icon: Clock, description: 'Waiting for faculty' },
+        { title: 'Total Passes', value: stats?.total ?? '-', icon: FileText },
+        { title: 'Recent', value: stats?.recent?.length ?? '-', icon: LogOut, description: 'Last 5 requests' },
     ];
 
-    const mockActivity = [
-        { id: '1', visitorName: 'Michael Brown (Father)', passType: 'STUDENT_GUEST', status: 'PENDING_APPROVAL' as const, time: '4h ago', initials: 'MB', description: 'Campus visit' },
-        { id: '2', visitorName: 'Self', passType: 'STUDENT_EXIT', status: 'EXPIRED' as const, time: '1w ago', initials: 'S', description: 'Weekend trip home' },
-    ];
+    const activityItems = stats?.recent ? mapRecentToActivity(stats.recent) : [];
 
     return (
         <div className="space-y-6">
@@ -38,11 +51,19 @@ export default async function StudentDashboardPage() {
                 </div>
             </div>
 
-            <StatsCards stats={mockStats} />
+            {isLoading ? (
+                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+                    {[1, 2, 3, 4].map((i) => (
+                        <div key={i} className="h-24 bg-slate-100 rounded-xl animate-pulse" />
+                    ))}
+                </div>
+            ) : (
+                <StatsCards stats={statsCards} />
+            )}
 
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-7">
                 <div className="lg:col-span-4">
-                    <RecentActivity items={mockActivity} title="My Requests" />
+                    <RecentActivity items={activityItems} title="My Requests" />
                 </div>
             </div>
         </div>

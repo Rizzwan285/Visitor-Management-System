@@ -1,18 +1,23 @@
 'use client';
 
-import { requireRole } from '@/lib/auth-utils';
 import { useApprovals } from '@/hooks/usePasses';
 import { ApprovalCard } from '@/components/passes/ApprovalCard';
 import { ClipboardList } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import type { VisitorPassWithDetails } from '@/hooks/usePasses';
 
 export default function AdminApprovalsPage() {
     const { data: approvalsData, isLoading } = useApprovals();
 
-    const approvals = approvalsData?.items || [];
+    const passes = approvalsData?.items || [];
 
-    const pendingApprovals = approvals.filter((a: any) => a.status === 'PENDING');
-    const pastApprovals = approvals.filter((a: any) => a.status !== 'PENDING');
+    // All items from the approvals query are PENDING_APPROVAL passes
+    const pendingPasses = passes.filter((p: VisitorPassWithDetails) =>
+        p.approvalRequest?.status === 'PENDING' || p.status === 'PENDING_APPROVAL'
+    );
+    const pastPasses = passes.filter((p: VisitorPassWithDetails) =>
+        p.approvalRequest?.status !== 'PENDING' && p.status !== 'PENDING_APPROVAL'
+    );
 
     return (
         <div className="max-w-5xl mx-auto space-y-6">
@@ -24,7 +29,7 @@ export default function AdminApprovalsPage() {
             <Tabs defaultValue="pending" className="w-full">
                 <TabsList className="grid w-full max-w-md grid-cols-2">
                     <TabsTrigger value="pending">
-                        Pending ({pendingApprovals.length})
+                        Pending ({pendingPasses.length})
                     </TabsTrigger>
                     <TabsTrigger value="history">History</TabsTrigger>
                 </TabsList>
@@ -32,15 +37,15 @@ export default function AdminApprovalsPage() {
                 <TabsContent value="pending" className="mt-6">
                     {isLoading ? (
                         <div className="p-12 text-center text-slate-500">Loading requests...</div>
-                    ) : pendingApprovals.length === 0 ? (
+                    ) : pendingPasses.length === 0 ? (
                         <div className="bg-white p-12 rounded-xl border border-dashed flex flex-col items-center justify-center text-slate-500 space-y-3">
                             <ClipboardList className="h-10 w-10 text-slate-300" />
                             <p>No pending approvals at the moment.</p>
                         </div>
                     ) : (
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                            {pendingApprovals.map((approval: any) => (
-                                <ApprovalCard key={approval.id} approval={approval} />
+                            {pendingPasses.map((pass: VisitorPassWithDetails) => (
+                                <ApprovalCard key={pass.id} pass={pass} />
                             ))}
                         </div>
                     )}
@@ -49,15 +54,15 @@ export default function AdminApprovalsPage() {
                 <TabsContent value="history" className="mt-6">
                     {isLoading ? (
                         <div className="p-12 text-center text-slate-500">Loading history...</div>
-                    ) : pastApprovals.length === 0 ? (
+                    ) : pastPasses.length === 0 ? (
                         <div className="bg-white p-12 rounded-xl border border-dashed flex flex-col items-center justify-center text-slate-500 space-y-3">
                             <ClipboardList className="h-10 w-10 text-slate-300" />
                             <p>No past decisions found.</p>
                         </div>
                     ) : (
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 opacity-75">
-                            {pastApprovals.map((approval: any) => (
-                                <ApprovalCard key={approval.id} approval={approval} />
+                            {pastPasses.map((pass: VisitorPassWithDetails) => (
+                                <ApprovalCard key={pass.id} pass={pass} />
                             ))}
                         </div>
                     )}

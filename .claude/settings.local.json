@@ -4,7 +4,8 @@
       "Bash(npx:*)",
       "Bash(npm install:*)",
       "Bash(timeout 15 npm run:*)",
-      "Bash(npm view:*)"
+      "Bash(npm view:*)",
+      "Bash(npm run:*)"
     ]
   }
 }
