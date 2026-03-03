@@ -5,7 +5,7 @@ import { errorResponse } from '@/types/api.types';
 
 type RouteHandler = (
     req: NextRequest,
-    context?: { params: Record<string, string> }
+    context?: any
 ) => Promise<NextResponse>;
 
 type AuthenticatedRequest = NextRequest & {
@@ -21,7 +21,7 @@ type AuthenticatedRequest = NextRequest & {
 
 type AuthenticatedHandler = (
     req: AuthenticatedRequest,
-    context?: { params: Record<string, string> }
+    context?: any
 ) => Promise<NextResponse>;
 
 /**
@@ -82,7 +82,7 @@ export function withValidation<T>(
     handler: (
         req: AuthenticatedRequest,
         validatedData: T,
-        context?: { params: Record<string, string> }
+        context?: any
     ) => Promise<NextResponse>
 ): AuthenticatedHandler {
     return async (req, context) => {

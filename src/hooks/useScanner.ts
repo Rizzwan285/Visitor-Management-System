@@ -1,0 +1,40 @@
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+
+export function useScanner() {
+    const queryClient = useQueryClient();
+
+    const verifyQR = useMutation({
+        mutationFn: async (qrData: string) => {
+            const res = await fetch(`/api/passes/verify?code=${encodeURIComponent(qrData)}`);
+            const json = await res.json();
+
+            if (!res.ok) {
+                throw new Error(json.error?.message || 'Invalid or expired QR code');
+            }
+
+            return json.data;
+        },
+    });
+
+    const logScan = useMutation({
+        mutationFn: async ({ passId, scanType, gateLocation }: { passId: string, scanType: 'ENTRY' | 'EXIT', gateLocation: string }) => {
+            const res = await fetch(`/api/passes/${passId}/scan`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ scanType, gateLocation }),
+            });
+            const json = await res.json();
+
+            if (!res.ok) {
+                throw new Error(json.error?.message || 'Failed to log scan');
+            }
+
+            return json.data;
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['passes'] });
+        },
+    });
+
+    return { verifyQR, logScan };
+}
