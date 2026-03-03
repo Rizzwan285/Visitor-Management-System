@@ -1,0 +1,207 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ─── Enums ──────────────────────────────────────────────
+
+enum Role {
+  EMPLOYEE
+  STUDENT
+  OFFICIAL
+  SECURITY
+  ADMIN
+}
+
+enum PassType {
+  EMPLOYEE_GUEST
+  OFFICIAL
+  STUDENT_GUEST
+  WALKIN
+  STUDENT_EXIT
+}
+
+enum PassStatus {
+  DRAFT
+  PENDING_APPROVAL
+  APPROVED
+  REJECTED
+  ACTIVE
+  EXPIRED
+  CANCELLED
+}
+
+enum ApprovalStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum ScanType {
+  ENTRY
+  EXIT
+}
+
+enum Sex {
+  MALE
+  FEMALE
+  OTHER
+}
+
+// ─── Models ─────────────────────────────────────────────
+
+model User {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  name         String?
+  role         Role
+  rollNumber   String?  @map("roll_number")
+  uniqueId     String?  @map("unique_id")
+  department   String?
+  passwordHash String?  @map("password_hash")
+  avatarUrl    String?  @map("avatar_url")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+  deletedAt    DateTime? @map("deleted_at")
+
+  // Relations
+  createdPasses     VisitorPass[]      @relation("CreatedPasses")
+  hostedPasses      VisitorPass[]      @relation("HostedPasses")
+  approvalRequests  ApprovalRequest[]  @relation("RequestedApprovals")
+  approvedRequests  ApprovalRequest[]  @relation("ApprovedRequests")
+  scanLogs          ScanLog[]
+  auditLogs         AuditLog[]
+
+  @@map("users")
+}
+
+model VisitorPass {
+  id                String      @id @default(uuid())
+  passNumber        String      @unique @map("pass_number")
+  passType          PassType    @map("pass_type")
+  status            PassStatus  @default(DRAFT)
+  createdById       String      @map("created_by_id")
+  visitorName       String      @map("visitor_name")
+  visitorSex        Sex         @map("visitor_sex")
+  purpose           String
+  visitFrom         DateTime    @map("visit_from")
+  visitTo           DateTime    @map("visit_to")
+  visitorRelation   String?     @map("visitor_relation")
+  visitorAge        Int?        @map("visitor_age")
+  visitorMobile     String?     @map("visitor_mobile")
+  visitorIdType     String?     @map("visitor_id_type")
+  visitorIdNumber   String?     @map("visitor_id_number")
+  visitorPhotoUrl   String?     @map("visitor_photo_url")
+  phoneConfirmedBy  String?     @map("phone_confirmed_by")
+  pointOfContact    String?     @map("point_of_contact")
+  hostelName        String?     @map("hostel_name")
+  qrCodeData        String      @map("qr_code_data")
+  qrCodeUrl         String?     @map("qr_code_url")
+  approvalRequired  Boolean     @default(false) @map("approval_required")
+  hostProfessorId   String?     @map("host_professor_id")
+  ccEmails          Json?       @default("[]") @map("cc_emails")
+  emailSentTo       Json?       @default("[]") @map("email_sent_to")
+  emailSent         Boolean     @default(false) @map("email_sent")
+  createdAt         DateTime    @default(now()) @map("created_at")
+  updatedAt         DateTime    @updatedAt @map("updated_at")
+  deletedAt         DateTime?   @map("deleted_at")
+
+  // Relations
+  createdBy       User              @relation("CreatedPasses", fields: [createdById], references: [id])
+  hostProfessor   User?             @relation("HostedPasses", fields: [hostProfessorId], references: [id])
+  approvalRequest ApprovalRequest?
+  scanLogs        ScanLog[]
+  emailLogs       EmailLog[]
+
+  @@index([passType])
+  @@index([status])
+  @@index([createdById])
+  @@index([hostProfessorId])
+  @@index([createdAt])
+  @@map("visitor_passes")
+}
+
+model ApprovalRequest {
+  id            String          @id @default(uuid())
+  passId        String          @unique @map("pass_id")
+  requestedById String          @map("requested_by_id")
+  approverId    String?         @map("approver_id")
+  status        ApprovalStatus  @default(PENDING)
+  remarks       String?
+  decidedAt     DateTime?       @map("decided_at")
+  createdAt     DateTime        @default(now()) @map("created_at")
+  updatedAt     DateTime        @updatedAt @map("updated_at")
+
+  // Relations
+  pass        VisitorPass @relation(fields: [passId], references: [id])
+  requestedBy User        @relation("RequestedApprovals", fields: [requestedById], references: [id])
+  approver    User?       @relation("ApprovedRequests", fields: [approverId], references: [id])
+
+  @@map("approval_requests")
+}
+
+model ScanLog {
+  id           String    @id @default(uuid())
+  passId       String    @map("pass_id")
+  scannedById  String    @map("scanned_by_id")
+  scanType     ScanType  @map("scan_type")
+  scannedAt    DateTime  @default(now()) @map("scanned_at")
+  gateLocation String?   @map("gate_location")
+  notes        String?
+
+  // Relations
+  pass      VisitorPass @relation(fields: [passId], references: [id])
+  scannedBy User        @relation(fields: [scannedById], references: [id])
+
+  @@index([passId])
+  @@index([scannedAt])
+  @@map("scan_logs")
+}
+
+model EmailLog {
+  id           String   @id @default(uuid())
+  passId       String   @map("pass_id")
+  toAddress    String   @map("to_address")
+  ccAddresses  Json?    @default("[]") @map("cc_addresses")
+  subject      String
+  status       String
+  errorMessage String?  @map("error_message")
+  sentAt       DateTime @default(now()) @map("sent_at")
+
+  // Relations
+  pass VisitorPass @relation(fields: [passId], references: [id])
+
+  @@map("email_logs")
+}
+
+model AuditLog {
+  id         String   @id @default(uuid())
+  userId     String?  @map("user_id")
+  action     String
+  entityType String   @map("entity_type")
+  entityId   String   @map("entity_id")
+  changes    Json?
+  ipAddress  String?  @map("ip_address")
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  // Relations
+  user User? @relation(fields: [userId], references: [id])
+
+  @@index([entityType, entityId])
+  @@index([createdAt])
+  @@map("audit_logs")
+}
+
+model FeatureFlag {
+  id          String   @id @default(uuid())
+  key         String   @unique
+  enabled     Boolean  @default(false)
+  description String?
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@map("feature_flags")
+}
