@@ -39,7 +39,7 @@ async function main() {
                         deletedAt: u.deleted_at ? new Date(u.deleted_at) : null
                     }
                 });
-            } catch (e) { console.error("Error on user", u.email, e.message); }
+            } catch (e: any) { console.error("Error on user", u.email, e.message); }
         }
     }
 
@@ -59,7 +59,7 @@ async function main() {
                         updatedAt: new Date(f.updated_at)
                     }
                 });
-            } catch (e) { console.error("Error on flag", f.key); }
+            } catch (e: any) { console.error("Error on flag", f.key); }
         }
     }
 
@@ -103,7 +103,7 @@ async function main() {
                         deletedAt: vp.deleted_at ? new Date(vp.deleted_at) : null
                     }
                 });
-            } catch (e) { console.error("Error on pass", vp.pass_number, e.message); }
+            } catch (e: any) { console.error("Error on pass", vp.pass_number, e.message); }
         }
     }
 
@@ -127,7 +127,7 @@ async function main() {
                         updatedAt: new Date(ar.updated_at)
                     }
                 });
-            } catch (e) { console.error("Error on approval req", ar.id, e.message); }
+            } catch (e: any) { console.error("Error on approval req", ar.id, e.message); }
         }
     }
 
