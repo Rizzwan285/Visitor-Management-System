@@ -86,10 +86,11 @@ Create a `.env` file referencing the structure below:
 DATABASE_URL=postgresql://user:password@host:port/dbname
 
 # NextAuth
-NEXTAUTH_URL=http://localhost:3000
+NEXTAUTH_URL=http://localhost:3000 # ⚠️ MUST be your live domain (e.g., https://app.onrender.com) in production!
 NEXTAUTH_SECRET=generate_a_strong_random_secret
 
 # Google OAuth
+# ⚠️ Your Google Cloud Console must have the exact NEXTAUTH_URL added as an Authorized Redirect URI!
 GOOGLE_CLIENT_ID=your_client_id
 GOOGLE_CLIENT_SECRET=your_client_secret
 
