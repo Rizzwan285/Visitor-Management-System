@@ -1,73 +1,120 @@
-# IIT Palakkad — Gate Security & Visitor Management System
+# Visitor Management System (VMS)
 
-## What This Is
-A full-stack web application designed for campus gate security management. It handles visitor passes, QR code scanning, multi-stage approval workflows (e.g., student exit passes and guest requests), and audit trails.
+A comprehensive, role-based Visitor Management System built for Indian Institute of Technology Palakkad (IITPKD). This application handles digital visitor passes, multi-level approvals, automated email notifications, and entry/exit QR code scanning.
 
-## Prerequisites
-- Node.js 18+
-- PostgreSQL 15+ (running locally)
-- Google Cloud project with OAuth 2.0 credentials (add `http://localhost:3000/api/auth/callback/google` as redirect URI)
+## 🌟 Key Features
 
-## Quick Start (Running Locally)
+- **Role-Based Access Control:** Distinct dashboards and permissions for Students, Employees, Officials, Security personnel, and Administrators.
+- **Pass Requests & Approvals:** Students can request guest passes, which are automatically routed to the designated Warden or Approver.
+- **Digital QR Passes:** Approved passes generate a securely crypted QR code that can be sent to visitors via email.
+- **Security Checkpoint Scanning:** Security personnel can scan QR codes at gates to register entry and exit timestamps.
+- **Real-Time Dashboards:** Instant visibility into active visitors, pending approvals, and historical logs.
+- **Automated Emails:** Integration with Resend to automatically dispatch pass status updates and QR tickets.
+- **Secure Authentication:** NextAuth integration supporting both institutional Google Workspace SSO (OAuth) and Admin credentials.
 
-1. **Clone this repo**
-2. **Install dependencies**: `npm install`
-3. **Environment Setup**: Copy `.env.example` to `.env.local` and fill in all values:
-   - `DATABASE_URL` — your PostgreSQL connection string
-   - `NEXTAUTH_SECRET` — a random 32-character string
-   - `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` — from Google Cloud
-   - `QR_HMAC_SECRET` — a random 32-character string
-4. **Run migrations**: `npm run db:migrate`
-5. **Seed the database**: `npm run db:seed`
-6. **Start the local server**: `npm run dev`
-7. **Access the application**: Open [http://localhost:3000](http://localhost:3000)
+---
 
-## Seeded Test Accounts
+## 💻 Tech Stack
 
-The following test accounts are available after running `npm run db:seed`. All use password authentication (or Google OAuth if the email matches the domain).
+- **Framework:** Next.js 14 (App Router)
+- **Language:** TypeScript
+- **Database:** PostgreSQL (Hosted on Supabase)
+- **ORM:** Prisma
+- **Styling:** Tailwind CSS & Shadcn UI
+- **Authentication:** NextAuth.js v5 (Google OAuth + Credentials)
+- **State Management:** Zustand & React Query
+- **Form Validation:** React Hook Form & Zod
+- **Email Service:** Resend
 
-| Role | Email | Password | Access |
-|------|-------|----------|--------|
-| **SECURITY** | `security@vms.local` | `security123` | Create walk-in passes, scan QR codes, monitor entries/exits |
-| **EMPLOYEE** | `employee@iitpkd.ac.in` | *(Google OAuth)* | Create employee guest passes, approve passes |
-| **STUDENT** | `student@smail.iitpkd.ac.in` | *(Google OAuth)* | Create student guest passes, request exit passes |
-| **OFFICIAL** | `official@iitpkd.ac.in` | *(Google OAuth)* | Create official guest passes |
-| **ADMIN** | `admin@iitpkd.ac.in` | *(Google OAuth)* | Full access to all dashboards and approvals |
+---
 
-> **Login Note**: The `/login` page offers Google OAuth for faculty and students, and a manual "Use Email & Password" fallback specifically for Security guards.
+## 📂 Project Directory Structure
 
-## How the Different Passes Work
+```text
+├── prisma/                  # Database schema and migrations
+├── public/                  # Static assets (fonts, images)
+├── scripts/                 # Utility scripts for DB import/export and admin management
+├── src/
+│   ├── app/                 # Next.js App Router pages and API endpoints
+│   │   ├── (auth)/          # Login routes
+│   │   ├── (dashboards)/    # Role-specific dashboard pages
+│   │   └── api/             # Backend API routes (passes, auth, scans)
+│   ├── components/          # Reusable UI components (Shadcn, generic)
+│   ├── config/              # Application configuration (domains, feature flags)
+│   ├── lib/                 # Core utilities (Prisma client, NextAuth, fetch wrappers)
+│   └── services/            # Business logic (pass creation, email templates)
+├── .env                     # Environment variables configuration
+└── package.json             # Project dependencies and scripts
+```
 
-The VMS handles specific workflows for different types of visitors:
+---
 
-- **Employee Guest Pass**: Requested by Faculty/Employees. Auto-approved by default unless the respective feature flag is restricted.
-- **Student Guest Pass**: Requested by Students for family/friends. **Requires approval** from an assigned Approver (Faculty/Admin). Once the assigned approver logs in and approves it, the pass becomes active.
-- **Official Guest Pass**: Requested by Department Officials for campus visitors (e.g., guest lecturers). Auto-approved.
-- **Walk-in Pass**: Created on the spot by Security Staff at the gate for unannounced visitors or deliveries. Includes live HTML5 webcam integration to capture guest photos.
-- **Student Exit Pass**: Requested by students leaving campus. Security scans it upon departure.
+## 🔐 Role-Based Access
 
-## Testing the QR Scanning Workflow (Security)
+The system enforces strict route protection through Next.js Middleware based on 5 roles:
 
-The core functionality is the QR scanning pipeline.
-1. Log in as an Employee or Student, create an active pass, and open the Pass Details page to view the QR Code.
-2. Open an Incognito window and log in as **Security** (`security@vms.local`).
-3. Navigate to **Scan QR** from the sidebar.
-4. Scan the QR code using a webcam, or manually enter the "Pass Number" (e.g., `VMS-20231025-XXXX`).
-5. A modal will pop up displaying the visitor's details and photo. Click **"Log Entry"** or **"Log Exit"** to record the movement in the database.
+1. **ADMIN** (`/admin`): Full system access, feature flag toggling, and environment configuration.
+2. **SECURITY** (`/security`): Access to QR scanning interfaces and live campus visitor logs.
+3. **EMPLOYEE** (`/employee`): Can instantly create pre-approved visitor passes and view their own visitor history.
+4. **STUDENT** (`/student`): Can create guest requests, which are placed in a `PENDING_APPROVAL` queue for wardens.
+5. **OFFICIAL** (`/official`): Can review, approve, or reject student pass requests.
 
-## Available Scripts
+---
 
-| Script | What it does |
-|--------|-------------|
-| `npm run dev` | Start local dev server |
-| `npm run build` | Production build |
-| `npm run lint` | Run ESLint |
-| `npm run type-check` | TypeScript check |
-| `npm run db:migrate` | Run pending migrations |
-| `npm run db:seed` | Seed test data |
-| `npm run db:reset` | Reset DB and re-migrate |
-| `npm run db:studio` | Open Prisma Studio (DB GUI) |
+## 🚀 Setup Instructions
 
-## Render Deployment Note
-To deploy this project as a Web Service on Render, ensure the root directory is empty, and use the following build command to generate the Prisma Client and migrate the production database:
-`npm install && npx prisma generate && npx prisma migrate deploy && npm run build`
+### Prerequisites
+- **Node.js**: v18 or newer
+- **PostgreSQL**: Local instance or Supabase account
+- **Google Cloud Console**: OAuth credentials configured for `localhost:3000`
+
+### 1. Clone the repository
+```bash
+git clone https://github.com/Rizzwan285/Visitor-Management-System.git
+cd Visitor-Management-System
+```
+
+### 2. Install dependencies
+```bash
+npm install
+```
+
+### 3. Environment Variables
+Create a `.env` file referencing the structure below:
+```env
+# Database
+DATABASE_URL=postgresql://user:password@host:port/dbname
+
+# NextAuth
+NEXTAUTH_URL=http://localhost:3000
+NEXTAUTH_SECRET=generate_a_strong_random_secret
+
+# Google OAuth
+GOOGLE_CLIENT_ID=your_client_id
+GOOGLE_CLIENT_SECRET=your_client_secret
+
+# Resend Mail
+RESEND_API_KEY=your_resend_hook
+EMAIL_FROM=onboarding@resend.dev
+```
+
+### 4. Database Initialization
+Push the Prisma schema to your requested database:
+```bash
+npx prisma db push
+```
+
+### 5. Start the Development Server
+```bash
+npm run dev
+```
+Navigate to `http://localhost:3000` to access the login terminal.
+
+---
+
+## 📝 Script Utilities
+
+The `scripts/` directory contains useful tools to manage database environments:
+- `set-admin-pwd.ts`: Force resets a specific user's login password.
+- `export_local_data.py`: Dumps local PostgreSQL rows into a JSON format.
+- `safe_import.ts`: Ingests the JSON dump securely into a remote Supabase instance via Prisma insertions. 

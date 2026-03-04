@@ -52,28 +52,23 @@ function LoginForm() {
         setIsCredentialsLoading(true);
 
         try {
-            // NextAuth v5 beta signIn with redirect:false returns undefined,
-            // so we call the credentials endpoint directly via fetch.
-            const csrfRes = await fetch('/api/auth/csrf');
-            const { csrfToken } = await csrfRes.json();
-
-            const res = await fetch('/api/auth/callback/credentials', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: new URLSearchParams({
-                    csrfToken,
-                    email,
-                    password,
-                }),
-                redirect: 'manual', // Don't auto-follow redirects
+            const res = await signIn('credentials', {
+                email,
+                password,
+                redirect: false,
             });
 
-            // NextAuth returns a redirect (302/307) on success, 401/200-with-error on failure
-            if (res.ok || res.type === 'opaqueredirect' || (res.status >= 300 && res.status < 400)) {
-                toast.success('Signed in successfully');
-                window.location.href = callbackUrl;
-            } else {
+            if (res?.error) {
                 toast.error('Invalid credentials. Please check your email and password.');
+            } else if (res?.ok) {
+                toast.success('Signed in successfully');
+                // Use a short timeout to let the toast render before the hard redirect
+                setTimeout(() => {
+                    window.location.href = callbackUrl;
+                }, 500);
+            } else {
+                // If res is undefined (happens in some v5 beta edge cases), let's just attempt redirect and rely on middleware
+                window.location.href = callbackUrl;
             }
         } catch (error) {
             toast.error('Authentication failed. Please try again.');

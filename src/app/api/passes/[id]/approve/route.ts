@@ -10,8 +10,10 @@ const approveSchema = z.object({
 });
 
 // Helper to extract id from context
-function getParamId(context?: { params: Record<string, string> }): string {
-    return context?.params?.id ?? '';
+async function getParamId(context?: any): Promise<string> {
+    if (!context?.params) return '';
+    const resolvedParams = await Promise.resolve(context.params);
+    return resolvedParams?.id ?? '';
 }
 
 /**
@@ -24,7 +26,7 @@ export const POST = withAuth(
         ['ADMIN'],
         withValidation(approveSchema, async (req, validatedData, context) => {
             try {
-                const passId = getParamId(context);
+                const passId = await getParamId(context);
                 const approverId = req.auth.user.id;
                 const ipAddress =
                     req.headers.get('x-forwarded-for') || undefined;
@@ -64,8 +66,8 @@ export const POST = withAuth(
                 const status = message.includes('not found')
                     ? 404
                     : message.includes('status')
-                      ? 409
-                      : 400;
+                        ? 409
+                        : 400;
                 console.error('[POST /api/passes/:id/approve]', err);
                 return NextResponse.json(
                     errorResponse('APPROVAL_ERROR', message),

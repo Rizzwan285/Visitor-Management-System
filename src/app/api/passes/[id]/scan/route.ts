@@ -6,8 +6,10 @@ import { scanInputSchema } from '@/schemas/scan.schema';
 import type { ScanType } from '@prisma/client';
 
 // Helper to extract id from context
-function getParamId(context?: { params: Record<string, string> }): string {
-    return context?.params?.id ?? '';
+async function getParamId(context?: any): Promise<string> {
+    if (!context?.params) return '';
+    const resolvedParams = await Promise.resolve(context.params);
+    return resolvedParams?.id ?? '';
 }
 
 /**
@@ -20,7 +22,7 @@ export const POST = withAuth(
         ['SECURITY'],
         withValidation(scanInputSchema, async (req, validatedData, context) => {
             try {
-                const passId = getParamId(context);
+                const passId = await getParamId(context);
                 const securityId = req.auth.user.id;
                 const ipAddress =
                     req.headers.get('x-forwarded-for') || undefined;

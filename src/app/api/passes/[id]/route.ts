@@ -20,8 +20,10 @@ const updatePassSchema = z.object({
 });
 
 // Helper to extract id from context
-function getParamId(context?: { params: Record<string, string> }): string {
-    return context?.params?.id ?? '';
+async function getParamId(context?: any): Promise<string> {
+    if (!context?.params) return '';
+    const resolvedParams = await Promise.resolve(context.params);
+    return resolvedParams?.id ?? '';
 }
 
 /**
@@ -30,7 +32,7 @@ function getParamId(context?: { params: Record<string, string> }): string {
  */
 export const GET = withAuth(async (req, context) => {
     try {
-        const id = getParamId(context);
+        const id = await getParamId(context);
         const userId = req.auth.user.id;
         const role = req.auth.user.role as Role;
 
@@ -72,7 +74,7 @@ export const GET = withAuth(async (req, context) => {
 export const PATCH = withAuth(
     withValidation(updatePassSchema, async (req, validatedData, context) => {
         try {
-            const id = getParamId(context);
+            const id = await getParamId(context);
             const userId = req.auth.user.id;
             const role = req.auth.user.role as Role;
             const ipAddress =
@@ -109,7 +111,7 @@ export const PATCH = withAuth(
  */
 export const DELETE = withAuth(async (req, context) => {
     try {
-        const id = getParamId(context);
+        const id = await getParamId(context);
         const userId = req.auth.user.id;
         const role = req.auth.user.role as Role;
         const ipAddress = req.headers.get('x-forwarded-for') || undefined;
