@@ -51,3 +51,6 @@ Walkthrough.md
 tests/Walkthrough.md
 executions_tasks.md
 SETUP_NOTES.md
+
+# Debug Logs
+logs/
