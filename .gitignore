@@ -46,3 +46,8 @@ next-env.d.ts
 # IDE & AI
 .vscode/
 .claude/
+execution_plan.md
+Walkthrough.md
+tests/Walkthrough.md
+executions_tasks.md
+SETUP_NOTES.md
