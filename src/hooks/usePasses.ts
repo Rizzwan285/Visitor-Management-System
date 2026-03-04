@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { CreatePassInput, PassFilters } from '@/types/pass.types';
-import { VisitorPass, ScanLog, ApprovalRequest, User } from '@/generated/prisma/client';
+import { VisitorPass, ScanLog, ApprovalRequest, User } from '@prisma/client';
 import { PaginatedResult, PaginationMeta } from '@/types/api.types';
 import { api } from '@/services/api';
 

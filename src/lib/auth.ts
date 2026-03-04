@@ -1,14 +1,13 @@
 import NextAuth from 'next-auth';
 import Google from 'next-auth/providers/google';
 import Credentials from 'next-auth/providers/credentials';
-import { PrismaAdapter } from '@auth/prisma-adapter';
 import bcrypt from 'bcryptjs';
 import { prisma } from '@/lib/prisma';
 import { isAllowedEmail } from '@/config/domains';
+import { authConfig } from '@/lib/auth.config';
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
-    adapter: PrismaAdapter(prisma),
-    session: { strategy: 'jwt' },
+    ...authConfig,
 
     providers: [
         Google({
@@ -48,6 +47,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     ],
 
     callbacks: {
+        ...authConfig.callbacks,
+
         async signIn({ user, account }) {
             // Credentials provider — already validated in authorize
             if (account?.provider === 'credentials') return true;
@@ -96,19 +97,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             return token;
         },
 
-        async session({ session, token }) {
-            if (session.user) {
-                (session.user as unknown as Record<string, unknown>).id = token.id;
-                (session.user as unknown as Record<string, unknown>).role = token.role;
-                (session.user as unknown as Record<string, unknown>).uniqueId = token.uniqueId;
-                (session.user as unknown as Record<string, unknown>).rollNumber = token.rollNumber;
-            }
-            return session;
-        },
-    },
-
-    pages: {
-        signIn: '/login',
-        error: '/login',
+        // session callback inherited from authConfig
     },
 });

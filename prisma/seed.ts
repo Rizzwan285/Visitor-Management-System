@@ -1,11 +1,8 @@
-import { PrismaClient, Role, PassType, PassStatus, Sex, ApprovalStatus } from '../src/generated/prisma/client';
-import { PrismaPg } from '@prisma/adapter-pg';
+import { PrismaClient, Role, PassType, PassStatus, Sex, ApprovalStatus } from '@prisma/client';
 import bcrypt from 'bcryptjs';
 import { v4 as uuidv4 } from 'uuid';
 
-const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL! });
-const prisma = new PrismaClient({ adapter });
-
+const prisma = new PrismaClient();
 function generatePassNumber(): string {
     const date = new Date().toISOString().slice(0, 10).replace(/-/g, '');
     const suffix = Math.random().toString(36).toUpperCase().slice(2, 6);
@@ -61,7 +58,7 @@ async function main() {
 
     const securityUser = await prisma.user.upsert({
         where: { email: 'security@vms.local' },
-        update: {},
+        update: { passwordHash: bcrypt.hashSync('security123', 10) },
         create: {
             id: uuidv4(),
             email: 'security@vms.local',

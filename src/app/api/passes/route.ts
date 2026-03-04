@@ -3,7 +3,7 @@ import { withAuth, withValidation } from '@/lib/api-middleware';
 import { successResponse, errorResponse } from '@/types/api.types';
 import { PassService } from '@/services/pass.service';
 import { createPassSchema, passFiltersSchema } from '@/schemas/pass.schema';
-import type { Role } from '@/generated/prisma/client';
+import type { Role } from '@prisma/client';
 
 /**
  * POST /api/passes

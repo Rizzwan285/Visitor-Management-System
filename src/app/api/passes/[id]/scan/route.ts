@@ -3,7 +3,7 @@ import { withAuth, withRole, withValidation } from '@/lib/api-middleware';
 import { successResponse, errorResponse } from '@/types/api.types';
 import { ScanService } from '@/services/scan.service';
 import { scanInputSchema } from '@/schemas/scan.schema';
-import type { ScanType } from '@/generated/prisma/client';
+import type { ScanType } from '@prisma/client';
 
 // Helper to extract id from context
 function getParamId(context?: { params: Record<string, string> }): string {

@@ -12,7 +12,7 @@ import type {
     User,
     ApprovalRequest,
     ScanLog,
-} from '@/generated/prisma/client';
+} from '@prisma/client';
 import { v4 as uuidv4 } from 'uuid';
 
 // ─── Inferred Input Types ───────────────────────────────────────

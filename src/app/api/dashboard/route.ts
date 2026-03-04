@@ -3,7 +3,7 @@ import { withAuth } from '@/lib/api-middleware';
 import { successResponse, errorResponse } from '@/types/api.types';
 import { prisma } from '@/lib/prisma';
 import { ScanService } from '@/services/scan.service';
-import type { Role } from '@/generated/prisma/client';
+import type { Role } from '@prisma/client';
 
 /**
  * GET /api/dashboard

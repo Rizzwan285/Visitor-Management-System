@@ -15,7 +15,7 @@ import {
 } from 'lucide-react';
 import { useSession } from 'next-auth/react';
 import { cn } from '@/lib/utils';
-import { Role } from '@/generated/prisma/client';
+import { Role } from '@prisma/client';
 
 // Map roles to their available navigation links
 const getNavLinks = (role: Role) => {

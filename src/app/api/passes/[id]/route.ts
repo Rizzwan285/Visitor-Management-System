@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { withAuth, withValidation } from '@/lib/api-middleware';
 import { successResponse, errorResponse } from '@/types/api.types';
 import { PassService } from '@/services/pass.service';
-import type { Role } from '@/generated/prisma/client';
+import type { Role } from '@prisma/client';
 import { z } from 'zod/v4';
 
 // Schema for PATCH body — all fields optional
@@ -93,8 +93,8 @@ export const PATCH = withAuth(
             const status = message.includes('not found')
                 ? 404
                 : message.includes('permission')
-                  ? 403
-                  : 400;
+                    ? 403
+                    : 400;
             return NextResponse.json(
                 errorResponse('UPDATE_PASS_ERROR', message),
                 { status }
@@ -123,8 +123,8 @@ export const DELETE = withAuth(async (req, context) => {
         const status = message.includes('not found')
             ? 404
             : message.includes('permission')
-              ? 403
-              : 400;
+                ? 403
+                : 400;
         return NextResponse.json(
             errorResponse('CANCEL_PASS_ERROR', message),
             { status }

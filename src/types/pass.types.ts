@@ -1,4 +1,4 @@
-import type { PassType, PassStatus, Sex } from '@/generated/prisma/client';
+import type { PassType, PassStatus, Sex } from '@prisma/client';
 
 export interface CreatePassInput {
     passType: PassType;

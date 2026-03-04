@@ -7,7 +7,7 @@ import type {
     VisitorPass,
     ApprovalRequest,
     ScanType,
-} from '@/generated/prisma/client';
+} from '@prisma/client';
 import type { PassWithRelations } from '@/services/pass.service';
 
 export type ScanLogWithRelations = ScanLog & {

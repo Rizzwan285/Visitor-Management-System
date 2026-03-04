@@ -1,9 +1,30 @@
 import { redirect } from 'next/navigation';
+import { auth } from '@/lib/auth';
 
-export default function Home() {
-  // Simple redirect from the landing page directly to the login
-  // Once the user authenticates, the Next.js middleware in Phase 0 handles 
-  // routing them to their respective role-based dashboard based on the 
-  // redirect URL or the default route.
-  redirect('/login');
+export default async function Home() {
+  const session = await auth();
+
+  // If not logged in, go to login.
+  if (!session?.user) {
+    redirect('/login');
+  }
+
+  // If logged in, automatically route to the corresponding dashboard.
+  const role = (session.user as any).role;
+
+  switch (role) {
+    case 'EMPLOYEE':
+      redirect('/employee');
+    case 'STUDENT':
+      redirect('/student');
+    case 'OFFICIAL':
+      redirect('/official');
+    case 'SECURITY':
+      redirect('/security');
+    case 'ADMIN':
+      redirect('/admin');
+    default:
+      // If no valid role is found, fallback to login
+      redirect('/login');
+  }
 }

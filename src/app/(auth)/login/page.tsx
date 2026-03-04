@@ -52,17 +52,28 @@ function LoginForm() {
         setIsCredentialsLoading(true);
 
         try {
-            const result = await signIn('credentials', {
-                email,
-                password,
-                redirect: false,
+            // NextAuth v5 beta signIn with redirect:false returns undefined,
+            // so we call the credentials endpoint directly via fetch.
+            const csrfRes = await fetch('/api/auth/csrf');
+            const { csrfToken } = await csrfRes.json();
+
+            const res = await fetch('/api/auth/callback/credentials', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: new URLSearchParams({
+                    csrfToken,
+                    email,
+                    password,
+                }),
+                redirect: 'manual', // Don't auto-follow redirects
             });
 
-            if (result?.error) {
-                toast.error('Invalid credentials. Please check your email and password.');
-            } else {
+            // NextAuth returns a redirect (302/307) on success, 401/200-with-error on failure
+            if (res.ok || res.type === 'opaqueredirect' || (res.status >= 300 && res.status < 400)) {
                 toast.success('Signed in successfully');
-                window.location.href = result?.url || callbackUrl;
+                window.location.href = callbackUrl;
+            } else {
+                toast.error('Invalid credentials. Please check your email and password.');
             }
         } catch (error) {
             toast.error('Authentication failed. Please try again.');

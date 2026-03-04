@@ -12,7 +12,7 @@ import type {
     User,
     PassType,
     PassStatus,
-} from '@/generated/prisma/client';
+} from '@prisma/client';
 
 // Full pass with relations needed for email sending
 type PassWithRelations = VisitorPass & {
