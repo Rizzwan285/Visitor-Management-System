@@ -83,14 +83,63 @@ function LoginForm() {
     }
 
     return (
-        <div className="grid gap-6">
+        <div className="flex flex-col w-full space-y-6">
+            <form onSubmit={onCredentialsSignIn} className="space-y-5">
+                <div className="space-y-1.5 text-left">
+                    <Label htmlFor="email" className="text-sm font-semibold text-slate-700">Email Address</Label>
+                    <Input
+                        id="email"
+                        type="email"
+                        placeholder="admin@iitpkd.ac.in"
+                        required
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        disabled={isCredentialsLoading || isGoogleLoading}
+                        className="h-12 border-slate-200 focus:ring-primary/20 shadow-sm transition-all"
+                    />
+                </div>
+                <div className="space-y-1.5 text-left">
+                    <Label htmlFor="password" className="text-sm font-semibold text-slate-700">Password</Label>
+                    <Input
+                        id="password"
+                        type="password"
+                        required
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        disabled={isCredentialsLoading || isGoogleLoading}
+                        className="h-12 border-slate-200 focus:ring-primary/20 shadow-sm transition-all"
+                    />
+                </div>
+                <Button
+                    type="submit"
+                    className="w-full h-12 text-base font-semibold bg-primary hover:bg-primary/90 text-white shadow-md transition-all mt-2"
+                    disabled={isCredentialsLoading || isGoogleLoading}
+                >
+                    {isCredentialsLoading ? (
+                        <span className="animate-spin inline-block w-4 h-4 border-2 border-current border-t-transparent rounded-full mr-2" />
+                    ) : null}
+                    Sign In
+                </Button>
+            </form>
+
+            <div className="relative py-2">
+                <div className="absolute inset-0 flex items-center">
+                    <Separator className="w-full bg-slate-200" />
+                </div>
+                <div className="relative flex justify-center text-xs uppercase">
+                    <span className="bg-white px-4 text-slate-500 font-semibold tracking-wider">
+                        Or continue with
+                    </span>
+                </div>
+            </div>
+
             {/* Google OAuth Button */}
             <Button
                 variant="outline"
                 type="button"
                 disabled={isGoogleLoading || isCredentialsLoading}
                 onClick={onGoogleSignIn}
-                className="w-full h-12 text-base font-normal flex items-center justify-center gap-2"
+                className="w-full h-12 text-base font-semibold bg-white flex items-center justify-center gap-3 border border-slate-200 hover:bg-slate-50 hover:text-slate-900 shadow-sm transition-all"
             >
                 {isGoogleLoading ? (
                     <span className="animate-spin inline-block w-4 h-4 border-2 border-current border-t-transparent rounded-full" />
@@ -115,79 +164,15 @@ function LoginForm() {
                         <path d="M1 1h22v22H1z" fill="none" />
                     </svg>
                 )}
-                Sign in with Google
+                Google
             </Button>
-
-            <div className="relative">
-                <div className="absolute inset-0 flex items-center">
-                    <Separator className="w-full" />
-                </div>
-                <div className="relative flex justify-center text-xs uppercase">
-                    <span className="bg-slate-50 px-2 text-slate-500">
-                        For Security Staff
-                    </span>
-                </div>
-            </div>
-
-            {/* Security Staff Credentials Form */}
-            {!showCredentials ? (
-                <Button
-                    variant="secondary"
-                    className="w-full h-12"
-                    onClick={() => setShowCredentials(true)}
-                >
-                    Use Email & Password
-                </Button>
-            ) : (
-                <Card className="border-slate-200">
-                    <CardContent className="pt-6">
-                        <form onSubmit={onCredentialsSignIn} className="space-y-4">
-                            <div className="space-y-2">
-                                <Label htmlFor="email">Email address</Label>
-                                <Input
-                                    id="email"
-                                    type="email"
-                                    placeholder="security@vms.local"
-                                    required
-                                    value={email}
-                                    onChange={(e) => setEmail(e.target.value)}
-                                    disabled={isCredentialsLoading || isGoogleLoading}
-                                />
-                            </div>
-                            <div className="space-y-2">
-                                <div className="flex items-center justify-between">
-                                    <Label htmlFor="password">Password</Label>
-                                </div>
-                                <Input
-                                    id="password"
-                                    type="password"
-                                    required
-                                    value={password}
-                                    onChange={(e) => setPassword(e.target.value)}
-                                    disabled={isCredentialsLoading || isGoogleLoading}
-                                />
-                            </div>
-                            <Button
-                                type="submit"
-                                className="w-full"
-                                disabled={isCredentialsLoading || isGoogleLoading}
-                            >
-                                {isCredentialsLoading ? (
-                                    <span className="animate-spin inline-block w-4 h-4 border-2 border-current border-t-transparent rounded-full mr-2" />
-                                ) : null}
-                                Sign In
-                            </Button>
-                        </form>
-                    </CardContent>
-                </Card>
-            )}
         </div>
     );
 }
 
 export default function LoginPage() {
     return (
-        <Suspense fallback={<div className="p-12 text-center text-slate-500">Loading secure sign in...</div>}>
+        <Suspense fallback={<div className="p-12 text-center text-slate-500 animate-pulse">Loading secure sign in...</div>}>
             <LoginForm />
         </Suspense>
     );

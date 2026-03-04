@@ -1,39 +1,33 @@
 import { ReactNode } from 'react';
+import Image from 'next/image';
 
 export default function AuthLayout({ children }: { children: ReactNode }) {
     return (
-        <div className="min-h-screen grid lg:grid-cols-2 bg-slate-50">
-            {/* Left Panel: Branding (hidden on mobile, shown on large screens) */}
-            <div className="hidden lg:flex flex-col justify-center items-center bg-slate-900 text-white p-12">
-                <div className="max-w-md text-center space-y-6">
-                    <div className="w-32 h-32 bg-slate-800 rounded-full mx-auto flex items-center justify-center mb-8">
-                        {/* Placeholder for IIT Palakkad Logo */}
-                        <span className="text-4xl font-bold tracking-tighter">VMS</span>
-                    </div>
-                    <h1 className="text-4xl font-bold tracking-tight">
-                        IIT Palakkad
-                    </h1>
-                    <p className="text-xl text-slate-300">
-                        Campus Security & Visitor Management System
-                    </p>
-                    <div className="pt-8 border-t border-slate-800 mt-8">
-                        <p className="text-sm text-slate-400">
-                            Streamlining campus access, ensuring safety, and managing visitor records effortlessly.
-                        </p>
-                    </div>
-                </div>
-            </div>
+        <div className="min-h-screen flex items-center justify-center bg-slate-50 p-4 sm:p-8">
+            <div className="w-full max-w-md bg-white rounded-2xl shadow-xl border border-slate-100 overflow-hidden">
 
-            {/* Right Panel: Auth Form */}
-            <div className="flex flex-col justify-center items-center p-8 sm:p-12 lg:p-16">
-                <div className="w-full max-w-[400px] flex flex-col justify-center space-y-6">
-                    <div className="flex flex-col space-y-2 text-center lg:text-left">
-                        <h1 className="text-3xl font-semibold tracking-tight">Welcome back</h1>
-                        <p className="text-sm text-slate-500">
-                            Please sign in to your role-based dashboard
-                        </p>
+                {/* Branding Header Area - Clean Fedena Style */}
+                <div className="bg-white px-8 pt-8 pb-5 flex flex-col items-center justify-center text-center relative border-b border-slate-100">
+                    <div className="relative z-10 w-64 h-24 flex items-center justify-center mb-2">
+                        <div className="relative w-full h-full flex items-center justify-center">
+                            <Image src="/logo.jpg" alt="IIT Palakkad Logo" fill className="object-contain" priority />
+                        </div>
                     </div>
+                    <h2 className="text-xs sm:text-sm font-medium tracking-wider text-slate-500 uppercase mt-1">
+                        Campus Security & Visitor Management
+                    </h2>
+                </div>
+
+                {/* Content Area */}
+                <div className="p-8 sm:p-10 pt-6">
                     {children}
+                </div>
+
+                {/* Footer Area */}
+                <div className="bg-slate-50 px-8 py-4 border-t border-slate-200 text-center">
+                    <p className="text-xs text-slate-500">
+                        Nurturing Minds For a Better World
+                    </p>
                 </div>
             </div>
         </div>
