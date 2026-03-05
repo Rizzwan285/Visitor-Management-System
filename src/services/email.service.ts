@@ -54,10 +54,14 @@ async function sendAndLog(params: {
             console.log(`[EmailService][STUB] Would send to: ${params.to}, subject: ${params.subject}`);
             result = { success: true, messageId: 'stub' };
         } else {
+            // DEV OVERRIDE: Send to verified admin email instead of unverified student email for Resend free tier compatibility
+            const devFallbackEmail = 'muhamed.rizwan2005@gmail.com';
+            console.log(`[EmailService] DEV MODE: Rerouting email intended for ${params.to} -> ${devFallbackEmail}`);
+
             const response = await resend.emails.send({
                 from: emailConfig.from,
-                to: params.to,
-                cc: params.cc?.length ? params.cc : undefined,
+                to: devFallbackEmail,
+                cc: params.cc?.length ? [devFallbackEmail] : undefined, // Also overwrite CC to prevent Sandbox rejections on CC array
                 subject: params.subject,
                 html: params.html,
             });

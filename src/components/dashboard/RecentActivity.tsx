@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -11,6 +12,7 @@ export interface ActivityItem {
     initials: string;
     avatarUrl?: string;
     description: string;
+    href?: string;
 }
 
 interface RecentActivityProps {
@@ -31,37 +33,49 @@ export function RecentActivity({ items, title = 'Recent Passes' }: RecentActivit
                     </div>
                 ) : (
                     <div className="space-y-6">
-                        {items.map((item) => (
-                            <div key={item.id} className="flex items-center">
-                                <Avatar className="h-9 w-9">
-                                    <AvatarImage src={item.avatarUrl} alt={item.visitorName} />
-                                    <AvatarFallback>{item.initials}</AvatarFallback>
-                                </Avatar>
-                                <div className="ml-4 space-y-1 overflow-hidden">
-                                    <p className="text-sm font-medium leading-none truncate pr-2">
-                                        {item.visitorName}
-                                    </p>
-                                    <p className="text-sm text-slate-500 truncate pr-2">
-                                        {item.description}
-                                    </p>
-                                </div>
-                                <div className="ml-auto flex flex-col items-end gap-1">
-                                    <Badge
-                                        variant={
-                                            item.status === 'ACTIVE' ? 'default' :
-                                                item.status === 'PENDING_APPROVAL' ? 'secondary' :
-                                                    item.status === 'REJECTED' ? 'destructive' : 'outline'
-                                        }
-                                        className="text-[10px] px-1.5 py-0 h-4"
-                                    >
-                                        {item.status.replace('_', ' ')}
-                                    </Badge>
-                                    <div className="text-xs text-slate-400">
-                                        {item.time}
+                        {items.map((item) => {
+                            const content = (
+                                <div className="flex items-center">
+                                    <Avatar className="h-9 w-9">
+                                        <AvatarImage src={item.avatarUrl} alt={item.visitorName} />
+                                        <AvatarFallback>{item.initials}</AvatarFallback>
+                                    </Avatar>
+                                    <div className="ml-4 space-y-1 overflow-hidden">
+                                        <p className="text-sm font-medium leading-none truncate pr-2">
+                                            {item.visitorName}
+                                        </p>
+                                        <p className="text-sm text-slate-500 truncate pr-2">
+                                            {item.description}
+                                        </p>
+                                    </div>
+                                    <div className="ml-auto flex flex-col items-end gap-1">
+                                        <Badge
+                                            variant={
+                                                item.status === 'ACTIVE' ? 'default' :
+                                                    item.status === 'PENDING_APPROVAL' ? 'secondary' :
+                                                        item.status === 'REJECTED' ? 'destructive' : 'outline'
+                                            }
+                                            className="text-[10px] px-1.5 py-0 h-4"
+                                        >
+                                            {item.status.replace('_', ' ')}
+                                        </Badge>
+                                        <div className="text-xs text-slate-400">
+                                            {item.time}
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                        ))}
+                            );
+
+                            return item.href ? (
+                                <Link key={item.id} href={item.href} className="block hover:bg-slate-50 p-2 -mx-2 rounded-md transition-colors">
+                                    {content}
+                                </Link>
+                            ) : (
+                                <div key={item.id} className="p-2 -mx-2">
+                                    {content}
+                                </div>
+                            );
+                        })}
                     </div>
                 )}
             </CardContent>

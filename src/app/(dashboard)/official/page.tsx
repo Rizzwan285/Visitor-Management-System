@@ -17,6 +17,7 @@ function mapRecentToActivity(recent: DashboardRecentPass[]): ActivityItem[] {
         time: formatDistanceToNow(new Date(pass.createdAt), { addSuffix: true }),
         initials: pass.visitorName.split(' ').map((n) => n[0]).join('').substring(0, 2).toUpperCase(),
         description: pass.purpose,
+        href: `/official/passes/${pass.id}`,
     }));
 }
 

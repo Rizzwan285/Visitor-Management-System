@@ -61,3 +61,4 @@ logs/
 !tsconfig.json
 *.txt
 !README.md
+*.log
