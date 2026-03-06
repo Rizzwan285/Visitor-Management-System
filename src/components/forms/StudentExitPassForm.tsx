@@ -74,12 +74,11 @@ export function StudentExitPassForm() {
                             <SelectValue placeholder="Select your hostel" />
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectItem value="Gargi">Gargi</SelectItem>
-                            <SelectItem value="Maitreyi">Maitreyi</SelectItem>
-                            <SelectItem value="Bhrigu">Bhrigu</SelectItem>
-                            <SelectItem value="Charaka">Charaka</SelectItem>
-                            <SelectItem value="Sushruta">Sushruta</SelectItem>
-                            <SelectItem value="Gautama">Gautama</SelectItem>
+                            <SelectItem value="Malhar">Malhar</SelectItem>
+                            <SelectItem value="Saveri">Saveri</SelectItem>
+                            <SelectItem value="Tilang A">Tilang A</SelectItem>
+                            <SelectItem value="Tilang B">Tilang B</SelectItem>
+                            <SelectItem value="Brindavani">Brindavani</SelectItem>
                         </SelectContent>
                     </Select>
                 </div>
