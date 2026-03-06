@@ -4,27 +4,33 @@ import bcrypt from 'bcryptjs';
 const prisma = new PrismaClient();
 
 async function main() {
-    const adminEmail = 'admin@iitpkd.ac.in';
-    const password = 'admin123';
+    const password = 'password123';
     const hash = await bcrypt.hash(password, 10);
 
-    const user = await prisma.user.findUnique({
-        where: { email: adminEmail }
-    });
-
-    if (!user) {
-        console.error(`❌ Admin user with email ${adminEmail} not found! Please run "npm run db:seed" first.`);
-        return;
+    // 1. Update security@vms.local to security@iitpkd.ac.in
+    try {
+        await prisma.user.update({
+            where: { email: 'security@vms.local' },
+            data: { email: 'security@iitpkd.ac.in' }
+        });
+        console.log('✅ Updated security email to security@iitpkd.ac.in');
+    } catch (e) {
+        console.log('⚠️ Could not update security@vms.local (might not exist or already updated)');
     }
 
-    await prisma.user.update({
-        where: { email: adminEmail },
-        data: { passwordHash: hash }
+    // 2. Set password for all except specified
+    const excludedEmails = ['muhamed.rizwan2005@gmail.com', '142301026@smail.iitpkd.ac.in'];
+
+    const result = await prisma.user.updateMany({
+        where: {
+            email: { notIn: excludedEmails }
+        },
+        data: {
+            passwordHash: hash
+        }
     });
 
-    console.log(`✅ Admin password updated successfully for ${adminEmail}!`);
-    console.log(`🔑 New Password: ${password}`);
-    console.log(`🌐 You can now login at /login using "Email & Password" option.`);
+    console.log(`✅ Updated passwords to "${password}" for ${result.count} users (skipped excluded emails).`);
 }
 
 main()

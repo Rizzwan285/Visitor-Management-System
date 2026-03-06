@@ -57,11 +57,11 @@ async function main() {
     console.log(`  ✓ Official: ${officialUser.email}`);
 
     const securityUser = await prisma.user.upsert({
-        where: { email: 'security@vms.local' },
+        where: { email: 'security@iitpkd.ac.in' },
         update: { passwordHash: bcrypt.hashSync('security123', 10) },
         create: {
             id: uuidv4(),
-            email: 'security@vms.local',
+            email: 'security@iitpkd.ac.in',
             name: 'Gate Security',
             role: Role.SECURITY,
             uniqueId: '1000000004',
