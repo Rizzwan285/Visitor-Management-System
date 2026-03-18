@@ -2,6 +2,7 @@
 
 import { StatsCards } from '@/components/dashboard/StatsCards';
 import { RecentActivity, ActivityItem } from '@/components/dashboard/RecentActivity';
+import { OverstayerAlerts } from '@/components/dashboard/OverstayerAlerts';
 import { FileText, ScanLine, UserPlus, Users } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
@@ -58,6 +59,8 @@ export default function SecurityDashboardPage() {
                     </Link>
                 </div>
             </div>
+            
+            <OverstayerAlerts />
 
             {isLoading ? (
                 <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">

@@ -14,7 +14,7 @@ export function ScanResultModal({ isOpen, onClose, passData }: ScanResultModalPr
 
     if (!passData) return null;
 
-    const handleLogScan = async (scanType: 'ENTRY' | 'EXIT') => {
+    const handleLogScan = async (scanType: 'ENTRY' | 'INTERMEDIATE_EXIT' | 'EXIT') => {
         try {
             await logScan.mutateAsync({
                 passId: passData.id,
@@ -75,13 +75,18 @@ export function ScanResultModal({ isOpen, onClose, passData }: ScanResultModalPr
                     </div>
 
                     {isActive ? (
-                        <div className="w-full grid grid-cols-2 gap-4 pt-4 border-t">
+                        <div className="w-full grid grid-cols-1 gap-3 pt-4 border-t">
                             <Button onClick={() => handleLogScan('ENTRY')} className="w-full bg-blue-600 hover:bg-blue-700" size="lg" disabled={logScan.isPending}>
                                 Log Entry
                             </Button>
-                            <Button onClick={() => handleLogScan('EXIT')} className="w-full bg-slate-800 hover:bg-slate-900" size="lg" disabled={logScan.isPending}>
-                                Log Exit
-                            </Button>
+                            <div className="grid grid-cols-2 gap-3">
+                                <Button onClick={() => handleLogScan('INTERMEDIATE_EXIT')} className="w-full bg-orange-500 hover:bg-orange-600" size="lg" disabled={logScan.isPending}>
+                                    Intermediate Exit
+                                </Button>
+                                <Button onClick={() => handleLogScan('EXIT')} className="w-full bg-slate-800 hover:bg-slate-900" size="lg" disabled={logScan.isPending}>
+                                    Final Exit
+                                </Button>
+                            </div>
                         </div>
                     ) : (
                         <div className="w-full pt-4 border-t px-2 text-center text-red-600 font-medium">

@@ -96,9 +96,16 @@ export const ScanService = {
             },
         })) as ScanLogWithRelations;
 
+        if (scanType === 'EXIT') {
+            await prisma.visitorPass.update({
+                where: { id: passId },
+                data: { status: 'EXPIRED' }
+            });
+        }
+
         void AuditService.log({
             userId: securityId,
-            action: scanType === 'ENTRY' ? 'SCAN_ENTRY' : 'SCAN_EXIT',
+            action: (scanType as string) === 'ENTRY' ? 'SCAN_ENTRY' : (scanType as string) === 'INTERMEDIATE_EXIT' ? 'SCAN_INTERMEDIATE_EXIT' : 'SCAN_EXIT',
             entityType: 'ScanLog',
             entityId: scanLog.id,
             changes: { passId, scanType, gateLocation },

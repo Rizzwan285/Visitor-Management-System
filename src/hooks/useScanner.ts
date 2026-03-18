@@ -17,7 +17,7 @@ export function useScanner() {
     });
 
     const logScan = useMutation({
-        mutationFn: async ({ passId, scanType, gateLocation }: { passId: string, scanType: 'ENTRY' | 'EXIT', gateLocation: string }) => {
+        mutationFn: async ({ passId, scanType, gateLocation }: { passId: string, scanType: 'ENTRY' | 'INTERMEDIATE_EXIT' | 'EXIT', gateLocation: string }) => {
             const res = await fetch(`/api/passes/${passId}/scan`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
