@@ -55,7 +55,7 @@ async function sendAndLog(params: {
             result = { success: true, messageId: 'stub' };
         } else {
             // DEV OVERRIDE: Send to verified admin email instead of unverified student email for Resend free tier compatibility
-            const devFallbackEmail = 'muhamed.rizwan2005@gmail.com';
+            const devFallbackEmail = 'student.iitpkd01@gmail.com';
             console.log(`[EmailService] DEV MODE: Rerouting email intended for ${params.to} -> ${devFallbackEmail}`);
 
             const response = await resend.emails.send({

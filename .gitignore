@@ -62,3 +62,10 @@ logs/
 *.txt
 !README.md
 *.log
+
+# Administration & password scripts
+set-admin-pwd.ts
+update-pwd.ts
+scripts/set_muhamed_admin.ts
+scripts/migrate_admin.ts
+scripts/set_specific_pwd.ts
