@@ -98,6 +98,7 @@ model VisitorPass {
   visitorPhotoUrl   String?     @map("visitor_photo_url")
   phoneConfirmedBy  String?     @map("phone_confirmed_by")
   pointOfContact    String?     @map("point_of_contact")
+  pocMobile         String?     @map("poc_mobile")
   hostelName        String?     @map("hostel_name")
   qrCodeData        String      @map("qr_code_data")
   qrCodeUrl         String?     @map("qr_code_url")

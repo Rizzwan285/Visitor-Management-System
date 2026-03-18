@@ -39,6 +39,7 @@ const walkinPassObject = z.object({
     visitorIdNumber: z.string().min(1, 'ID number is required'),
     visitorPhotoUrl: z.string().optional(),
     pointOfContact: z.string().min(1, 'Point of contact is required'),
+    pocMobile: z.string().regex(/^\d{10}$/, 'Mobile must be 10 digits'),
     phoneConfirmedBy: z.string().min(1, 'Phone confirmation is required'),
 });
 

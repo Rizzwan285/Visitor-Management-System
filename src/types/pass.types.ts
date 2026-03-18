@@ -29,6 +29,7 @@ export interface UpdatePassInput {
     visitorAge?: number;
     visitorMobile?: string;
     pointOfContact?: string;
+    pocMobile?: string;
     hostelName?: string;
 }
 

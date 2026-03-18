@@ -30,6 +30,7 @@ export type CreatePassInput = {
     visitorIdNumber?: string;
     visitorPhotoUrl?: string;
     pointOfContact?: string;
+    pocMobile?: string;
     phoneConfirmedBy?: string;
     hostelName?: string;
     approverId?: string;
@@ -196,6 +197,7 @@ export const PassService = {
                           visitorIdNumber: (parsed as { visitorIdNumber?: string }).visitorIdNumber ?? null,
                           visitorPhotoUrl: (parsed as { visitorPhotoUrl?: string }).visitorPhotoUrl ?? null,
                           pointOfContact: (parsed as { pointOfContact?: string }).pointOfContact ?? null,
+                          pocMobile: (parsed as { pocMobile?: string }).pocMobile ?? null,
                           phoneConfirmedBy: (parsed as { phoneConfirmedBy?: string }).phoneConfirmedBy ?? null,
                       }
                     : {};

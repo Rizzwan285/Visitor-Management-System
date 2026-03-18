@@ -106,6 +106,7 @@ export function WalkinPassForm() {
             visitorIdType: idType,
             visitorIdNumber: formData.get('visitorIdNumber') as string,
             pointOfContact: formData.get('pointOfContact') as string,
+            pocMobile: formData.get('pocMobile') as string,
             phoneConfirmedBy: formData.get('phoneConfirmedBy') as string,
             visitorPhotoUrl: uploadedPhotoUrl,
             visitFrom: new Date(formData.get('visitFrom') as string).toISOString(),
@@ -235,6 +236,11 @@ export function WalkinPassForm() {
                     </div>
 
                     <div className="space-y-2">
+                        <Label htmlFor="pocMobile">POC Mobile Number</Label>
+                        <Input id="pocMobile" name="pocMobile" type="tel" pattern="[0-9]{10}" placeholder="10-digit number" required />
+                    </div>
+
+                    <div className="space-y-2 col-span-1 md:col-span-2">
                         <Label htmlFor="phoneConfirmedBy">Phone Confirmed By</Label>
                         <Input id="phoneConfirmedBy" name="phoneConfirmedBy" placeholder="Name of person who confirmed by phone" required />
                     </div>

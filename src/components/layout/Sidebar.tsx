@@ -11,7 +11,8 @@ import {
     ScanLine,
     UserPlus,
     ListChecks,
-    History
+    History,
+    BarChart3
 } from 'lucide-react';
 import { useSession } from 'next-auth/react';
 import { cn } from '@/lib/utils';
@@ -55,7 +56,8 @@ const getNavLinks = (role: Role) => {
                 { title: 'Dashboard', href: '/admin', icon: LayoutDashboard },
                 { title: 'All Passes', href: '/admin/passes', icon: FileText },
                 { title: 'Approvals', href: '/admin/approvals', icon: ListChecks },
-                { title: 'Scan Logs', href: '/admin/logs', icon: History }
+                { title: 'Scan Logs', href: '/admin/logs', icon: History },
+                { title: 'Reports', href: '/admin/reports', icon: BarChart3 }
             );
             break;
     }
