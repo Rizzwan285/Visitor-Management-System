@@ -125,7 +125,7 @@ export const EmailService = {
                         visitFrom: new Date(pass.visitFrom).toLocaleString(),
                         visitTo: new Date(pass.visitTo).toLocaleString(),
                         hostName: pass.createdBy.name || pass.createdBy.email,
-                        qrCodeUrl: pass.qrCodeUrl ?? undefined,
+                        qrCodeUrl: `${baseUrl}/api/passes/${pass.id}/qr`,
                     });
 
                     await sendAndLog({
@@ -146,7 +146,7 @@ export const EmailService = {
                         visitFrom: new Date(pass.visitFrom).toLocaleString(),
                         visitTo: new Date(pass.visitTo).toLocaleString(),
                         hostName: pass.createdBy.name || pass.createdBy.email,
-                        qrCodeUrl: pass.qrCodeUrl ?? undefined,
+                        qrCodeUrl: `${baseUrl}/api/passes/${pass.id}/qr`,
                         ccDeptHeads: emailConfig.deptHeadEmails,
                     });
 
@@ -172,7 +172,7 @@ export const EmailService = {
                         visitFrom: new Date(pass.visitFrom).toLocaleString(),
                         visitTo: new Date(pass.visitTo).toLocaleString(),
                         status: status === 'PENDING_APPROVAL' ? 'PENDING_APPROVAL' : 'ACTIVE',
-                        qrCodeUrl: pass.qrCodeUrl ?? undefined,
+                        qrCodeUrl: `${baseUrl}/api/passes/${pass.id}/qr`,
                     });
 
                     const cc: string[] = [];
@@ -204,7 +204,7 @@ export const EmailService = {
                         purpose: pass.purpose,
                         exitDate: new Date(pass.visitFrom).toLocaleString(),
                         returnDate: new Date(pass.visitTo).toLocaleString(),
-                        qrCodeUrl: pass.qrCodeUrl ?? undefined,
+                        qrCodeUrl: `${baseUrl}/api/passes/${pass.id}/qr`,
                     });
 
                     const cc: string[] = [];
