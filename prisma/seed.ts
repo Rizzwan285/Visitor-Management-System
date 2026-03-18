@@ -12,6 +12,11 @@ function generatePassNumber(): string {
 async function main() {
     console.log('🌱 Seeding database...');
 
+    const securityPassword = process.env.VMS_SCRIPT_PASSWORD;
+    if (!securityPassword) {
+        throw new Error('VMS_SCRIPT_PASSWORD environment variable is required for seeding.');
+    }
+
     // ─── Users (one per role) ─────────────────────────
 
     const employeeUser = await prisma.user.upsert({
@@ -58,14 +63,14 @@ async function main() {
 
     const securityUser = await prisma.user.upsert({
         where: { email: 'security@iitpkd.ac.in' },
-        update: { passwordHash: bcrypt.hashSync('security123', 10) },
+        update: { passwordHash: bcrypt.hashSync(securityPassword, 10) },
         create: {
             id: uuidv4(),
             email: 'security@iitpkd.ac.in',
             name: 'Gate Security',
             role: Role.SECURITY,
             uniqueId: '1000000004',
-            passwordHash: bcrypt.hashSync('security123', 10),
+            passwordHash: bcrypt.hashSync(securityPassword, 10),
         },
     });
     console.log(`  ✓ Security: ${securityUser.email}`);

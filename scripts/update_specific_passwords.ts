@@ -13,7 +13,10 @@ async function main() {
     }
 
     const excludedEmail = '142301026@smail.iitpkd.ac.in';
-    const newPassword = 'admin123';
+    const newPassword = process.env.VMS_SCRIPT_PASSWORD;
+    if (!newPassword) {
+        throw new Error('VMS_SCRIPT_PASSWORD environment variable is required.');
+    }
     const hash = await bcrypt.hash(newPassword, 10);
 
     let updatedCount = 0;

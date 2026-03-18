@@ -14,8 +14,11 @@ async function main() {
 
     console.log(`Found ${users.length} users. Updating passwords...`);
 
-    // We will set everyone's password to 'password123'
-    const defaultPassword = 'password123';
+    // We will set everyone's password using the env variable
+    const defaultPassword = process.env.VMS_SCRIPT_PASSWORD;
+    if (!defaultPassword) {
+        throw new Error('VMS_SCRIPT_PASSWORD environment variable is required.');
+    }
     const hash = await bcrypt.hash(defaultPassword, 10);
 
     let updatedCount = 0;

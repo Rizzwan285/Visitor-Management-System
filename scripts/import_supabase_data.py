@@ -3,8 +3,9 @@ import json
 import psycopg2
 from psycopg2.extras import execute_values
 
-# Hardcoded Supabase URL for import execution
-SUPABASE_URL = "postgresql://postgres:Rizwan2458!!@db.tcttlpzwqwnqeewuaqhf.supabase.co:5432/postgres"
+SUPABASE_URL = os.environ.get("DATABASE_URL")
+if not SUPABASE_URL:
+    raise ValueError("DATABASE_URL environment variable is required")
 
 def main():
     print(f"Connecting to Supabase...")
