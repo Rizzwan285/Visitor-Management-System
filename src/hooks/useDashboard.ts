@@ -61,3 +61,27 @@ export function useDashboard() {
         refetchInterval: 30000, // Refresh every 30 seconds
     });
 }
+
+export interface OverstayingPass {
+    id: string;
+    passNumber: string;
+    visitorName: string;
+    passType: string;
+    visitorMobile: string | null;
+    pocMobile: string | null;
+    pointOfContact: string | null;
+    visitTo: string;
+}
+
+/**
+ * Fetches overstaying visitors from GET /api/dashboard/overstaying.
+ */
+export function useOverstayingAlerts() {
+    return useQuery({
+        queryKey: ['overstaying-alerts'],
+        queryFn: async () => {
+            return api.get<OverstayingPass[]>('/api/dashboard/overstaying');
+        },
+        refetchInterval: 30000, // Refresh every 30 seconds
+    });
+}

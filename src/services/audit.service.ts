@@ -8,8 +8,9 @@ export type AuditAction =
     | 'PASS_APPROVED'
     | 'PASS_REJECTED'
     | 'SCAN_ENTRY'
-    | 'SCAN_INTERMEDIATE_EXIT'
     | 'SCAN_EXIT'
+    | 'SCAN_INTERMEDIATE_EXIT'
+    | 'SCAN_FINAL_EXIT'
     | 'USER_LOGIN';
 
 interface LogParams {

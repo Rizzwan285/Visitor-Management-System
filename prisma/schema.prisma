@@ -44,7 +44,7 @@ enum ApprovalStatus {
 enum ScanType {
   ENTRY
   INTERMEDIATE_EXIT
-  EXIT
+  FINAL_EXIT
 }
 
 enum Sex {

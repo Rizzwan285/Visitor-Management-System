@@ -96,16 +96,18 @@ export const ScanService = {
             },
         })) as ScanLogWithRelations;
 
-        if (scanType === 'EXIT') {
+        if (scanType === 'FINAL_EXIT') {
             await prisma.visitorPass.update({
                 where: { id: passId },
                 data: { status: 'EXPIRED' }
             });
+            // Also update the in-memory returned pass object so UI reflects it immediately
+            scanLog.pass.status = 'EXPIRED';
         }
 
         void AuditService.log({
             userId: securityId,
-            action: (scanType as string) === 'ENTRY' ? 'SCAN_ENTRY' : (scanType as string) === 'INTERMEDIATE_EXIT' ? 'SCAN_INTERMEDIATE_EXIT' : 'SCAN_EXIT',
+            action: `SCAN_${scanType}`,
             entityType: 'ScanLog',
             entityId: scanLog.id,
             changes: { passId, scanType, gateLocation },

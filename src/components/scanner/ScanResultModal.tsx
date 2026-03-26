@@ -14,17 +14,17 @@ export function ScanResultModal({ isOpen, onClose, passData }: ScanResultModalPr
 
     if (!passData) return null;
 
-    const handleLogScan = async (scanType: 'ENTRY' | 'INTERMEDIATE_EXIT' | 'EXIT') => {
+    const handleLogScan = async (scanType: 'ENTRY' | 'INTERMEDIATE_EXIT' | 'FINAL_EXIT') => {
         try {
             await logScan.mutateAsync({
                 passId: passData.id,
                 scanType,
                 gateLocation: 'Main Gate',
             });
-            toast.success(`${scanType} logged successfully for ${passData.visitorName}`);
+            toast.success(`${scanType.replace('_', ' ')} logged successfully for ${passData.visitorName}`);
             onClose();
         } catch (err: any) {
-            toast.error(err.message || `Failed to log ${scanType.toLowerCase()}`);
+            toast.error(err.message || `Failed to log ${scanType.replace('_', ' ').toLowerCase()}`);
         }
     };
 
@@ -75,15 +75,15 @@ export function ScanResultModal({ isOpen, onClose, passData }: ScanResultModalPr
                     </div>
 
                     {isActive ? (
-                        <div className="w-full grid grid-cols-1 gap-3 pt-4 border-t">
+                        <div className="w-full flex flex-col gap-3 pt-4 border-t">
                             <Button onClick={() => handleLogScan('ENTRY')} className="w-full bg-blue-600 hover:bg-blue-700" size="lg" disabled={logScan.isPending}>
                                 Log Entry
                             </Button>
                             <div className="grid grid-cols-2 gap-3">
-                                <Button onClick={() => handleLogScan('INTERMEDIATE_EXIT')} className="w-full bg-orange-500 hover:bg-orange-600" size="lg" disabled={logScan.isPending}>
+                                <Button onClick={() => handleLogScan('INTERMEDIATE_EXIT')} className="w-full bg-slate-600 hover:bg-slate-700" size="lg" disabled={logScan.isPending}>
                                     Intermediate Exit
                                 </Button>
-                                <Button onClick={() => handleLogScan('EXIT')} className="w-full bg-slate-800 hover:bg-slate-900" size="lg" disabled={logScan.isPending}>
+                                <Button onClick={() => handleLogScan('FINAL_EXIT')} variant="destructive" className="w-full" size="lg" disabled={logScan.isPending}>
                                     Final Exit
                                 </Button>
                             </div>

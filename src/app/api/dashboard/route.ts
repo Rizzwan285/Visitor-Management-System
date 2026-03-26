@@ -32,7 +32,7 @@ export const GET = withAuth(async (req) => {
                     }),
                     prisma.scanLog.count({
                         where: {
-                            scanType: 'EXIT',
+                            scanType: { in: ['INTERMEDIATE_EXIT', 'FINAL_EXIT'] },
                             scannedAt: { gte: today, lt: tomorrow },
                         },
                     }),
