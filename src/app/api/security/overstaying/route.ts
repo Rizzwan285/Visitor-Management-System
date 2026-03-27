@@ -18,9 +18,11 @@ export const GET = withAuth(
                     passType: {
                         not: 'STUDENT_EXIT',
                     },
-                    deletedAt: null,
-                    // Check if final exit doesn't exist
+                    // Check if they have recorded an ENTRY, but not a FINAL_EXIT
                     scanLogs: {
+                        some: {
+                            scanType: 'ENTRY'
+                        },
                         none: {
                             scanType: 'FINAL_EXIT'
                         }
