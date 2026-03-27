@@ -61,6 +61,21 @@ async function main() {
     });
     console.log(`  ✓ Official: ${officialUser.email}`);
 
+    const wardenUser = await prisma.user.upsert({
+        where: { email: 'warden1@iitpkd.ac.in' },
+        update: { passwordHash: bcrypt.hashSync('password123', 10) },
+        create: {
+            id: uuidv4(),
+            email: 'warden1@iitpkd.ac.in',
+            name: 'Assistant Warden',
+            role: Role.OFFICIAL,
+            uniqueId: '1000000006',
+            department: 'Hostel Administration',
+            passwordHash: bcrypt.hashSync('password123', 10),
+        },
+    });
+    console.log(`  ✓ Assistant Warden: ${wardenUser.email}`);
+
     const securityUser = await prisma.user.upsert({
         where: { email: 'security@iitpkd.ac.in' },
         update: { passwordHash: bcrypt.hashSync(securityPassword, 10) },
