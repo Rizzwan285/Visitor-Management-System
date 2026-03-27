@@ -242,6 +242,38 @@ export const EmailService = {
     },
 
     /**
+     * Forwards a copy of the given pass to the explicitly specified target email.
+     */
+    async forwardPassEmail(pass: PassWithRelations, targetEmail: string): Promise<void> {
+        const baseUrl = process.env.NEXTAUTH_URL || 'http://localhost:3000';
+        try {
+            if (pass.passType === 'STUDENT_EXIT') {
+                const html = renderStudentExitEmail({
+                    passNumber: pass.passNumber,
+                    studentName: pass.createdBy.name || pass.createdBy.email,
+                    hostelName: pass.hostelName || '',
+                    purpose: pass.purpose,
+                    exitDate: new Date(pass.visitFrom).toLocaleString(),
+                    returnDate: new Date(pass.visitTo).toLocaleString(),
+                    qrCodeUrl: `${baseUrl}/api/passes/${pass.id}/qr`,
+                    photoUrl: pass.visitorPhotoUrl ? `${baseUrl}/api/passes/${pass.id}/photo` : undefined,
+                });
+
+                await sendAndLog({
+                    passId: pass.id,
+                    to: targetEmail,
+                    subject: `[FORWARDED] Student Exit Pass — ${pass.passNumber}`,
+                    html,
+                });
+            } else {
+                console.warn(`[EmailService] Forwarding for pass type ${pass.passType} is not implemented natively yet.`);
+            }
+        } catch (err) {
+            console.error('[EmailService] forwardPassEmail failed:', err);
+        }
+    },
+
+    /**
      * Sends an approval request notification to the designated approver.
      */
     async sendApprovalRequestEmail(

@@ -41,8 +41,8 @@ export const POST = withAuth(async (req: NextRequest, { params }: { params: Prom
             );
         }
 
-        // Hook into our existing Student Exit email dispatcher natively
-        await EmailService.sendStudentExitEmail(pass, email);
+        // Delegate explicitly to the Email Service
+        await EmailService.forwardPassEmail(pass as any, email);
 
         return NextResponse.json(
             successResponse({ forwardedTo: email }),
