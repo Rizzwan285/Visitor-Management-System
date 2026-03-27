@@ -280,6 +280,33 @@ export function PassDetail({ pass, role }: PassDetailProps) {
                             <img src={`/api/passes/${pass.id}/photo`} alt="Visitor" className="w-full aspect-video object-cover rounded-md border" />
                         </div>
                     )}
+
+                    {/* Signatures on Record */}
+                    {(pass.visitorSignatureUrl || pass.securitySignatureUrl || pass.hostSignatureUrl) && (
+                        <div className="w-full bg-slate-50 p-4 rounded-xl border">
+                            <h4 className="text-sm font-semibold mb-3">Signatures on Record</h4>
+                            <div className="grid grid-cols-3 gap-3">
+                                {pass.visitorSignatureUrl && (
+                                    <div className="text-center">
+                                        <img src={pass.visitorSignatureUrl} alt="Visitor Signature" className="h-14 mx-auto border rounded bg-white object-contain" />
+                                        <span className="text-[10px] text-slate-400 mt-1 block">Visitor</span>
+                                    </div>
+                                )}
+                                {pass.securitySignatureUrl && (
+                                    <div className="text-center">
+                                        <img src={pass.securitySignatureUrl} alt="Security Signature" className="h-14 mx-auto border rounded bg-white object-contain" />
+                                        <span className="text-[10px] text-slate-400 mt-1 block">Security</span>
+                                    </div>
+                                )}
+                                {pass.hostSignatureUrl && (
+                                    <div className="text-center">
+                                        <img src={pass.hostSignatureUrl} alt="Host Signature" className="h-14 mx-auto border rounded bg-white object-contain" />
+                                        <span className="text-[10px] text-slate-400 mt-1 block">Host</span>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    )}
                 </div>
             </div>
         </div>
