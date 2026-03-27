@@ -4,10 +4,14 @@ import path from 'path';
 import { prisma } from '@/lib/prisma';
 import fs from 'fs';
 
-export async function GET(req: Request, { params }: { params: { id: string } }) {
+export async function GET(
+    req: Request,
+    context: { params: Promise<{ id: string }> }
+) {
     try {
+        const { id } = await context.params;
         const pass = await prisma.visitorPass.findUnique({
-            where: { id: params.id },
+            where: { id: id },
             select: { visitorPhotoUrl: true }
         });
 
