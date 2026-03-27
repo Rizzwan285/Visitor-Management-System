@@ -110,6 +110,33 @@ export function ScanResultModal({ isOpen, onClose, passData }: ScanResultModalPr
                                 </div>
                             </div>
                         )}
+
+                        {/* Signatures */}
+                        {(passData.visitorSignatureUrl || passData.securitySignatureUrl || passData.hostSignatureUrl) && (
+                            <div className="col-span-2 mt-3 pt-3 border-t">
+                                <span className="text-slate-500 font-semibold block mb-2">Signatures on Record</span>
+                                <div className="grid grid-cols-3 gap-3">
+                                    {passData.visitorSignatureUrl && (
+                                        <div className="text-center">
+                                            <img src={passData.visitorSignatureUrl} alt="Visitor" className="h-12 mx-auto border rounded object-contain bg-white" />
+                                            <span className="text-[10px] text-slate-400 mt-1 block">Visitor</span>
+                                        </div>
+                                    )}
+                                    {passData.securitySignatureUrl && (
+                                        <div className="text-center">
+                                            <img src={passData.securitySignatureUrl} alt="Security" className="h-12 mx-auto border rounded object-contain bg-white" />
+                                            <span className="text-[10px] text-slate-400 mt-1 block">Security</span>
+                                        </div>
+                                    )}
+                                    {passData.hostSignatureUrl && (
+                                        <div className="text-center">
+                                            <img src={passData.hostSignatureUrl} alt="Host" className="h-12 mx-auto border rounded object-contain bg-white" />
+                                            <span className="text-[10px] text-slate-400 mt-1 block">Host</span>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        )}
                     </div>
 
                     {isActive ? (

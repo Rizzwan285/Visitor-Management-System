@@ -5,6 +5,7 @@ import { renderEmployeeGuestEmail } from '@/lib/email-templates/employee-guest';
 import { renderOfficialPassEmail } from '@/lib/email-templates/official-pass';
 import { renderStudentGuestEmail } from '@/lib/email-templates/student-guest';
 import { renderStudentExitEmail } from '@/lib/email-templates/student-exit';
+import { renderWalkinPassEmail } from '@/lib/email-templates/walkin-pass';
 import { renderApprovalRequestEmail } from '@/lib/email-templates/approval-request';
 import type {
     VisitorPass,
@@ -217,8 +218,30 @@ export const EmailService = {
                 }
 
                 case 'WALKIN': {
-                    // No email for walk-in — physical process handled at gate
-                    console.log(`[EmailService] WALKIN pass ${pass.passNumber} — no email sent`);
+                    const walkinHtml = renderWalkinPassEmail({
+                        passNumber: pass.passNumber,
+                        visitorName: pass.visitorName,
+                        visitorSex: pass.visitorSex,
+                        purpose: pass.purpose,
+                        visitorMobile: pass.visitorMobile || '',
+                        visitorIdType: pass.visitorIdType || '',
+                        visitorIdNumber: pass.visitorIdNumber || '',
+                        pointOfContact: pass.pointOfContact || '',
+                        phoneConfirmedBy: pass.phoneConfirmedBy || '',
+                        visitFrom: new Date(pass.visitFrom).toLocaleString(),
+                        visitTo: new Date(pass.visitTo).toLocaleString(),
+                        qrCodeUrl: `${baseUrl}/api/passes/${pass.id}/qr`,
+                        visitorSignatureUrl: pass.visitorSignatureUrl,
+                        securitySignatureUrl: pass.securitySignatureUrl,
+                        hostSignatureUrl: pass.hostSignatureUrl,
+                    });
+
+                    await sendAndLog({
+                        passId: pass.id,
+                        to: pass.createdBy.email,
+                        subject: `Walk-in Visitor Pass — ${pass.passNumber}`,
+                        html: walkinHtml,
+                    });
                     break;
                 }
 

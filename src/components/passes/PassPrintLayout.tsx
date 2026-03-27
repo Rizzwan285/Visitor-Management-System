@@ -124,11 +124,23 @@ export function PassPrintLayout({ pass }: PassPrintLayoutProps) {
 
             {/* Footer Signatures */}
             <div className="mt-16 flex justify-between px-8">
-                <div className="w-64 text-center">
-                    <div className="border-t-2 border-black pt-2 w-full font-bold uppercase">Visitor Signature</div>
+                <div className="w-52 text-center">
+                    {pass.visitorSignatureUrl && (
+                        <img src={pass.visitorSignatureUrl} alt="Visitor Signature" className="h-16 mx-auto mb-1 object-contain" />
+                    )}
+                    <div className="border-t-2 border-black pt-2 w-full font-bold uppercase text-xs">Visitor Signature</div>
                 </div>
-                <div className="w-64 text-center">
-                    <div className="border-t-2 border-black pt-2 w-full font-bold uppercase">Security / Officer Seal</div>
+                <div className="w-52 text-center">
+                    {pass.securitySignatureUrl && (
+                        <img src={pass.securitySignatureUrl} alt="Security Signature" className="h-16 mx-auto mb-1 object-contain" />
+                    )}
+                    <div className="border-t-2 border-black pt-2 w-full font-bold uppercase text-xs">Security Officer</div>
+                </div>
+                <div className="w-52 text-center">
+                    {pass.hostSignatureUrl && (
+                        <img src={pass.hostSignatureUrl} alt="Host Signature" className="h-16 mx-auto mb-1 object-contain" />
+                    )}
+                    <div className="border-t-2 border-black pt-2 w-full font-bold uppercase text-xs">Host / Countersign</div>
                 </div>
             </div>
 
