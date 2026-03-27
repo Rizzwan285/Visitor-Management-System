@@ -5,9 +5,10 @@ import { RecentActivity, ActivityItem } from '@/components/dashboard/RecentActiv
 import { FileText, ScanLine, UserPlus, Users } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { useDashboard, useOverstayingAlerts, SecurityDashboardStats, DashboardRecentScan } from '@/hooks/useDashboard';
+import { useDashboard, SecurityDashboardStats, DashboardRecentScan } from '@/hooks/useDashboard';
 import { formatDistanceToNow } from 'date-fns';
-import { AlertCircle, Clock } from 'lucide-react';
+import { OverstayingAlerts } from '@/components/dashboard/OverstayingAlerts';
+
 
 function mapScansToActivity(scans: DashboardRecentScan[]): ActivityItem[] {
     return scans.map((scan) => ({
@@ -23,7 +24,6 @@ function mapScansToActivity(scans: DashboardRecentScan[]): ActivityItem[] {
 
 export default function SecurityDashboardPage() {
     const { data: dashData, isLoading } = useDashboard();
-    const { data: overstayingData, isLoading: isLoadingAlerts } = useOverstayingAlerts();
 
     const stats = dashData as SecurityDashboardStats | undefined;
 
@@ -71,42 +71,7 @@ export default function SecurityDashboardPage() {
                 <StatsCards stats={statsCards} />
             )}
 
-            {!isLoadingAlerts && overstayingData && overstayingData.length > 0 && (
-                <div className="space-y-4">
-                    <h2 className="text-xl font-semibold flex items-center gap-2 text-red-600">
-                        <AlertCircle className="h-5 w-5" /> Active Alerts: Overstaying Visitors
-                    </h2>
-                    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                        {overstayingData.map((pass: any) => (
-                            <div key={pass.id} className="bg-red-50 border border-red-200 text-red-900 shadow-sm relative overflow-hidden rounded-xl p-4">
-                                <div className="absolute top-0 right-0 p-2 opacity-10">
-                                    <Clock className="w-16 h-16" />
-                                </div>
-                                <div className="font-bold flex justify-between items-center mb-2">
-                                    <div className="flex items-center gap-2">
-                                        <AlertCircle className="h-4 w-4" />
-                                        {pass.visitorName}
-                                    </div>
-                                    <span className="text-xs font-mono bg-red-100 text-red-800 px-2 py-1 rounded">
-                                        {pass.passNumber}
-                                    </span>
-                                </div>
-                                <div className="text-sm space-y-1 relative z-10">
-                                    <p><span className="font-semibold">Type:</span> {pass.passType.replace('_', ' ')}</p>
-                                    <p><span className="font-semibold">Host:</span> {pass.pointOfContact || 'N/A'}</p>
-                                    <p><span className="font-semibold">Expired:</span> {formatDistanceToNow(new Date(pass.visitTo), { addSuffix: true })}</p>
-                                    {(pass.visitorMobile || pass.pocMobile) && (
-                                        <div className="pt-2 mt-2 border-t border-red-200">
-                                            {pass.visitorMobile && <p><span className="font-semibold">Visitor:</span> {pass.visitorMobile}</p>}
-                                            {pass.pocMobile && <p><span className="font-semibold">Host:</span> {pass.pocMobile}</p>}
-                                        </div>
-                                    )}
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            )}
+            <OverstayingAlerts />
 
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-7">
                 <div className="lg:col-span-4">

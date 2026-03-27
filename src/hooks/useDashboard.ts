@@ -70,18 +70,19 @@ export interface OverstayingPass {
     visitorMobile: string | null;
     pocMobile: string | null;
     pointOfContact: string | null;
+    ccEmails: any;
     visitTo: string;
 }
 
 /**
- * Fetches overstaying visitors from GET /api/dashboard/overstaying.
+ * Fetches overstaying visitors from GET /api/security/overstaying.
  */
 export function useOverstayingAlerts() {
     return useQuery({
         queryKey: ['overstaying-alerts'],
         queryFn: async () => {
-            return api.get<OverstayingPass[]>('/api/dashboard/overstaying');
+            return api.get<OverstayingPass[]>('/api/security/overstaying');
         },
-        refetchInterval: 30000, // Refresh every 30 seconds
+        refetchInterval: 300000, // Refresh every 5 minutes
     });
 }
