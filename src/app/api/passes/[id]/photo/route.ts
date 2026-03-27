@@ -4,6 +4,8 @@ import path from 'path';
 import { prisma } from '@/lib/prisma';
 import fs from 'fs';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(
     req: Request,
     context: { params: Promise<{ id: string }> }
@@ -19,11 +21,27 @@ export async function GET(
             return new NextResponse('Photo not found', { status: 404 });
         }
 
-        // We assume visitorPhotoUrl corresponds to /uploads/... 
-        // e.g., /uploads/filename.jpg or raw absolute path.
-        let imagePath = pass.visitorPhotoUrl;
-        
-        // Strip leading slashes to prevent root resolution issues when constructing path
+        const photoStr = pass.visitorPhotoUrl;
+
+        // 1) Handle Base64 Data URL (e.g. data:image/png;base64,...)
+        if (photoStr.startsWith('data:image/')) {
+            const matches = photoStr.match(/^data:(image\/\w+);base64,(.+)$/);
+            if (matches && matches.length === 3) {
+                const contentType = matches[1];
+                const base64Data = matches[2];
+                const imageBuffer = Buffer.from(base64Data, 'base64');
+                
+                return new NextResponse(imageBuffer, {
+                    headers: { 
+                        'Content-Type': contentType, 
+                        'Cache-Control': 'public, max-age=3600' 
+                    }
+                });
+            }
+        }
+
+        // 2) Fallback to local disk (Legacy uploaded files)
+        let imagePath = photoStr;
         if (imagePath.startsWith('/')) {
             imagePath = imagePath.slice(1);
         }
@@ -36,7 +54,6 @@ export async function GET(
 
         const imageBuffer = await readFile(absolutePath);
         
-        // Very basic mime typing based on rough extension assumption
         let contentType = 'image/jpeg';
         if (absolutePath.toLowerCase().endsWith('.png')) {
             contentType = 'image/png';

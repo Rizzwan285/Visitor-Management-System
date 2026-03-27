@@ -68,21 +68,11 @@ export function WalkinPassForm() {
                 setPhotoDataUrl(dataUrl);
                 stopCamera();
 
-                // Upload the photo to the server
-                try {
-                    setIsUploading(true);
-                    const blob = await (await fetch(dataUrl)).blob();
-                    const formData = new FormData();
-                    formData.append('photo', blob, 'visitor-photo.jpg');
-                    const result = await api.upload<{ url: string }>('/api/upload/photo', formData);
-                    setUploadedPhotoUrl(result.url);
-                    toast.success('Photo captured and uploaded');
-                } catch (err: any) {
-                    toast.error(err.message || 'Failed to upload photo');
-                    setUploadedPhotoUrl(null);
-                } finally {
-                    setIsUploading(false);
-                }
+                // Inject the raw base64 string directly into our persistent state
+                // This gracefully circumvents ephemeral Render storage wipes.
+                setUploadedPhotoUrl(dataUrl);
+                toast.success('Photo captured securely!');
+                setIsUploading(false);
             }
         }
     };
