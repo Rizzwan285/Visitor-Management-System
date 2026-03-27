@@ -19,8 +19,8 @@ export const GET = withAuth(async (req) => {
         const search = searchParams.get('search') || undefined;
 
         // Validate role filter if provided
-        const validRoles: Role[] = ['EMPLOYEE', 'STUDENT', 'OFFICIAL', 'SECURITY', 'ADMIN'];
-        if (roleFilter && !validRoles.includes(roleFilter)) {
+        const validRoles: string[] = ['EMPLOYEE', 'STUDENT', 'OFFICIAL', 'SECURITY', 'ADMIN', 'OIC_STUDENT_SECTION'];
+        if (roleFilter && !validRoles.includes(roleFilter as string)) {
             return NextResponse.json(
                 errorResponse('VALIDATION_ERROR', `Invalid role: ${roleFilter}`),
                 { status: 400 }
