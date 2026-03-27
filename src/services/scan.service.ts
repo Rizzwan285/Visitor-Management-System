@@ -96,13 +96,26 @@ export const ScanService = {
             },
         })) as ScanLogWithRelations;
 
-        if (scanType === 'FINAL_EXIT') {
+        const typeStr = scanType as string;
+        if (typeStr === 'FINAL_EXIT') {
             await prisma.visitorPass.update({
                 where: { id: passId },
                 data: { status: 'EXPIRED' }
             });
             // Also update the in-memory returned pass object so UI reflects it immediately
             scanLog.pass.status = 'EXPIRED';
+        } else if (typeStr === 'STUDENT_EXIT_RETURN' || typeStr === 'STUDENT_EXIT_OUT') {
+            if (typeStr === 'STUDENT_EXIT_RETURN') {
+                await prisma.visitorPass.update({
+                    where: { id: passId },
+                    data: { status: 'EXPIRED' }
+                });
+                scanLog.pass.status = 'EXPIRED';
+            }
+            
+            // Explicitly notify Assistant Wardens of student flow
+            const { EmailService } = require('@/services/email.service');
+            void EmailService.sendStudentScanNotification(scanLog.pass, typeStr);
         }
 
         void AuditService.log({

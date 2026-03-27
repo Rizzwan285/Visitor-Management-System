@@ -54,14 +54,21 @@ async function sendAndLog(params: {
             console.log(`[EmailService][STUB] Would send to: ${params.to}, subject: ${params.subject}`);
             result = { success: true, messageId: 'stub' };
         } else {
-            // DEV OVERRIDE: Send to verified admin email instead of unverified student email for Resend free tier compatibility
+            // Sandbox Resend Override (strictly development mode only)
+            const isProd = process.env.NODE_ENV === 'production';
             const devFallbackEmail = 'student.iitpkd01@gmail.com';
-            console.log(`[EmailService] DEV MODE: Rerouting email intended for ${params.to} -> ${devFallbackEmail}`);
+            
+            const finalTo = isProd ? params.to : devFallbackEmail;
+            const finalCc = isProd ? params.cc : (params.cc?.length ? [devFallbackEmail] : undefined);
+
+            if (!isProd) {
+                console.log(`[EmailService] DEV MODE: Rerouting email intended for ${params.to} -> ${devFallbackEmail}`);
+            }
 
             const response = await resend.emails.send({
                 from: emailConfig.from,
-                to: devFallbackEmail,
-                cc: params.cc?.length ? [devFallbackEmail] : undefined, // Also overwrite CC to prevent Sandbox rejections on CC array
+                to: finalTo,
+                cc: finalCc,
                 subject: params.subject,
                 html: params.html,
             });
@@ -126,6 +133,7 @@ export const EmailService = {
                         visitTo: new Date(pass.visitTo).toLocaleString(),
                         hostName: pass.createdBy.name || pass.createdBy.email,
                         qrCodeUrl: `${baseUrl}/api/passes/${pass.id}/qr`,
+                        photoUrl: pass.visitorPhotoUrl ? `${baseUrl}/api/passes/${pass.id}/photo` : undefined,
                     });
 
                     await sendAndLog({
@@ -147,6 +155,7 @@ export const EmailService = {
                         visitTo: new Date(pass.visitTo).toLocaleString(),
                         hostName: pass.createdBy.name || pass.createdBy.email,
                         qrCodeUrl: `${baseUrl}/api/passes/${pass.id}/qr`,
+                        photoUrl: pass.visitorPhotoUrl ? `${baseUrl}/api/passes/${pass.id}/photo` : undefined,
                         ccDeptHeads: emailConfig.deptHeadEmails,
                     });
 
@@ -173,6 +182,7 @@ export const EmailService = {
                         visitTo: new Date(pass.visitTo).toLocaleString(),
                         status: status === 'PENDING_APPROVAL' ? 'PENDING_APPROVAL' : 'ACTIVE',
                         qrCodeUrl: `${baseUrl}/api/passes/${pass.id}/qr`,
+                        photoUrl: pass.visitorPhotoUrl ? `${baseUrl}/api/passes/${pass.id}/photo` : undefined,
                     });
 
                     const cc: string[] = [];
@@ -205,6 +215,7 @@ export const EmailService = {
                         exitDate: new Date(pass.visitFrom).toLocaleString(),
                         returnDate: new Date(pass.visitTo).toLocaleString(),
                         qrCodeUrl: `${baseUrl}/api/passes/${pass.id}/qr`,
+                        photoUrl: pass.visitorPhotoUrl ? `${baseUrl}/api/passes/${pass.id}/photo` : undefined,
                     });
 
                     const cc: string[] = [];
@@ -265,6 +276,44 @@ export const EmailService = {
             });
         } catch (err) {
             console.error('[EmailService] sendApprovalRequestEmail failed:', err);
+        }
+    },
+
+    /**
+     * Specialized notification for Student Exits
+     */
+    async sendStudentScanNotification(pass: any, scanType: string): Promise<void> {
+        try {
+            if (!emailConfig.assistantWardenEmail) return;
+            
+            const scanDescription = scanType === 'STUDENT_EXIT_OUT' ? 'Exited Campus' : 'Returned to Campus';
+            const html = `<!DOCTYPE html>
+<html>
+<body style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; color: #333;">
+  <div style="background: #1a3a6b; color: white; padding: 20px; border-radius: 8px 8px 0 0;">
+    <h1 style="margin: 0; font-size: 22px;">Student Gate Notification - ${scanDescription}</h1>
+  </div>
+  <div style="border: 1px solid #ddd; border-top: none; padding: 24px; border-radius: 0 0 8px 8px;">
+    <p>Dear Assistant Warden,</p>
+    <p>Student <strong>${pass.visitorName || 'A Student'}</strong> has officially <strong>${scanDescription.toLowerCase()}</strong>.</p>
+    <table style="width: 100%; border-collapse: collapse; margin-top: 16px;">
+      <tr><td style="padding: 8px 12px; background: #f5f5f5; font-weight: bold; width: 40%; border: 1px solid #e0e0e0;">Pass Number</td><td style="padding: 8px 12px; border: 1px solid #e0e0e0;">${pass.passNumber}</td></tr>
+      <tr><td style="padding: 8px 12px; background: #f5f5f5; font-weight: bold; border: 1px solid #e0e0e0;">Expected Return</td><td style="padding: 8px 12px; border: 1px solid #e0e0e0;">${new Date(pass.visitTo).toLocaleString()}</td></tr>
+    </table>
+    <hr style="border-color: #e0e0e0; margin: 24px 0;" />
+    <p style="font-size: 12px; color: #999;">Automated notification from IIT Palakkad VMS.</p>
+  </div>
+</body>
+</html>`;
+
+            await sendAndLog({
+                passId: pass.id,
+                to: emailConfig.assistantWardenEmail,
+                subject: `Student Gate Alert: ${scanDescription} (${pass.passNumber})`,
+                html,
+            });
+        } catch (err) {
+            console.error('[EmailService] sendStudentScanNotification failed:', err);
         }
     },
 };

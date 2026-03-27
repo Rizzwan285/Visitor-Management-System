@@ -199,6 +199,9 @@ export const PassService = {
                           pointOfContact: (parsed as { pointOfContact?: string }).pointOfContact ?? null,
                           pocMobile: (parsed as { pocMobile?: string }).pocMobile ?? null,
                           phoneConfirmedBy: (parsed as { phoneConfirmedBy?: string }).phoneConfirmedBy ?? null,
+                          visitorSignatureUrl: (parsed as { visitorSignatureUrl?: string }).visitorSignatureUrl ?? null,
+                          securitySignatureUrl: (parsed as { securitySignatureUrl?: string }).securitySignatureUrl ?? null,
+                          hostSignatureUrl: (parsed as { hostSignatureUrl?: string }).hostSignatureUrl ?? null,
                       }
                     : {};
 

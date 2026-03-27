@@ -58,6 +58,20 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                 const result = isAllowedEmail(user.email);
                 if (!result.allowed) return false;
 
+                // Supervisor Constraint: Restrict generic emails to predefined whitelists
+                const genericPrefixes = ['personnel', 'office_cs', 'iptif', 'techin', 'office'];
+                const emailPrefix = user.email.split('@')[0].toLowerCase();
+
+                if (genericPrefixes.some(gp => emailPrefix.includes(gp) || emailPrefix === gp)) {
+                    const isWhitelisted = await prisma.whitelistedEmail.findUnique({
+                        where: { email: user.email },
+                    });
+                    if (!isWhitelisted) {
+                        console.warn(`[AUTH] Blocked unauthorized generic email login attempt: ${user.email}`);
+                        return false; 
+                    }
+                }
+
                 // Upsert user with role derived from email domain
                 const existingUser = await prisma.user.findUnique({
                     where: { email: user.email },

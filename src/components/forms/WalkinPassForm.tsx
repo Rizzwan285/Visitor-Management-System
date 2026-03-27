@@ -11,6 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { toast } from 'sonner';
 import { useCreatePass } from '@/hooks/usePasses';
 import { api } from '@/services/api';
+import { SignaturePad } from '@/components/ui/signature-pad';
 
 export function WalkinPassForm() {
     const router = useRouter();
@@ -24,6 +25,11 @@ export function WalkinPassForm() {
     const [uploadedPhotoUrl, setUploadedPhotoUrl] = useState<string | null>(null);
     const [isCameraActive, setIsCameraActive] = useState(false);
     const [isUploading, setIsUploading] = useState(false);
+
+    // Signature State
+    const [visitorSignatureUrl, setVisitorSignatureUrl] = useState<string | null>(null);
+    const [securitySignatureUrl, setSecuritySignatureUrl] = useState<string | null>(null);
+    const [hostSignatureUrl, setHostSignatureUrl] = useState<string | null>(null);
 
     // Form State
     const [idType, setIdType] = useState('AADHAR');
@@ -109,6 +115,9 @@ export function WalkinPassForm() {
             pocMobile: formData.get('pocMobile') as string,
             phoneConfirmedBy: formData.get('phoneConfirmedBy') as string,
             visitorPhotoUrl: uploadedPhotoUrl,
+            visitorSignatureUrl: visitorSignatureUrl,
+            securitySignatureUrl: securitySignatureUrl,
+            hostSignatureUrl: hostSignatureUrl,
             visitFrom: new Date(formData.get('visitFrom') as string).toISOString(),
             visitTo: new Date(formData.get('visitTo') as string).toISOString(),
         };
@@ -249,6 +258,22 @@ export function WalkinPassForm() {
                 <div className="space-y-2">
                     <Label htmlFor="purpose">Purpose of Visit</Label>
                     <Textarea id="purpose" name="purpose" required />
+                </div>
+
+                {/* Signature Provisions */}
+                <div className="space-y-6 pt-4 border-t">
+                    <SignaturePad
+                        label="Visitor's Signature"
+                        onSignatureChange={(url) => setVisitorSignatureUrl(url)}
+                    />
+                    <SignaturePad
+                        label="Security Officer's Signature"
+                        onSignatureChange={(url) => setSecuritySignatureUrl(url)}
+                    />
+                    <SignaturePad
+                        label="Host / Person Being Visited's Signature"
+                        onSignatureChange={(url) => setHostSignatureUrl(url)}
+                    />
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

@@ -22,7 +22,7 @@ import { Role } from '@prisma/client';
 const getNavLinks = (role: Role) => {
     const links = [];
 
-    switch (role) {
+    switch (role as string) {
         case 'EMPLOYEE':
             links.push(
                 { title: 'Dashboard', href: '/employee', icon: LayoutDashboard },
@@ -49,6 +49,12 @@ const getNavLinks = (role: Role) => {
                 { title: 'Dashboard', href: '/security', icon: LayoutDashboard },
                 { title: 'Scan QR', href: '/security/scan', icon: ScanLine },
                 { title: 'Walk-in Pass', href: '/security/walkin', icon: UserPlus }
+            );
+            break;
+        case 'OIC_STUDENT_SECTION':
+            links.push(
+                { title: 'Dashboard', href: '/oic', icon: LayoutDashboard },
+                { title: 'Approvals', href: '/oic', icon: ListChecks }
             );
             break;
         case 'ADMIN':

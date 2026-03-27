@@ -12,6 +12,7 @@ const ROUTE_ROLE_MAP: Record<string, string[]> = {
     '/official': ['OFFICIAL', 'ADMIN'],
     '/security': ['SECURITY', 'ADMIN'],
     '/admin': ['ADMIN'],
+    '/oic': ['OIC_STUDENT_SECTION', 'ADMIN'],
 };
 
 export default auth((req) => {
@@ -49,5 +50,6 @@ export const config = {
         '/official/:path*',
         '/security/:path*',
         '/admin/:path*',
+        '/oic/:path*',
     ],
 };

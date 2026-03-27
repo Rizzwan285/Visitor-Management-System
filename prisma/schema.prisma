@@ -15,6 +15,7 @@ enum Role {
   OFFICIAL
   SECURITY
   ADMIN
+  OIC_STUDENT_SECTION
 }
 
 enum PassType {
@@ -45,6 +46,8 @@ enum ScanType {
   ENTRY
   INTERMEDIATE_EXIT
   FINAL_EXIT
+  STUDENT_EXIT_OUT
+  STUDENT_EXIT_RETURN
 }
 
 enum Sex {
@@ -108,6 +111,10 @@ model VisitorPass {
   ccEmails          Json?       @default("[]") @map("cc_emails")
   emailSentTo       Json?       @default("[]") @map("email_sent_to")
   emailSent         Boolean     @default(false) @map("email_sent")
+  visitorSignatureUrl String?   @map("visitor_signature_url")
+  securitySignatureUrl String?  @map("security_signature_url")
+  hostSignatureUrl    String?   @map("host_signature_url")
+  countersignUrl    String?     @map("countersign_url")
   createdAt         DateTime    @default(now()) @map("created_at")
   updatedAt         DateTime    @updatedAt @map("updated_at")
   deletedAt         DateTime?   @map("deleted_at")
@@ -206,4 +213,14 @@ model FeatureFlag {
   updatedAt   DateTime @updatedAt @map("updated_at")
 
   @@map("feature_flags")
+}
+
+model WhitelistedEmail {
+  id          String   @id @default(uuid())
+  email       String   @unique
+  department  String?
+  addedBy     String?
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  @@map("whitelisted_emails")
 }

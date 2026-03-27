@@ -6,12 +6,13 @@ A robust, full-stack Next.js application designed to manage, track, and approve 
 The VMS digitizes the entire lifecycle of visitor passes—from drafting and multi-level approval to QR code generation and live security gate scanning. It offers specialized dashboards tailored to different roles (Admin, Security, Student, Employee, Official) to streamline operations, enhance campus security, and provide real-time reporting on pass lifecycles.
 
 ## Implemented Features
-- **Role-Based Dashboards:** Unique UI views and features for Admins, Security, Employees, Officials, and Students.
+- **Role-Based Dashboards:** Unique UI views and features for Admins, Security, Employees, Officials, Students, and the distinct **Officer-in-Charge (OIC)**.
 - **Dynamic Pass Generation:** Different workflows for Guest Passes, Exit Passes, and Walk-ins.
-- **Multi-Level Approvals:** Granular permission system for passing pending requests through required approvers (e.g. host professors).
-- **Secure QR Code Generation:** Real-time generation of encrypted QR codes distributed via Email API to visitors for seamless security scanning.
-- **Scanner Workflows:** Security guards can scan QR codes logging both `ENTRY`, `INTERMEDIATE_EXIT`, and `FINAL_EXIT`. Passes automatically expire heavily mitigating unauthorized re-entires.
-- **Security Analytics & Alerts:** Security Dashboard includes real-time feeds of gate operations and an active alert tracker for Overstaying Visitors.
+- **Multi-Level Approvals:** Granular permission system for passing pending requests through required approvers (e.g. Host professors and Student Section Officiants).
+- **Advanced Walk-in Capture:** Physical webcam implementations combined with a multi-tiered **3-signature digital pad** (Visitor, Security, Host) tracking physical walk-in validity securely.
+- **Secure QR Code Generation:** Real-time generation of encrypted QR codes distributed via Email API to visitors for seamless security scanning, explicitly bypassing email image strippers via direct raw-byte proxies.
+- **Scanner Workflows:** Security guards can scan QR codes logging both `ENTRY`, `INTERMEDIATE_EXIT`, and `FINAL_EXIT`. Dedicated overlays allow isolating **`STUDENT_EXIT_OUT`** and **`STUDENT_EXIT_RETURN`** pipelines completely explicitly alerting Assistant Wardens automatically.
+- **Security Analytics & Alerts:** Security Dashboard includes real-time feeds of gate operations and an active alert tracker for Overstaying Visitors directly querying DB checkpoints.
 - **Admin Reporting Engine:** A powerful data visualization UI for exporting custom-timeline analytical CSV reports.
 
 ## Tech Stack

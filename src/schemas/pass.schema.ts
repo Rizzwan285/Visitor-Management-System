@@ -41,6 +41,9 @@ const walkinPassObject = z.object({
     pointOfContact: z.string().min(1, 'Point of contact is required'),
     pocMobile: z.string().regex(/^\d{10}$/, 'Mobile must be 10 digits'),
     phoneConfirmedBy: z.string().min(1, 'Phone confirmation is required'),
+    visitorSignatureUrl: z.string().nullable().optional(),
+    securitySignatureUrl: z.string().nullable().optional(),
+    hostSignatureUrl: z.string().nullable().optional(),
 });
 
 const studentExitObject = z.object({

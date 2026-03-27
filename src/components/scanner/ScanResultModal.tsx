@@ -14,7 +14,7 @@ export function ScanResultModal({ isOpen, onClose, passData }: ScanResultModalPr
 
     if (!passData) return null;
 
-    const handleLogScan = async (scanType: 'ENTRY' | 'INTERMEDIATE_EXIT' | 'FINAL_EXIT') => {
+    const handleLogScan = async (scanType: 'ENTRY' | 'INTERMEDIATE_EXIT' | 'FINAL_EXIT' | 'STUDENT_EXIT_OUT' | 'STUDENT_EXIT_RETURN') => {
         try {
             await logScan.mutateAsync({
                 passId: passData.id,
@@ -53,41 +53,90 @@ export function ScanResultModal({ isOpen, onClose, passData }: ScanResultModalPr
                     <div className="w-full grid grid-cols-2 gap-4 text-sm">
                         <div className="space-y-1">
                             <span className="text-slate-500 font-semibold block">Host / To Visit</span>
-                            <span>{passData.pointOfContact || passData.createdBy?.name || 'N/A'}</span>
+                            <span>{passData.pointOfContact || passData.hostProfessor?.name || passData.createdBy?.name || 'N/A'}</span>
                         </div>
                         <div className="space-y-1">
                             <span className="text-slate-500 font-semibold block">Purpose</span>
                             <span>{passData.purpose}</span>
                         </div>
 
+                        {passData.visitorSex && (
+                            <div className="space-y-1">
+                                <span className="text-slate-500 font-semibold block">Sex</span>
+                                <span className="capitalize">{passData.visitorSex.toLowerCase()}</span>
+                            </div>
+                        )}
+                        {passData.visitorAge && (
+                            <div className="space-y-1">
+                                <span className="text-slate-500 font-semibold block">Age</span>
+                                <span>{passData.visitorAge} years</span>
+                            </div>
+                        )}
+                        {passData.visitorRelation && (
+                            <div className="space-y-1">
+                                <span className="text-slate-500 font-semibold block">Relation</span>
+                                <span>{passData.visitorRelation}</span>
+                            </div>
+                        )}
+                        {passData.hostelName && (
+                            <div className="space-y-1">
+                                <span className="text-slate-500 font-semibold block">Hostel</span>
+                                <span>{passData.hostelName}</span>
+                            </div>
+                        )}
+                        {passData.visitorIdType && (
+                            <div className="space-y-1 col-span-2">
+                                <span className="text-slate-500 font-semibold block">ID Proof Provided</span>
+                                <span>{passData.visitorIdType} - {passData.visitorIdNumber}</span>
+                            </div>
+                        )}
+
                         {passData.visitorMobile && (
                             <div className="space-y-1 col-span-2">
-                                <span className="text-slate-500 font-semibold block">Mobile</span>
+                                <span className="text-slate-500 font-semibold block">Visitor Mobile</span>
                                 <span>{passData.visitorMobile}</span>
                             </div>
                         )}
 
                         {passData.visitorPhotoUrl && (
                             <div className="col-span-2 mt-2">
-                                <img src={passData.visitorPhotoUrl} alt="Visitor" className="w-full max-h-48 object-cover rounded-md border" />
+                                <span className="text-slate-500 font-semibold block mb-2">Visitor Photo</span>
+                                <div className="w-32 h-32 rounded-lg overflow-hidden border">
+                                    <img 
+                                        src={`/api/passes/${passData.id}/photo`} 
+                                        alt={`Photo of ${passData.visitorName}`} 
+                                        className="w-full h-full object-cover" 
+                                    />
+                                </div>
                             </div>
                         )}
                     </div>
 
                     {isActive ? (
-                        <div className="w-full flex flex-col gap-3 pt-4 border-t">
-                            <Button onClick={() => handleLogScan('ENTRY')} className="w-full bg-blue-600 hover:bg-blue-700" size="lg" disabled={logScan.isPending}>
-                                Log Entry
-                            </Button>
-                            <div className="grid grid-cols-2 gap-3">
-                                <Button onClick={() => handleLogScan('INTERMEDIATE_EXIT')} className="w-full bg-slate-600 hover:bg-slate-700" size="lg" disabled={logScan.isPending}>
-                                    Intermediate Exit
+                        passData.passType === 'STUDENT_EXIT' ? (
+                            <div className="w-full flex flex-col gap-3 pt-4 border-t">
+                                <Button onClick={() => handleLogScan('STUDENT_EXIT_OUT')} className="w-full bg-amber-600 hover:bg-amber-700" size="lg" disabled={logScan.isPending}>
+                                    Log Student Exit (Leaving Campus)
                                 </Button>
-                                <Button onClick={() => handleLogScan('FINAL_EXIT')} variant="destructive" className="w-full" size="lg" disabled={logScan.isPending}>
-                                    Final Exit
+                                <Button onClick={() => handleLogScan('STUDENT_EXIT_RETURN')} className="w-full bg-green-600 hover:bg-green-700" size="lg" disabled={logScan.isPending}>
+                                    Log Student Return (Back to Campus)
                                 </Button>
                             </div>
-                        </div>
+                        ) : (
+                            <div className="w-full flex flex-col gap-3 pt-4 border-t">
+                                <Button onClick={() => handleLogScan('ENTRY')} className="w-full bg-blue-600 hover:bg-blue-700" size="lg" disabled={logScan.isPending}>
+                                    Log Entry
+                                </Button>
+                                <div className="grid grid-cols-2 gap-3">
+                                    <Button onClick={() => handleLogScan('INTERMEDIATE_EXIT')} className="w-full bg-slate-600 hover:bg-slate-700" size="lg" disabled={logScan.isPending}>
+                                        Intermediate Exit
+                                    </Button>
+                                    <Button onClick={() => handleLogScan('FINAL_EXIT')} variant="destructive" className="w-full" size="lg" disabled={logScan.isPending}>
+                                        Final Exit
+                                    </Button>
+                                </div>
+                            </div>
+                        )
                     ) : (
                         <div className="w-full pt-4 border-t px-2 text-center text-red-600 font-medium">
                             This pass cannot be used for entry or exit.

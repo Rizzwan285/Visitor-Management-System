@@ -89,6 +89,20 @@ async function main() {
     });
     console.log(`  ✓ Admin: ${adminUser.email}`);
 
+    const oicUser = await prisma.user.upsert({
+        where: { email: 'oic.studentsection@iitpkd.ac.in' },
+        update: { passwordHash: bcrypt.hashSync('password123', 10) },
+        create: {
+            id: uuidv4(),
+            email: 'oic.studentsection@iitpkd.ac.in',
+            name: 'Officer-in-Charge, Student Section',
+            role: Role.OIC_STUDENT_SECTION,
+            passwordHash: bcrypt.hashSync('password123', 10),
+            department: 'Student Section',
+        },
+    });
+    console.log(`  ✓ OIC Student Section: ${oicUser.email}`);
+
     // ─── Feature Flags ────────────────────────────────
 
     await prisma.featureFlag.upsert({

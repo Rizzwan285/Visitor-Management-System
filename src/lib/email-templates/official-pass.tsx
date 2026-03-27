@@ -8,6 +8,7 @@ interface OfficialPassEmailProps {
     hostName: string;
     qrCodeUrl?: string;
     ccDeptHeads?: string[];
+    photoUrl?: string;
 }
 
 export function renderOfficialPassEmail(props: OfficialPassEmailProps): string {
@@ -34,7 +35,10 @@ export function renderOfficialPassEmail(props: OfficialPassEmailProps): string {
       <tr><td style="padding: 8px 12px; background: #f5f5f5; font-weight: bold; border: 1px solid #e0e0e0;">Valid From</td><td style="padding: 8px 12px; border: 1px solid #e0e0e0;">${props.visitFrom}</td></tr>
       <tr><td style="padding: 8px 12px; background: #f5f5f5; font-weight: bold; border: 1px solid #e0e0e0;">Valid To</td><td style="padding: 8px 12px; border: 1px solid #e0e0e0;">${props.visitTo}</td></tr>
     </table>
-    ${props.qrCodeUrl ? `<div style="margin-top: 24px; text-align: center;"><p style="font-weight: bold;">QR Code for Gate Entry</p><img src="${props.qrCodeUrl}" alt="QR Code" width="200" height="200" style="border: 1px solid #ddd; padding: 8px;" /></div>` : ''}
+    <div style="margin-top: 24px; text-align: center;">
+      ${props.photoUrl ? `<div style="display: inline-block; margin-right: 20px;"><p style="font-weight: bold;">Visitor Photo</p><img src="${props.photoUrl}" alt="Photo" width="150" height="150" style="border: 1px solid #ddd; object-fit: cover; border-radius: 8px;" /></div>` : ''}
+      ${props.qrCodeUrl ? `<div style="display: inline-block;"><p style="font-weight: bold;">QR Code</p><img src="${props.qrCodeUrl}" alt="QR Code" width="150" height="150" style="border: 1px solid #ddd; padding: 8px;" /></div>` : ''}
+    </div>
     ${ccNote}
     <p style="margin-top: 16px; font-size: 13px; color: #666;">Please present this QR code at the campus gate. This pass is valid only within the specified date/time range.</p>
     <hr style="border-color: #e0e0e0; margin: 24px 0;" />

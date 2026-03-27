@@ -16,8 +16,8 @@ export function StudentGuestPassForm() {
     const { mutateAsync: createPass, isPending } = useCreatePass();
     const [approverId, setApproverId] = useState('');
 
-    // Fetch ADMIN users as potential approvers
-    const { data: adminsData, isLoading: isLoadingAdmins } = useUsers({ role: 'ADMIN', limit: 50 });
+    // Fetch OIC_STUDENT_SECTION users as potential approvers
+    const { data: adminsData, isLoading: isLoadingAdmins } = useUsers({ role: 'OIC_STUDENT_SECTION', limit: 50 });
     const admins = adminsData?.users || [];
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {

@@ -23,7 +23,7 @@ async function getParamId(context?: any): Promise<string> {
  */
 export const POST = withAuth(
     withRole(
-        ['ADMIN'],
+        ['ADMIN', 'OIC_STUDENT_SECTION'],
         withValidation(approveSchema, async (req, validatedData, context) => {
             try {
                 const passId = await getParamId(context);
