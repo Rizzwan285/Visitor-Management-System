@@ -313,6 +313,8 @@ export const PassService = {
             baseWhere.createdById = userId;
         } else if (role === 'SECURITY') {
             baseWhere.status = 'ACTIVE';
+        } else if (role === 'ASSISTANT_WARDEN') {
+            baseWhere.passType = { in: ['STUDENT_GUEST', 'STUDENT_EXIT'] };
         }
         // ADMIN: no extra scope — sees all passes
 

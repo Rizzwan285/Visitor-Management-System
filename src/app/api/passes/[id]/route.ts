@@ -47,8 +47,11 @@ export const GET = withAuth(async (req, context) => {
 
         // Access control: owner, SECURITY, or ADMIN
         const isOwner = pass.createdById === userId;
+        const isWardenAccess = role === 'ASSISTANT_WARDEN' && 
+            ['STUDENT_GUEST', 'STUDENT_EXIT'].includes(pass.passType);
+            
         const canAccess =
-            isOwner || role === 'SECURITY' || role === 'ADMIN';
+            isOwner || role === 'SECURITY' || role === 'ADMIN' || isWardenAccess;
 
         if (!canAccess) {
             return NextResponse.json(
