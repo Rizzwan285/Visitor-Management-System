@@ -3,7 +3,9 @@ export const emailConfig = {
     replyTo: process.env.EMAIL_REPLY_TO || undefined,
 
     // CC recipients for specific pass types
-    assistantWardenEmail: process.env.ASSISTANT_WARDEN_EMAIL || '',
+    assistantWardenEmails: (process.env.ASSISTANT_WARDEN_EMAIL || '')
+        .split(',')
+        .filter(Boolean),
     deptHeadEmails: (process.env.DEPT_HEAD_EMAILS || '')
         .split(',')
         .filter(Boolean),

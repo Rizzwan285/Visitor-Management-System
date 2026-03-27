@@ -186,8 +186,8 @@ export const EmailService = {
                     });
 
                     const cc: string[] = [];
-                    if (emailConfig.assistantWardenEmail) {
-                        cc.push(emailConfig.assistantWardenEmail);
+                    if (emailConfig.assistantWardenEmails.length > 0) {
+                        cc.push(...emailConfig.assistantWardenEmails);
                     }
 
                     await sendAndLog({
@@ -219,8 +219,8 @@ export const EmailService = {
                     });
 
                     const cc: string[] = [];
-                    if (emailConfig.assistantWardenEmail) {
-                        cc.push(emailConfig.assistantWardenEmail);
+                    if (emailConfig.assistantWardenEmails.length > 0) {
+                        cc.push(...emailConfig.assistantWardenEmails);
                     }
 
                     await sendAndLog({
@@ -284,7 +284,7 @@ export const EmailService = {
      */
     async sendStudentScanNotification(pass: any, scanType: string): Promise<void> {
         try {
-            if (!emailConfig.assistantWardenEmail) return;
+            if (emailConfig.assistantWardenEmails.length === 0) return;
             
             const scanDescription = scanType === 'STUDENT_EXIT_OUT' ? 'Exited Campus' : 'Returned to Campus';
             const html = `<!DOCTYPE html>
@@ -308,7 +308,8 @@ export const EmailService = {
 
             await sendAndLog({
                 passId: pass.id,
-                to: emailConfig.assistantWardenEmail,
+                to: emailConfig.assistantWardenEmails[0],
+                cc: emailConfig.assistantWardenEmails.slice(1),
                 subject: `Student Gate Alert: ${scanDescription} (${pass.passNumber})`,
                 html,
             });
