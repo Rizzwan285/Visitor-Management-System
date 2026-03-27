@@ -55,22 +55,38 @@ async function sendAndLog(params: {
             result = { success: true, messageId: 'stub' };
         } else {
             // Sandbox Resend Override (strictly development mode only)
-            const isProd = process.env.NODE_ENV === 'production';
+            const isEmailTestingMode = process.env.EMAIL_TESTING_MODE === 'true';
             const devFallbackEmail = 'student.iitpkd01@gmail.com';
             
-            const finalTo = isProd ? params.to : devFallbackEmail;
-            const finalCc = isProd ? params.cc : (params.cc?.length ? [devFallbackEmail] : undefined);
+            const finalTo = !isEmailTestingMode ? params.to : devFallbackEmail;
+            const finalCc = !isEmailTestingMode ? params.cc : (params.cc && params.cc.length > 0 ? [devFallbackEmail] : undefined);
+            
+            let finalHtml = params.html;
 
-            if (!isProd) {
-                console.log(`[EmailService] DEV MODE: Rerouting email intended for ${params.to} -> ${devFallbackEmail}`);
+            if (isEmailTestingMode) {
+                console.log(`[EmailService] SANDBOX MODE: Rerouting email intended for ${params.to} -> ${devFallbackEmail}`);
+                
+                const intendedTargetsText = `
+                <div style="background-color: #ffebee; border: 1px solid #ffcdd2; color: #c62828; padding: 12px; margin-bottom: 20px; border-radius: 4px; font-family: sans-serif;">
+                    <strong>⚠️ DEV SANDBOX INTERCEPTION</strong><br/>
+                    <strong>Intended To:</strong> ${params.to}<br/>
+                    ${params.cc?.length ? `<strong>Intended CC:</strong> ${params.cc.join(', ')}<br/>` : ''}
+                </div>`;
+                
+                // Inject the header right after the opening body tag if present, otherwise prepend
+                if (finalHtml.includes('<body')) {
+                    finalHtml = finalHtml.replace(/(<body[^>]*>)/i, `$1${intendedTargetsText}`);
+                } else {
+                    finalHtml = intendedTargetsText + finalHtml;
+                }
             }
 
             const response = await resend.emails.send({
                 from: emailConfig.from,
                 to: finalTo,
                 cc: finalCc,
-                subject: params.subject,
-                html: params.html,
+                subject: (isEmailTestingMode ? '[SANDBOX] ' : '') + params.subject,
+                html: finalHtml,
             });
 
             if (response.error) {

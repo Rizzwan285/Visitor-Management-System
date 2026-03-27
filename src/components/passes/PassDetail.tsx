@@ -15,7 +15,7 @@ import { api } from '@/services/api';
 
 interface PassDetailProps {
     pass: VisitorPassWithDetails;
-    role: 'EMPLOYEE' | 'STUDENT' | 'OFFICIAL' | 'SECURITY' | 'ADMIN';
+    role: 'EMPLOYEE' | 'STUDENT' | 'OFFICIAL' | 'SECURITY' | 'ADMIN' | 'ASSISTANT_WARDEN';
 }
 
 export function PassDetail({ pass, role }: PassDetailProps) {

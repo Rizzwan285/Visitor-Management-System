@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { withAuth, withValidation } from '@/lib/api-middleware';
+import { withAuth, withRole, withValidation } from '@/lib/api-middleware';
 import { successResponse, errorResponse } from '@/types/api.types';
 import { PassService } from '@/services/pass.service';
 import { createPassSchema, passFiltersSchema } from '@/schemas/pass.schema';
@@ -8,10 +8,11 @@ import type { Role } from '@prisma/client';
 /**
  * POST /api/passes
  * Create a new visitor pass.
- * Auth: ALL roles
+ * Auth: ALL roles except ASSISTANT_WARDEN
  */
 export const POST = withAuth(
-    withValidation(createPassSchema, async (req, validatedData) => {
+    withRole(['EMPLOYEE', 'STUDENT', 'OFFICIAL', 'SECURITY', 'ADMIN', 'OIC_STUDENT_SECTION'],
+        withValidation(createPassSchema, async (req, validatedData) => {
         try {
             const userId = req.auth.user.id;
             const ipAddress =
@@ -32,6 +33,7 @@ export const POST = withAuth(
             );
         }
     })
+  )
 );
 
 /**

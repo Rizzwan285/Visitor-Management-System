@@ -16,6 +16,7 @@ enum Role {
   SECURITY
   ADMIN
   OIC_STUDENT_SECTION
+  ASSISTANT_WARDEN
 }
 
 enum PassType {

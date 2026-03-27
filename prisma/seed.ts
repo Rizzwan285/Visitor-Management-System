@@ -68,7 +68,7 @@ async function main() {
             id: uuidv4(),
             email: 'warden1@iitpkd.ac.in',
             name: 'Assistant Warden',
-            role: Role.OFFICIAL,
+            role: Role.ASSISTANT_WARDEN,
             uniqueId: '1000000006',
             department: 'Hostel Administration',
             passwordHash: bcrypt.hashSync('password123', 10),
