@@ -23,6 +23,8 @@ export default async function Home() {
       redirect('/security');
     case 'OIC_STUDENT_SECTION':
       redirect('/oic');
+    case 'ASSISTANT_WARDEN':
+      redirect('/warden');
     case 'ADMIN':
       redirect('/admin');
     default:

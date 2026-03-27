@@ -63,7 +63,7 @@ async function main() {
 
     const wardenUser = await prisma.user.upsert({
         where: { email: 'warden1@iitpkd.ac.in' },
-        update: { passwordHash: bcrypt.hashSync('password123', 10) },
+        update: { passwordHash: bcrypt.hashSync('password123', 10), role: Role.ASSISTANT_WARDEN },
         create: {
             id: uuidv4(),
             email: 'warden1@iitpkd.ac.in',

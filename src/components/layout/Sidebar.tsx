@@ -57,6 +57,12 @@ const getNavLinks = (role: Role) => {
                 { title: 'Approvals', href: '/oic', icon: ListChecks }
             );
             break;
+        case 'ASSISTANT_WARDEN':
+            links.push(
+                { title: 'Dashboard', href: '/warden', icon: LayoutDashboard },
+                { title: 'Student Logs', href: '/warden', icon: FileText }
+            );
+            break;
         case 'ADMIN':
             links.push(
                 { title: 'Dashboard', href: '/admin', icon: LayoutDashboard },
