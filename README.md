@@ -12,7 +12,7 @@ The VMS digitizes the entire lifecycle of visitor passes—from drafting and mul
 - **Advanced Walk-in Capture:** Physical webcam implementations combined with a multi-tiered **3-signature digital pad** (Visitor, Security, Host) tracking physical walk-in validity securely.
 - **Secure QR Code Generation:** Real-time generation of encrypted QR codes distributed via Email API to visitors for seamless security scanning, explicitly bypassing email image strippers via direct raw-byte proxies.
 - **Scanner Workflows:** Security guards can scan QR codes logging both `ENTRY`, `INTERMEDIATE_EXIT`, and `FINAL_EXIT`. Dedicated overlays allow isolating **`STUDENT_EXIT_OUT`** and **`STUDENT_EXIT_RETURN`** pipelines completely explicitly alerting Assistant Wardens automatically.
-- **Security Analytics & Alerts:** Security Dashboard includes real-time feeds of gate operations and an active alert tracker for Overstaying Visitors directly querying DB checkpoints.
+- **Security Analytics & Alerts:** Security Dashboard includes real-time feeds of gate operations and a highly optimized, background-polling active alert tracker for Overstaying Visitors (featuring click-to-call action links and real-time overdue calculations).
 - **Admin Reporting Engine:** A powerful data visualization UI for exporting custom-timeline analytical CSV reports.
 
 ## Tech Stack
