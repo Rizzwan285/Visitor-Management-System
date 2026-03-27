@@ -8,6 +8,10 @@ import { format } from 'date-fns';
 import { CalendarIcon, Clock, MapPin, Printer, UserX, Share2, Phone } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
+import { useState } from 'react';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { api } from '@/services/api';
 
 interface PassDetailProps {
     pass: VisitorPassWithDetails;
@@ -17,6 +21,10 @@ interface PassDetailProps {
 export function PassDetail({ pass, role }: PassDetailProps) {
     const router = useRouter();
     const { mutateAsync: cancelPass, isPending: isCancelling } = useCancelPass();
+
+    const [isForwardOpen, setIsForwardOpen] = useState(false);
+    const [forwardEmail, setForwardEmail] = useState('');
+    const [isForwarding, setIsForwarding] = useState(false);
 
     // Use the server-generated QR code URL (already a data URL)
     const qrUrl = pass.qrCodeUrl || '';
@@ -34,6 +42,24 @@ export function PassDetail({ pass, role }: PassDetailProps) {
             } catch (err: any) {
                 toast.error(err.message || 'Failed to cancel pass');
             }
+        }
+    };
+
+    const handleForward = async () => {
+        if (!forwardEmail || !forwardEmail.includes('@')) {
+            toast.error('Please enter a valid email address');
+            return;
+        }
+        try {
+            setIsForwarding(true);
+            await api.post(`/api/passes/${pass.id}/forward`, { email: forwardEmail });
+            toast.success('Pass successfully forwarded');
+            setIsForwardOpen(false);
+            setForwardEmail('');
+        } catch (err: any) {
+            toast.error(err.message || 'Failed to forward pass');
+        } finally {
+            setIsForwarding(false);
         }
     };
 
@@ -73,9 +99,38 @@ export function PassDetail({ pass, role }: PassDetailProps) {
                     )}
 
                     {pass.passType === 'STUDENT_EXIT' && pass.status === 'ACTIVE' && (
-                        <Button variant="outline" className="gap-2 flex-1 md:flex-none" onClick={() => toast.info('Email dialog would open here')}>
-                            <Share2 className="h-4 w-4" /> Forward
-                        </Button>
+                        <Dialog open={isForwardOpen} onOpenChange={setIsForwardOpen}>
+                            <DialogTrigger asChild>
+                                <Button variant="outline" className="gap-2 flex-1 md:flex-none">
+                                    <Share2 className="h-4 w-4" /> Forward
+                                </Button>
+                            </DialogTrigger>
+                            <DialogContent>
+                                <DialogHeader>
+                                    <DialogTitle>Forward Exit Pass</DialogTitle>
+                                    <DialogDescription>
+                                        Send a copy of this Student Exit pass to another official or warden immediately.
+                                    </DialogDescription>
+                                </DialogHeader>
+                                <div className="space-y-4 py-4">
+                                    <div className="space-y-2">
+                                        <label className="text-sm font-medium">Recipient Email</label>
+                                        <Input
+                                            type="email"
+                                            placeholder="warden@iitpkd.ac.in"
+                                            value={forwardEmail}
+                                            onChange={(e) => setForwardEmail(e.target.value)}
+                                        />
+                                    </div>
+                                </div>
+                                <DialogFooter>
+                                    <Button variant="outline" onClick={() => setIsForwardOpen(false)} disabled={isForwarding}>Cancel</Button>
+                                    <Button onClick={handleForward} disabled={isForwarding}>
+                                        {isForwarding ? 'Forwarding...' : 'Send Pass'}
+                                    </Button>
+                                </DialogFooter>
+                            </DialogContent>
+                        </Dialog>
                     )}
 
                     {['ACTIVE', 'PENDING_APPROVAL'].includes(pass.status) && role !== 'SECURITY' && (
