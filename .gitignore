@@ -46,11 +46,6 @@ next-env.d.ts
 # IDE & AI
 .vscode/
 .claude/
-execution_plan.md
-Walkthrough.md
-tests/Walkthrough.md
-executions_tasks.md
-SETUP_NOTES.md
 
 # Debug Logs
 logs/
@@ -58,11 +53,8 @@ logs/
 *.json
 !package.json
 !package-lock.json
+!components.json
 !tsconfig.json
 *.txt
 !README.md
 *.log
-todo.md
-
-project_details.md
-vms_implementation_prompt.md
