@@ -21,7 +21,7 @@ async function main() {
 
     const employeeUser = await prisma.user.upsert({
         where: { email: 'john.doe@iitpkd.ac.in' },
-        update: {},
+        update: { passwordHash: bcrypt.hashSync('password123', 10) },
         create: {
             id: uuidv4(),
             email: 'john.doe@iitpkd.ac.in',
@@ -29,13 +29,14 @@ async function main() {
             role: Role.EMPLOYEE,
             uniqueId: '1000000001',
             department: 'Computer Science',
+            passwordHash: bcrypt.hashSync('password123', 10),
         },
     });
     console.log(`  ✓ Employee: ${employeeUser.email}`);
 
     const studentUser = await prisma.user.upsert({
         where: { email: 'student01@smail.iitpkd.ac.in' },
-        update: {},
+        update: { passwordHash: bcrypt.hashSync('password123', 10) },
         create: {
             id: uuidv4(),
             email: 'student01@smail.iitpkd.ac.in',
@@ -43,13 +44,14 @@ async function main() {
             role: Role.STUDENT,
             rollNumber: '112201001',
             department: 'Computer Science',
+            passwordHash: bcrypt.hashSync('password123', 10),
         },
     });
     console.log(`  ✓ Student: ${studentUser.email}`);
 
     const officialUser = await prisma.user.upsert({
         where: { email: 'office_cs@iitpkd.ac.in' },
-        update: {},
+        update: { passwordHash: bcrypt.hashSync('password123', 10) },
         create: {
             id: uuidv4(),
             email: 'office_cs@iitpkd.ac.in',
@@ -57,16 +59,17 @@ async function main() {
             role: Role.OFFICIAL,
             uniqueId: '1000000003',
             department: 'Computer Science',
+            passwordHash: bcrypt.hashSync('password123', 10),
         },
     });
     console.log(`  ✓ Official: ${officialUser.email}`);
 
     const wardenUser = await prisma.user.upsert({
-        where: { email: 'warden1@iitpkd.ac.in' },
+        where: { email: 'student.iitpkd01+warden@gmail.com' },
         update: { passwordHash: bcrypt.hashSync('password123', 10), role: Role.ASSISTANT_WARDEN },
         create: {
             id: uuidv4(),
-            email: 'warden1@iitpkd.ac.in',
+            email: 'student.iitpkd01+warden@gmail.com',
             name: 'Assistant Warden',
             role: Role.ASSISTANT_WARDEN,
             uniqueId: '1000000006',
@@ -78,38 +81,39 @@ async function main() {
 
     const securityUser = await prisma.user.upsert({
         where: { email: 'security@iitpkd.ac.in' },
-        update: { passwordHash: bcrypt.hashSync(securityPassword, 10) },
+        update: { passwordHash: bcrypt.hashSync('password123', 10) },
         create: {
             id: uuidv4(),
             email: 'security@iitpkd.ac.in',
             name: 'Gate Security',
             role: Role.SECURITY,
             uniqueId: '1000000004',
-            passwordHash: bcrypt.hashSync(securityPassword, 10),
+            passwordHash: bcrypt.hashSync('password123', 10),
         },
     });
     console.log(`  ✓ Security: ${securityUser.email}`);
 
     const adminUser = await prisma.user.upsert({
-        where: { email: 'admin@iitpkd.ac.in' },
-        update: {},
+        where: { email: 'student.iitpkd01@gmail.com' },
+        update: { passwordHash: bcrypt.hashSync('Pass123!', 10) },
         create: {
             id: uuidv4(),
-            email: 'admin@iitpkd.ac.in',
+            email: 'student.iitpkd01@gmail.com',
             name: 'System Admin',
             role: Role.ADMIN,
             uniqueId: '1000000005',
             department: 'Administration',
+            passwordHash: bcrypt.hashSync('Pass123!', 10),
         },
     });
     console.log(`  ✓ Admin: ${adminUser.email}`);
 
     const oicUser = await prisma.user.upsert({
-        where: { email: 'oic.studentsection@iitpkd.ac.in' },
-        update: { passwordHash: bcrypt.hashSync('password123', 10) },
+        where: { email: 'warden1@iitpkd.ac.in' },
+        update: { passwordHash: bcrypt.hashSync('password123', 10), role: Role.OIC_STUDENT_SECTION },
         create: {
             id: uuidv4(),
-            email: 'oic.studentsection@iitpkd.ac.in',
+            email: 'warden1@iitpkd.ac.in',
             name: 'Officer-in-Charge, Student Section',
             role: Role.OIC_STUDENT_SECTION,
             passwordHash: bcrypt.hashSync('password123', 10),
