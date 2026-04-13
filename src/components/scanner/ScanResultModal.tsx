@@ -14,7 +14,7 @@ export function ScanResultModal({ isOpen, onClose, passData }: ScanResultModalPr
 
     if (!passData) return null;
 
-    const handleLogScan = async (scanType: 'ENTRY' | 'INTERMEDIATE_EXIT' | 'FINAL_EXIT' | 'STUDENT_EXIT_OUT' | 'STUDENT_EXIT_RETURN') => {
+    const handleLogScan = async (scanType: 'ENTRY' | 'INTERMEDIATE_EXIT' | 'FINAL_EXIT' | 'STUDENT_EXIT_OUT' | 'STUDENT_EXIT_RETURN' | 'STUDENT_EXIT_AUTO') => {
         try {
             await logScan.mutateAsync({
                 passId: passData.id,
@@ -103,7 +103,7 @@ export function ScanResultModal({ isOpen, onClose, passData }: ScanResultModalPr
                                 <span className="text-slate-500 font-semibold block mb-2">Visitor Photo</span>
                                 <div className="w-32 h-32 rounded-lg overflow-hidden border">
                                     <img 
-                                        src={`/api/passes/${passData.id}/photo`} 
+                                        src={passData.visitorPhotoUrl.startsWith('data:') ? passData.visitorPhotoUrl : `/api/passes/${passData.id}/photo`} 
                                         alt={`Photo of ${passData.visitorName}`} 
                                         className="w-full h-full object-cover" 
                                     />
@@ -142,12 +142,10 @@ export function ScanResultModal({ isOpen, onClose, passData }: ScanResultModalPr
                     {isActive ? (
                         passData.passType === 'STUDENT_EXIT' ? (
                             <div className="w-full flex flex-col gap-3 pt-4 border-t">
-                                <Button onClick={() => handleLogScan('STUDENT_EXIT_OUT')} className="w-full bg-amber-600 hover:bg-amber-700" size="lg" disabled={logScan.isPending}>
-                                    Log Student Exit (Leaving Campus)
+                                <Button onClick={() => handleLogScan('STUDENT_EXIT_AUTO')} className="w-full bg-indigo-600 hover:bg-indigo-700" size="lg" disabled={logScan.isPending}>
+                                    Log Student Gate Scan
                                 </Button>
-                                <Button onClick={() => handleLogScan('STUDENT_EXIT_RETURN')} className="w-full bg-green-600 hover:bg-green-700" size="lg" disabled={logScan.isPending}>
-                                    Log Student Return (Back to Campus)
-                                </Button>
+                                <p className="text-xs text-center text-slate-500">The system will automatically log an Exit or Return based on current state.</p>
                             </div>
                         ) : (
                             <div className="w-full flex flex-col gap-3 pt-4 border-t">

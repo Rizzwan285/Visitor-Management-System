@@ -90,6 +90,21 @@ export function WalkinPassForm() {
             return;
         }
 
+        if (!visitorSignatureUrl) {
+            toast.error('Visitor signature is mandatory. Please provide the visitor\'s signature.');
+            return;
+        }
+
+        if (!securitySignatureUrl) {
+            toast.error('Security officer signature is mandatory. Please countersign.');
+            return;
+        }
+
+        if (!hostSignatureUrl) {
+            toast.error('Host signature is mandatory. Please acquire the host\'s signature.');
+            return;
+        }
+
         const formData = new FormData(e.currentTarget);
 
         const data = {

@@ -13,6 +13,7 @@ export type AuditAction =
     | 'SCAN_FINAL_EXIT'
     | 'SCAN_STUDENT_EXIT_OUT'
     | 'SCAN_STUDENT_EXIT_RETURN'
+    | 'SCAN_STUDENT_EXIT_AUTO'
     | 'USER_LOGIN';
 
 interface LogParams {

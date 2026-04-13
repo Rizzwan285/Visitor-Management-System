@@ -77,16 +77,60 @@ export const ScanService = {
     async logScan(
         passId: string,
         securityId: string,
-        scanType: ScanType,
+        scanType: ScanType | 'STUDENT_EXIT_AUTO',
         gateLocation?: string,
         notes?: string,
         ipAddress?: string
     ): Promise<ScanLogWithRelations> {
+        // ENFORCE STATE MACHINE: Backend must independently validate before any action
+        const pass = await prisma.visitorPass.findUnique({
+            where: { id: passId },
+            include: { scanLogs: { orderBy: { scannedAt: 'desc' }, take: 1 } }
+        });
+
+        if (!pass) throw new Error('Pass not found');
+
+        if (pass.status !== 'ACTIVE') {
+            throw new Error(`Cannot log scan. Pass is already ${pass.status}.`);
+        }
+
+        const now = new Date();
+        if (now > pass.visitTo) {
+            // Auto-expire dynamically right before scanning if time exceeded
+            await prisma.visitorPass.update({
+                where: { id: passId },
+                data: { status: 'EXPIRED' }
+            });
+            throw new Error('Pass validity period has expired and the pass was automatically closed.');
+        }
+
+        if (now < pass.visitFrom) {
+            throw new Error('Pass visit window has not started yet.');
+        }
+
+        const lastLog = pass.scanLogs[0];
+        if (lastLog) {
+            // Debounce: 60 seconds
+            if (now.getTime() - lastLog.scannedAt.getTime() < 60000) {
+                throw new Error('Scan cooldown active. Please wait 60 seconds before scanning again.');
+            }
+        }
+
+        let finalScanType = scanType;
+
+        if (scanType === 'STUDENT_EXIT_AUTO') {
+            if (lastLog?.scanType === 'STUDENT_EXIT_OUT') {
+                finalScanType = 'STUDENT_EXIT_RETURN';
+            } else {
+                finalScanType = 'STUDENT_EXIT_OUT';
+            }
+        }
+
         const scanLog = (await prisma.scanLog.create({
             data: {
                 passId,
                 scannedById: securityId,
-                scanType,
+                scanType: finalScanType as ScanType,
                 gateLocation: gateLocation ?? null,
                 notes: notes ?? null,
             },
@@ -96,7 +140,7 @@ export const ScanService = {
             },
         })) as ScanLogWithRelations;
 
-        const typeStr = scanType as string;
+        const typeStr = finalScanType as string;
         if (typeStr === 'FINAL_EXIT') {
             await prisma.visitorPass.update({
                 where: { id: passId },
@@ -105,25 +149,17 @@ export const ScanService = {
             // Also update the in-memory returned pass object so UI reflects it immediately
             scanLog.pass.status = 'EXPIRED';
         } else if (typeStr === 'STUDENT_EXIT_RETURN' || typeStr === 'STUDENT_EXIT_OUT') {
-            if (typeStr === 'STUDENT_EXIT_RETURN') {
-                await prisma.visitorPass.update({
-                    where: { id: passId },
-                    data: { status: 'EXPIRED' }
-                });
-                scanLog.pass.status = 'EXPIRED';
-            }
-            
-            // Explicitly notify Assistant Wardens of student flow
+            // Explicitly notify Assistant Wardens of student flow natively triggered from the backend interceptor
             const { EmailService } = require('@/services/email.service');
             void EmailService.sendStudentScanNotification(scanLog.pass, typeStr);
         }
 
         void AuditService.log({
             userId: securityId,
-            action: `SCAN_${scanType}`,
+            action: `SCAN_${finalScanType}`,
             entityType: 'ScanLog',
             entityId: scanLog.id,
-            changes: { passId, scanType, gateLocation },
+            changes: { passId, scanType: finalScanType, gateLocation },
             ipAddress,
         });
 

@@ -23,7 +23,7 @@ export function StudentGuestPassForm() {
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         if (!approverId) {
-            toast.error('Please select a faculty approver.');
+            toast.error('Please select an OIC Student Section approver.');
             return;
         }
 
@@ -62,7 +62,7 @@ export function StudentGuestPassForm() {
                     </div>
                     <div className="ml-3">
                         <p className="text-sm text-yellow-700">
-                            This pass requires faculty approval before it becomes active. You will be notified once approved.
+                            This pass requires OIC Student Section approval before it becomes active. You will be notified once approved.
                         </p>
                     </div>
                 </div>
@@ -71,7 +71,7 @@ export function StudentGuestPassForm() {
             <div className="space-y-4">
                 {/* Approver Selection */}
                 <div className="space-y-2 p-4 border rounded-md bg-slate-50">
-                    <Label htmlFor="approver" className="font-semibold text-blue-800">Assign Faculty Approver *</Label>
+                    <Label htmlFor="approver" className="font-semibold text-blue-800">Assign OIC Student Section Approver *</Label>
                     <Select value={approverId} onValueChange={setApproverId} required>
                         <SelectTrigger>
                             <SelectValue placeholder={isLoadingAdmins ? 'Loading approvers...' : 'Select an approver'} />
@@ -87,7 +87,7 @@ export function StudentGuestPassForm() {
                             )}
                         </SelectContent>
                     </Select>
-                    <p className="text-xs text-slate-500">The assigned faculty member will receive an email to approve this pass.</p>
+                    <p className="text-xs text-slate-500">The assigned OIC Student Section member will receive an email to approve this pass.</p>
                 </div>
 
                 <div className="space-y-2">
