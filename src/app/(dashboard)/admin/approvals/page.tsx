@@ -23,7 +23,7 @@ export default function AdminApprovalsPage() {
         <div className="max-w-5xl mx-auto space-y-6">
             <div>
                 <h1 className="text-3xl font-bold tracking-tight">Access Approvals</h1>
-                <p className="text-slate-500">Review and authorize pending visitor requests requiring high-level or faculty consent.</p>
+                <p className="text-muted-foreground">Review and authorize pending visitor requests requiring high-level or faculty consent.</p>
             </div>
 
             <Tabs defaultValue="pending" className="w-full">
@@ -36,9 +36,9 @@ export default function AdminApprovalsPage() {
 
                 <TabsContent value="pending" className="mt-6">
                     {isLoading ? (
-                        <div className="p-12 text-center text-slate-500">Loading requests...</div>
+                        <div className="p-12 text-center text-muted-foreground">Loading requests...</div>
                     ) : pendingPasses.length === 0 ? (
-                        <div className="bg-white p-12 rounded-xl border border-dashed flex flex-col items-center justify-center text-slate-500 space-y-3">
+                        <div className="bg-card p-12 rounded-xl border border-dashed flex flex-col items-center justify-center text-muted-foreground space-y-3">
                             <ClipboardList className="h-10 w-10 text-slate-300" />
                             <p>No pending approvals at the moment.</p>
                         </div>
@@ -53,9 +53,9 @@ export default function AdminApprovalsPage() {
 
                 <TabsContent value="history" className="mt-6">
                     {isLoading ? (
-                        <div className="p-12 text-center text-slate-500">Loading history...</div>
+                        <div className="p-12 text-center text-muted-foreground">Loading history...</div>
                     ) : pastPasses.length === 0 ? (
-                        <div className="bg-white p-12 rounded-xl border border-dashed flex flex-col items-center justify-center text-slate-500 space-y-3">
+                        <div className="bg-card p-12 rounded-xl border border-dashed flex flex-col items-center justify-center text-muted-foreground space-y-3">
                             <ClipboardList className="h-10 w-10 text-slate-300" />
                             <p>No past decisions found.</p>
                         </div>

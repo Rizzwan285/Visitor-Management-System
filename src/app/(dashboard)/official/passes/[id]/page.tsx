@@ -15,7 +15,7 @@ export default function OfficialPassDetailPage() {
     const { data: pass, isLoading, isError } = usePassDetail(id);
 
     if (isLoading) {
-        return <div className="p-12 text-center text-slate-500">Loading pass details...</div>;
+        return <div className="p-12 text-center text-muted-foreground">Loading pass details...</div>;
     }
 
     if (isError || !pass) {
@@ -30,7 +30,7 @@ export default function OfficialPassDetailPage() {
     return (
         <div className="max-w-4xl mx-auto space-y-6">
             <div className="no-print mb-4">
-                <Button variant="ghost" className="gap-2 text-slate-500" onClick={() => router.back()}>
+                <Button variant="ghost" className="gap-2 text-muted-foreground" onClick={() => router.back()}>
                     <ArrowLeft className="h-4 w-4" /> Back to Dashboard
                 </Button>
             </div>

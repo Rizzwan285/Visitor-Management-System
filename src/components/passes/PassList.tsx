@@ -47,7 +47,7 @@ export function PassList({ basePath, defaultPassType, showTypeFilter = true, tit
             {/* Filters */}
             <div className="flex flex-wrap gap-4 items-center">
                 <div className="relative flex-1 min-w-[200px]">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     <Input
                         placeholder="Search by visitor name..."
                         className="pl-10"
@@ -89,11 +89,11 @@ export function PassList({ basePath, defaultPassType, showTypeFilter = true, tit
 
             {/* List */}
             {isLoading ? (
-                <div className="p-12 text-center text-slate-500">Loading passes...</div>
+                <div className="p-12 text-center text-muted-foreground">Loading passes...</div>
             ) : isError ? (
                 <div className="p-12 text-center text-red-500">Failed to load passes. Please try again.</div>
             ) : passes.length === 0 ? (
-                <div className="p-12 text-center text-slate-500 border border-dashed rounded-xl">
+                <div className="p-12 text-center text-muted-foreground border border-dashed rounded-xl">
                     No passes found matching your criteria.
                 </div>
             ) : (
@@ -109,7 +109,7 @@ export function PassList({ basePath, defaultPassType, showTypeFilter = true, tit
             {/* Pagination */}
             {meta && meta.totalPages > 1 && (
                 <div className="flex items-center justify-between pt-4">
-                    <div className="text-sm text-slate-500">
+                    <div className="text-sm text-muted-foreground">
                         Page {meta.page} of {meta.totalPages} ({meta.total} total)
                     </div>
                     <div className="flex gap-2">

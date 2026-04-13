@@ -28,7 +28,7 @@ export function RecentActivity({ items, title = 'Recent Passes' }: RecentActivit
             </CardHeader>
             <CardContent>
                 {items.length === 0 ? (
-                    <div className="text-center py-6 text-slate-500 text-sm">
+                    <div className="text-center py-6 text-muted-foreground text-sm">
                         No recent activity found.
                     </div>
                 ) : (
@@ -44,7 +44,7 @@ export function RecentActivity({ items, title = 'Recent Passes' }: RecentActivit
                                         <p className="text-sm font-medium leading-none truncate pr-2">
                                             {item.visitorName}
                                         </p>
-                                        <p className="text-sm text-slate-500 truncate pr-2">
+                                        <p className="text-sm text-muted-foreground truncate pr-2">
                                             {item.description}
                                         </p>
                                     </div>
@@ -59,7 +59,7 @@ export function RecentActivity({ items, title = 'Recent Passes' }: RecentActivit
                                         >
                                             {item.status.replace('_', ' ')}
                                         </Badge>
-                                        <div className="text-xs text-slate-400">
+                                        <div className="text-xs text-muted-foreground">
                                             {item.time}
                                         </div>
                                     </div>
@@ -67,7 +67,7 @@ export function RecentActivity({ items, title = 'Recent Passes' }: RecentActivit
                             );
 
                             return item.href ? (
-                                <Link key={item.id} href={item.href} className="block hover:bg-slate-50 p-2 -mx-2 rounded-md transition-colors">
+                                <Link key={item.id} href={item.href} className="block hover:bg-background p-2 -mx-2 rounded-md transition-colors">
                                     {content}
                                 </Link>
                             ) : (

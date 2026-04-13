@@ -209,28 +209,28 @@ export default function ReportsPage() {
                     <div className="flex flex-col md:flex-row gap-4 items-end">
                         <div className="space-y-2 w-full md:w-auto">
                             <label className="text-sm font-medium">Timeline</label>
-                            <div className="flex border rounded-md overflow-hidden bg-slate-50">
+                            <div className="flex border rounded-md overflow-hidden bg-background">
                                 <button 
                                     onClick={() => setTimeline('today')}
-                                    className={`px-4 py-2 text-sm font-medium transition-colors ${timeline === 'today' ? 'bg-blue-600 text-white' : 'hover:bg-slate-200 text-slate-700'}`}
+                                    className={`px-4 py-2 text-sm font-medium transition-colors ${timeline === 'today' ? 'bg-primary text-white' : 'hover:bg-muted/80 text-foreground'}`}
                                 >
                                     Today
                                 </button>
                                 <button 
                                     onClick={() => setTimeline('week')}
-                                    className={`px-4 py-2 text-sm font-medium border-l transition-colors border-slate-200 ${timeline === 'week' ? 'bg-blue-600 text-white' : 'hover:bg-slate-200 text-slate-700'}`}
+                                    className={`px-4 py-2 text-sm font-medium border-l transition-colors border-border ${timeline === 'week' ? 'bg-primary text-white' : 'hover:bg-muted/80 text-foreground'}`}
                                 >
                                     Last 7 Days
                                 </button>
                                 <button 
                                     onClick={() => setTimeline('month')}
-                                    className={`px-4 py-2 text-sm font-medium border-l transition-colors border-slate-200 ${timeline === 'month' ? 'bg-blue-600 text-white' : 'hover:bg-slate-200 text-slate-700'}`}
+                                    className={`px-4 py-2 text-sm font-medium border-l transition-colors border-border ${timeline === 'month' ? 'bg-primary text-white' : 'hover:bg-muted/80 text-foreground'}`}
                                 >
                                     Last 30 Days
                                 </button>
                                 <button 
                                     onClick={() => setTimeline('custom')}
-                                    className={`px-4 py-2 text-sm font-medium border-l transition-colors border-slate-200 ${timeline === 'custom' ? 'bg-blue-600 text-white' : 'hover:bg-slate-200 text-slate-700'}`}
+                                    className={`px-4 py-2 text-sm font-medium border-l transition-colors border-border ${timeline === 'custom' ? 'bg-primary text-white' : 'hover:bg-muted/80 text-foreground'}`}
                                 >
                                     Custom Range
                                 </button>
@@ -265,7 +265,7 @@ export default function ReportsPage() {
             </Card>
 
             {isLoading ? (
-                <div className="py-20 flex justify-center text-slate-500">
+                <div className="py-20 flex justify-center text-muted-foreground">
                     <RefreshCcw className="h-8 w-8 animate-spin opacity-50" />
                 </div>
             ) : summary ? (
@@ -275,7 +275,7 @@ export default function ReportsPage() {
                         <Card>
                             <CardContent className="pt-6">
                                 <div className="flex items-center gap-4">
-                                    <div className="h-12 w-12 rounded-full bg-blue-100 flex items-center justify-center text-blue-600">
+                                    <div className="h-12 w-12 rounded-full bg-blue-100 flex items-center justify-center text-primary">
                                         <FileText className="h-6 w-6" />
                                     </div>
                                     <div>
@@ -291,19 +291,19 @@ export default function ReportsPage() {
                                 <p className="text-sm font-medium text-muted-foreground mb-4">Pass Breakdown</p>
                                 <div className="space-y-2 text-sm">
                                     <div className="flex justify-between items-center">
-                                        <span className="text-slate-600">Guest Passes</span>
+                                        <span className="text-muted-foreground">Guest Passes</span>
                                         <span className="font-semibold">{summary.byType.STUDENT_GUEST + summary.byType.EMPLOYEE_GUEST}</span>
                                     </div>
                                     <div className="flex justify-between items-center">
-                                        <span className="text-slate-600">Exit Passes</span>
+                                        <span className="text-muted-foreground">Exit Passes</span>
                                         <span className="font-semibold">{summary.byType.STUDENT_EXIT}</span>
                                     </div>
                                     <div className="flex justify-between items-center">
-                                        <span className="text-slate-600">Walk-ins</span>
+                                        <span className="text-muted-foreground">Walk-ins</span>
                                         <span className="font-semibold">{summary.byType.WALKIN}</span>
                                     </div>
                                     <div className="flex justify-between items-center">
-                                        <span className="text-slate-600">Official</span>
+                                        <span className="text-muted-foreground">Official</span>
                                         <span className="font-semibold">{summary.byType.OFFICIAL}</span>
                                     </div>
                                 </div>
@@ -326,7 +326,7 @@ export default function ReportsPage() {
                                         <span className="block text-xl font-bold">{summary.byStatus.REJECTED}</span>
                                         <span className="text-xs uppercase font-medium">Rejected</span>
                                     </div>
-                                    <div className="p-3 bg-slate-50 rounded-lg text-slate-900 border border-slate-100">
+                                    <div className="p-3 bg-background rounded-lg text-foreground border border-border">
                                         <span className="block text-xl font-bold">{summary.byStatus.EXPIRED + summary.byStatus.CANCELLED}</span>
                                         <span className="text-xs uppercase font-medium">Inactive</span>
                                     </div>
@@ -344,7 +344,7 @@ export default function ReportsPage() {
                         <CardContent>
                             <div className="overflow-x-auto">
                                 <table className="w-full text-sm text-left">
-                                    <thead className="text-xs text-slate-500 uppercase bg-slate-50 border-b">
+                                    <thead className="text-xs text-muted-foreground uppercase bg-background border-b">
                                         <tr>
                                             <th className="px-4 py-3 font-medium">Pass Number</th>
                                             <th className="px-4 py-3 font-medium">Pass Type</th>
@@ -356,28 +356,28 @@ export default function ReportsPage() {
                                     </thead>
                                     <tbody>
                                         {passes.length > 0 ? passes.map((pass) => (
-                                            <tr key={pass.id} className="border-b hover:bg-slate-50">
+                                            <tr key={pass.id} className="border-b hover:bg-background">
                                                 <td className="px-4 py-3 font-medium">{pass.passNumber}</td>
-                                                <td className="px-4 py-3 text-slate-600">{pass.passType.replace('_', ' ')}</td>
+                                                <td className="px-4 py-3 text-muted-foreground">{pass.passType.replace('_', ' ')}</td>
                                                 <td className="px-4 py-3">
                                                     <span className={`px-2 py-1 rounded-full text-xs font-medium 
                                                         ${pass.status === 'ACTIVE' || pass.status === 'APPROVED' ? 'bg-green-100 text-green-700' : ''}
                                                         ${pass.status === 'PENDING_APPROVAL' ? 'bg-yellow-100 text-yellow-700' : ''}
                                                         ${pass.status === 'REJECTED' || pass.status === 'CANCELLED' ? 'bg-red-100 text-red-700' : ''}
-                                                        ${pass.status === 'EXPIRED' ? 'bg-slate-100 text-slate-700' : ''}
+                                                        ${pass.status === 'EXPIRED' ? 'bg-muted text-foreground' : ''}
                                                     `}>
                                                         {pass.status}
                                                     </span>
                                                 </td>
                                                 <td className="px-4 py-3">{pass.visitorName || '-'}</td>
                                                 <td className="px-4 py-3">{pass.createdBy?.name || pass.createdBy?.email}</td>
-                                                <td className="px-4 py-3 text-slate-500">
+                                                <td className="px-4 py-3 text-muted-foreground">
                                                     {new Date(pass.createdAt).toLocaleDateString()} {new Date(pass.createdAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
                                                 </td>
                                             </tr>
                                         )) : (
                                             <tr>
-                                                <td colSpan={6} className="px-4 py-8 text-center text-slate-500">
+                                                <td colSpan={6} className="px-4 py-8 text-center text-muted-foreground">
                                                     No passes found in this time range.
                                                 </td>
                                             </tr>

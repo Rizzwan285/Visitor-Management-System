@@ -30,7 +30,7 @@ export function SignaturePad({ label, onSignatureChange }: SignaturePadProps) {
   return (
     <div className="space-y-2">
       <label className="text-sm font-medium">{label}</label>
-      <div className="border rounded-lg bg-white relative">
+      <div className="border rounded-lg bg-card relative">
         <SignatureCanvas
           ref={sigRef}
           canvasProps={{

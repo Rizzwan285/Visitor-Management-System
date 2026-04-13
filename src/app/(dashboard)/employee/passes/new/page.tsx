@@ -8,9 +8,9 @@ export default async function NewEmployeePassPage() {
         <div className="max-w-2xl mx-auto space-y-6">
             <div>
                 <h1 className="text-3xl font-bold tracking-tight">Register Guest</h1>
-                <p className="text-slate-500">Create a visitor pass for your upcoming guest.</p>
+                <p className="text-muted-foreground">Create a visitor pass for your upcoming guest.</p>
             </div>
-            <div className="bg-white p-6 rounded-xl border shadow-sm">
+            <div className="bg-card p-6 rounded-xl border shadow-sm">
                 <EmployeePassForm />
             </div>
         </div>

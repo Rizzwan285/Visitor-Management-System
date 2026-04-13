@@ -43,7 +43,7 @@ export default function SecurityDashboardPage() {
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <div>
                     <h1 className="text-3xl font-bold tracking-tight">Security Gate</h1>
-                    <p className="text-slate-500">Scan QR codes and log walk-in visitors.</p>
+                    <p className="text-muted-foreground">Scan QR codes and log walk-in visitors.</p>
                 </div>
                 <div className="flex gap-2">
                     <Link href="/security/walkin">
@@ -53,7 +53,7 @@ export default function SecurityDashboardPage() {
                         </Button>
                     </Link>
                     <Link href="/security/scan">
-                        <Button className="gap-2 bg-blue-600 hover:bg-blue-700">
+                        <Button className="gap-2 bg-primary hover:bg-blue-700">
                             <ScanLine className="h-4 w-4" />
                             Scan QR
                         </Button>
@@ -64,7 +64,7 @@ export default function SecurityDashboardPage() {
             {isLoading ? (
                 <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
                     {[1, 2, 3, 4].map((i) => (
-                        <div key={i} className="h-24 bg-slate-100 rounded-xl animate-pulse" />
+                        <div key={i} className="h-24 bg-muted rounded-xl animate-pulse" />
                     ))}
                 </div>
             ) : (
@@ -78,10 +78,10 @@ export default function SecurityDashboardPage() {
                     <RecentActivity items={activityItems} title="Recent Scans" />
                 </div>
                 <div className="lg:col-span-3">
-                    <div className="rounded-xl border bg-slate-900 text-white shadow p-6 flex flex-col items-center justify-center text-center space-y-4 h-full min-h-[250px]">
-                        <ScanLine className="h-16 w-16 text-slate-400" />
+                    <div className="rounded-xl border bg-card text-white shadow p-6 flex flex-col items-center justify-center text-center space-y-4 h-full min-h-[250px]">
+                        <ScanLine className="h-16 w-16 text-muted-foreground" />
                         <h3 className="text-xl font-semibold">Ready to Scan</h3>
-                        <p className="text-slate-400 text-sm max-w-xs">
+                        <p className="text-muted-foreground text-sm max-w-xs">
                             Click the Scan QR button above to open the camera and verify passes.
                         </p>
                     </div>

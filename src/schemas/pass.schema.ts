@@ -41,9 +41,9 @@ const walkinPassObject = z.object({
     pointOfContact: z.string().min(1, 'Point of contact is required'),
     pocMobile: z.string().regex(/^\d{10}$/, 'Mobile must be 10 digits'),
     phoneConfirmedBy: z.string().min(1, 'Phone confirmation is required'),
-    visitorSignatureUrl: z.string().min(1, 'Visitor signature is required'),
-    securitySignatureUrl: z.string().min(1, 'Security signature is required'),
-    hostSignatureUrl: z.string().min(1, 'Host signature is required'),
+    visitorSignatureUrl: z.string().optional(),
+    securitySignatureUrl: z.string().optional(),
+    hostSignatureUrl: z.string().optional(),
 });
 
 const studentExitObject = z.object({
@@ -87,7 +87,10 @@ export const createPassSchema = z.discriminatedUnion('passType', [
     studentGuestObject,
     walkinPassObject,
     studentExitObject,
-]);
+]).refine((data) => new Date(data.visitTo) > new Date(data.visitFrom), {
+    message: 'Out time (visitTo) must be later than the In time (visitFrom)',
+    path: ['visitTo'],
+});
 
 // ─── Filters Schema ────────────────────────────────
 

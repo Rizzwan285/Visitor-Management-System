@@ -14,7 +14,7 @@ export function OverstayingAlerts() {
                 <h2 className="text-xl font-semibold flex items-center gap-2 text-red-600">
                     <AlertCircle className="h-5 w-5" /> Active Alerts: Overstaying Visitors
                 </h2>
-                <div className="h-24 bg-slate-100 rounded-xl animate-pulse" />
+                <div className="h-24 bg-muted rounded-xl animate-pulse" />
             </div>
         );
     }
@@ -66,7 +66,7 @@ export function OverstayingAlerts() {
                                             {pass.visitorMobile && (
                                                 <div className="flex justify-between items-center">
                                                     <span className="font-semibold text-xs text-red-600 uppercase tracking-wider">Visitor Phone</span>
-                                                    <a href={`tel:${pass.visitorMobile}`} className="bg-white border border-red-200 hover:bg-red-100 px-3 py-1 rounded text-red-800 font-medium transition-colors">
+                                                    <a href={`tel:${pass.visitorMobile}`} className="bg-card border border-red-200 hover:bg-red-100 px-3 py-1 rounded text-red-800 font-medium transition-colors">
                                                         {pass.visitorMobile}
                                                     </a>
                                                 </div>
@@ -82,7 +82,7 @@ export function OverstayingAlerts() {
                                             {pass.ccEmails && Array.isArray(pass.ccEmails) && pass.ccEmails.length > 0 && (
                                                 <div className="flex justify-between items-center mt-1">
                                                     <span className="font-semibold text-xs text-red-600 uppercase tracking-wider">Host Email</span>
-                                                    <a href={`mailto:${pass.ccEmails[0]}`} className="bg-white border border-red-200 hover:bg-red-100 px-3 py-1 rounded text-red-800 font-medium transition-colors truncate max-w-[150px]">
+                                                    <a href={`mailto:${pass.ccEmails[0]}`} className="bg-card border border-red-200 hover:bg-red-100 px-3 py-1 rounded text-red-800 font-medium transition-colors truncate max-w-[150px]">
                                                         {pass.ccEmails[0]}
                                                     </a>
                                                 </div>

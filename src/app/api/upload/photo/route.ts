@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { withAuth, withRole } from '@/lib/api-middleware';
 import { successResponse, errorResponse } from '@/types/api.types';
-import { writeFile, mkdir } from 'fs/promises';
-import path from 'path';
+import { supabase } from '@/lib/supabase';
 import { v4 as uuidv4 } from 'uuid';
 
 const MAX_FILE_SIZE = parseInt(process.env.MAX_FILE_SIZE || '5242880', 10); // 5MB default
@@ -71,16 +70,23 @@ export const POST = withAuth(
             const ext = extMap[file.type] || '.jpg';
             const filename = `${uuidv4()}${ext}`;
 
-            // Ensure upload directory exists
-            const uploadPath = path.resolve(UPLOAD_DIR);
-            await mkdir(uploadPath, { recursive: true });
-
-            // Write file
+            // Upload to Supabase Storage
             const bytes = await file.arrayBuffer();
             const buffer = Buffer.from(bytes);
-            await writeFile(path.join(uploadPath, filename), buffer);
+            
+            const { error } = await supabase.storage
+                .from('visitor-uploads')
+                .upload(filename, buffer, {
+                    contentType: file.type,
+                    upsert: false
+                });
 
-            const url = `/uploads/${filename}`;
+            if (error) {
+                console.error('Supabase upload error:', error);
+                throw error;
+            }
+
+            const url = `/api/secure-image/${filename}`;
 
             return NextResponse.json(
                 successResponse({ url, filename, size: file.size }),

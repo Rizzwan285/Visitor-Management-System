@@ -25,9 +25,16 @@ async function handleResponse<T>(res: Response): Promise<T> {
     const json: ApiResponse<T> = await res.json();
 
     if (!res.ok || !json.success) {
+        let errorMessage = json.error?.message || `Request failed with status ${res.status}`;
+        
+        // Surface specific Zod validation details into the active string so frontend toast natively displays it
+        if (json.error?.code === 'VALIDATION_ERROR' && Array.isArray(json.error?.details) && json.error.details.length > 0) {
+            errorMessage = json.error.details.map((d: any) => d.message).join(' | ');
+        }
+
         throw new ApiError(
             json.error?.code || 'UNKNOWN_ERROR',
-            json.error?.message || `Request failed with status ${res.status}`,
+            errorMessage,
             res.status,
             json.error?.details
         );
@@ -75,9 +82,15 @@ export const api = {
         const json: ApiResponse<T> = await res.json();
 
         if (!res.ok || !json.success) {
+            let errorMessage = json.error?.message || `Request failed with status ${res.status}`;
+            
+            if (json.error?.code === 'VALIDATION_ERROR' && Array.isArray(json.error?.details) && json.error.details.length > 0) {
+                errorMessage = json.error.details.map((d: any) => d.message).join(' | ');
+            }
+
             throw new ApiError(
                 json.error?.code || 'UNKNOWN_ERROR',
-                json.error?.message || `Request failed with status ${res.status}`,
+                errorMessage,
                 res.status,
                 json.error?.details
             );

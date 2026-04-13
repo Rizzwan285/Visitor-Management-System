@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { DateTimePicker } from '@/components/ui/date-time-picker';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -70,7 +71,7 @@ export function StudentGuestPassForm() {
 
             <div className="space-y-4">
                 {/* Approver Selection */}
-                <div className="space-y-2 p-4 border rounded-md bg-slate-50">
+                <div className="space-y-2 p-4 border rounded-md bg-background">
                     <Label htmlFor="approver" className="font-semibold text-blue-800">Assign OIC Student Section Approver *</Label>
                     <Select value={approverId} onValueChange={setApproverId} required>
                         <SelectTrigger>
@@ -87,7 +88,7 @@ export function StudentGuestPassForm() {
                             )}
                         </SelectContent>
                     </Select>
-                    <p className="text-xs text-slate-500">The assigned OIC Student Section member will receive an email to approve this pass.</p>
+                    <p className="text-xs text-muted-foreground">The assigned OIC Student Section member will receive an email to approve this pass.</p>
                 </div>
 
                 <div className="space-y-2">
@@ -128,11 +129,11 @@ export function StudentGuestPassForm() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
                         <Label htmlFor="visitFrom">Expected Entry</Label>
-                        <Input id="visitFrom" name="visitFrom" type="datetime-local" required />
+                        <DateTimePicker name="visitFrom" required />
                     </div>
                     <div className="space-y-2">
                         <Label htmlFor="visitTo">Expected Exit</Label>
-                        <Input id="visitTo" name="visitTo" type="datetime-local" required />
+                        <DateTimePicker name="visitTo" required />
                     </div>
                 </div>
             </div>

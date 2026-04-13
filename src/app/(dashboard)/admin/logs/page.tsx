@@ -58,17 +58,17 @@ export default function AdminScanLogsPage() {
                 <h1 className="text-3xl font-bold tracking-tight flex items-center gap-3">
                     <History className="h-8 w-8" /> Scan Logs
                 </h1>
-                <p className="text-slate-500">Chronological record of all gate entry and exit scans.</p>
+                <p className="text-muted-foreground">Chronological record of all gate entry and exit scans.</p>
             </div>
 
             <Card>
                 <CardContent className="p-0">
                     {isLoading ? (
-                        <div className="p-12 text-center text-slate-500">Loading scan logs...</div>
+                        <div className="p-12 text-center text-muted-foreground">Loading scan logs...</div>
                     ) : isError ? (
                         <div className="p-12 text-center text-red-500">Failed to load scan logs.</div>
                     ) : logs.length === 0 ? (
-                        <div className="p-12 text-center text-slate-500">No scan logs recorded yet.</div>
+                        <div className="p-12 text-center text-muted-foreground">No scan logs recorded yet.</div>
                     ) : (
                         <Table>
                             <TableHeader>
@@ -93,7 +93,7 @@ export default function AdminScanLogsPage() {
                                             </Badge>
                                         </TableCell>
                                         <TableCell className="font-medium">{log.pass.visitorName}</TableCell>
-                                        <TableCell className="text-sm text-slate-500">
+                                        <TableCell className="text-sm text-muted-foreground">
                                             {log.pass.passType.replace('_', ' ')}
                                         </TableCell>
                                         <TableCell className="text-sm">{log.gateLocation || 'Main Gate'}</TableCell>
@@ -108,7 +108,7 @@ export default function AdminScanLogsPage() {
 
             {meta && meta.totalPages > 1 && (
                 <div className="flex items-center justify-between">
-                    <div className="text-sm text-slate-500">
+                    <div className="text-sm text-muted-foreground">
                         Page {meta.page} of {meta.totalPages} ({meta.total} total)
                     </div>
                     <div className="flex gap-2">

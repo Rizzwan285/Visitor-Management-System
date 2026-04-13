@@ -5,13 +5,13 @@ import { useRouter } from 'next/navigation';
 import { Camera, Image as ImageIcon, RefreshCcw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { DateTimePicker } from '@/components/ui/date-time-picker';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from 'sonner';
 import { useCreatePass } from '@/hooks/usePasses';
 import { api } from '@/services/api';
-import { SignaturePad } from '@/components/ui/signature-pad';
 
 export function WalkinPassForm() {
     const router = useRouter();
@@ -25,11 +25,6 @@ export function WalkinPassForm() {
     const [uploadedPhotoUrl, setUploadedPhotoUrl] = useState<string | null>(null);
     const [isCameraActive, setIsCameraActive] = useState(false);
     const [isUploading, setIsUploading] = useState(false);
-
-    // Signature State
-    const [visitorSignatureUrl, setVisitorSignatureUrl] = useState<string | null>(null);
-    const [securitySignatureUrl, setSecuritySignatureUrl] = useState<string | null>(null);
-    const [hostSignatureUrl, setHostSignatureUrl] = useState<string | null>(null);
 
     // Form State
     const [idType, setIdType] = useState('AADHAR');
@@ -68,11 +63,25 @@ export function WalkinPassForm() {
                 setPhotoDataUrl(dataUrl);
                 stopCamera();
 
-                // Inject the raw base64 string directly into our persistent state
-                // This gracefully circumvents ephemeral Render storage wipes.
-                setUploadedPhotoUrl(dataUrl);
-                toast.success('Photo captured securely!');
-                setIsUploading(false);
+                setIsUploading(true);
+                try {
+                    // Convert the local browser dataUrl to a FormData blob
+                    const res = await fetch(dataUrl);
+                    const blob = await res.blob();
+                    const formData = new FormData();
+                    formData.append('photo', new File([blob], 'photo.jpg', { type: 'image/jpeg' }));
+
+                    // Actually upload it to our secured backend which pushes to Supabase Storage
+                    const result: any = await api.upload('/api/upload/photo', formData);
+                    
+                    setUploadedPhotoUrl(result.url); // Sets to /api/secure-image/xxx.jpg
+                    // Note: upload is now hidden silently per request
+                } catch (err: any) {
+                    toast.error('Failed to upload photo to storage. Let backend finalize errors.');
+                    console.error('Frontend upload fail:', err);
+                } finally {
+                    setIsUploading(false);
+                }
             }
         }
     };
@@ -87,21 +96,6 @@ export function WalkinPassForm() {
         e.preventDefault();
         if (!uploadedPhotoUrl) {
             toast.error('A photograph is mandatory for walk-in passes. Please capture and upload a photo.');
-            return;
-        }
-
-        if (!visitorSignatureUrl) {
-            toast.error('Visitor signature is mandatory. Please provide the visitor\'s signature.');
-            return;
-        }
-
-        if (!securitySignatureUrl) {
-            toast.error('Security officer signature is mandatory. Please countersign.');
-            return;
-        }
-
-        if (!hostSignatureUrl) {
-            toast.error('Host signature is mandatory. Please acquire the host\'s signature.');
             return;
         }
 
@@ -120,9 +114,6 @@ export function WalkinPassForm() {
             pocMobile: formData.get('pocMobile') as string,
             phoneConfirmedBy: formData.get('phoneConfirmedBy') as string,
             visitorPhotoUrl: uploadedPhotoUrl,
-            visitorSignatureUrl: visitorSignatureUrl,
-            securitySignatureUrl: securitySignatureUrl,
-            hostSignatureUrl: hostSignatureUrl,
             visitFrom: new Date(formData.get('visitFrom') as string).toISOString(),
             visitTo: new Date(formData.get('visitTo') as string).toISOString(),
         };
@@ -139,14 +130,14 @@ export function WalkinPassForm() {
     return (
         <form onSubmit={handleSubmit} className="space-y-8">
             {/* 1. Photograph Section */}
-            <div className="space-y-4 p-6 border rounded-lg bg-slate-50">
+            <div className="space-y-4 p-6 border rounded-lg bg-background">
                 <h3 className="font-semibold text-lg flex items-center gap-2">
                     <Camera className="h-5 w-5" /> Visitor Photograph *
                 </h3>
                 <div className="flex flex-col md:flex-row gap-6 items-center">
                     <div className="relative w-full md:w-80 aspect-video bg-black rounded-md overflow-hidden flex items-center justify-center">
                         {!isCameraActive && !photoDataUrl && (
-                            <div className="text-slate-500 flex flex-col items-center">
+                            <div className="text-muted-foreground flex flex-col items-center">
                                 <ImageIcon className="h-10 w-10 mb-2 opacity-50" />
                                 <span className="text-sm">No photo captured</span>
                             </div>
@@ -265,30 +256,14 @@ export function WalkinPassForm() {
                     <Textarea id="purpose" name="purpose" required />
                 </div>
 
-                {/* Signature Provisions */}
-                <div className="space-y-6 pt-4 border-t">
-                    <SignaturePad
-                        label="Visitor's Signature"
-                        onSignatureChange={(url) => setVisitorSignatureUrl(url)}
-                    />
-                    <SignaturePad
-                        label="Security Officer's Signature"
-                        onSignatureChange={(url) => setSecuritySignatureUrl(url)}
-                    />
-                    <SignaturePad
-                        label="Host / Person Being Visited's Signature"
-                        onSignatureChange={(url) => setHostSignatureUrl(url)}
-                    />
-                </div>
-
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-2">
                         <Label htmlFor="visitFrom">Valid From</Label>
-                        <Input id="visitFrom" name="visitFrom" type="datetime-local" required />
+                        <DateTimePicker name="visitFrom" required />
                     </div>
                     <div className="space-y-2">
                         <Label htmlFor="visitTo">Valid To</Label>
-                        <Input id="visitTo" name="visitTo" type="datetime-local" required />
+                        <DateTimePicker name="visitTo" required />
                     </div>
                 </div>
             </div>

@@ -14,7 +14,7 @@ export default function WardenPassDetailPage() {
     const { data: pass, isLoading, isError } = usePassDetail(id);
 
     if (isLoading) {
-        return <div className="p-12 text-center text-slate-500">Loading tracking history...</div>;
+        return <div className="p-12 text-center text-muted-foreground">Loading tracking history...</div>;
     }
 
     if (isError || !pass) {
@@ -29,7 +29,7 @@ export default function WardenPassDetailPage() {
     return (
         <div className="max-w-4xl mx-auto space-y-6">
             <div className="no-print mb-4">
-                <Button variant="ghost" className="gap-2 text-slate-500" onClick={() => router.back()}>
+                <Button variant="ghost" className="gap-2 text-muted-foreground" onClick={() => router.back()}>
                     <ArrowLeft className="h-4 w-4" /> Back to Monitoring List
                 </Button>
             </div>

@@ -42,7 +42,7 @@ export default function EmployeeDashboardPage() {
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <div>
                     <h1 className="text-3xl font-bold tracking-tight">Employee Dashboard</h1>
-                    <p className="text-slate-500">Manage your visitor passes and approvals.</p>
+                    <p className="text-muted-foreground">Manage your visitor passes and approvals.</p>
                 </div>
                 <Link href="/employee/passes/new">
                     <Button>Create New Pass</Button>
@@ -52,7 +52,7 @@ export default function EmployeeDashboardPage() {
             {isLoading ? (
                 <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
                     {[1, 2, 3, 4].map((i) => (
-                        <div key={i} className="h-24 bg-slate-100 rounded-xl animate-pulse" />
+                        <div key={i} className="h-24 bg-muted rounded-xl animate-pulse" />
                     ))}
                 </div>
             ) : (
@@ -67,8 +67,8 @@ export default function EmployeeDashboardPage() {
                     <div className="rounded-xl border bg-card text-card-foreground shadow p-6">
                         <h3 className="font-semibold leading-none tracking-tight mb-4">Quick Links</h3>
                         <div className="space-y-2">
-                            <Link href="/employee/passes" className="block text-sm text-blue-600 hover:underline">View all my passes</Link>
-                            <Link href="/employee/passes/new" className="block text-sm text-blue-600 hover:underline">Register a new guest</Link>
+                            <Link href="/employee/passes" className="block text-sm text-primary hover:underline">View all my passes</Link>
+                            <Link href="/employee/passes/new" className="block text-sm text-primary hover:underline">Register a new guest</Link>
                         </div>
                     </div>
                 </div>

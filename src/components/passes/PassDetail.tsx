@@ -75,7 +75,7 @@ export function PassDetail({ pass, role }: PassDetailProps) {
     };
 
     return (
-        <div className="bg-white rounded-xl border shadow-sm no-print mb-8">
+        <div className="bg-card rounded-xl border shadow-sm no-print mb-8">
             {/* Header section */}
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center p-6 border-b gap-4">
                 <div>
@@ -85,9 +85,9 @@ export function PassDetail({ pass, role }: PassDetailProps) {
                             {pass.status.replace('_', ' ')}
                         </Badge>
                     </div>
-                    <p className="text-slate-500 font-medium">{pass.passType.replace('_', ' ')}</p>
+                    <p className="text-muted-foreground font-medium">{pass.passType.replace('_', ' ')}</p>
                     {pass.passNumber && (
-                        <p className="text-sm text-slate-400 font-mono mt-1">{pass.passNumber}</p>
+                        <p className="text-sm text-muted-foreground font-mono mt-1">{pass.passNumber}</p>
                     )}
                 </div>
 
@@ -150,50 +150,50 @@ export function PassDetail({ pass, role }: PassDetailProps) {
                         <h3 className="text-lg font-semibold mb-4 border-b pb-2">Pass Details</h3>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-6 gap-x-4">
                             <div>
-                                <span className="text-sm text-slate-500 block">Pass Number</span>
+                                <span className="text-sm text-muted-foreground block">Pass Number</span>
                                 <span className="font-medium font-mono text-sm">{pass.passNumber || pass.id.split('-')[0].toUpperCase()}</span>
                             </div>
 
                             <div>
-                                <span className="text-sm text-slate-500 block">Host / Point of Contact</span>
+                                <span className="text-sm text-muted-foreground block">Host / Point of Contact</span>
                                 <span className="font-medium">{pass.pointOfContact || pass.createdBy?.name || 'N/A'}</span>
                             </div>
 
                             <div>
-                                <span className="text-sm text-slate-500 block">Age & Sex</span>
+                                <span className="text-sm text-muted-foreground block">Age & Sex</span>
                                 <span className="font-medium capitalize">{pass.visitorAge || 'N/A'} / {pass.visitorSex.toLowerCase()}</span>
                             </div>
 
                             {pass.visitorMobile && (
                                 <div>
-                                    <span className="text-sm text-slate-500 flex items-center gap-1 mb-1"><Phone className="h-3 w-3" /> Mobile Number</span>
+                                    <span className="text-sm text-muted-foreground flex items-center gap-1 mb-1"><Phone className="h-3 w-3" /> Mobile Number</span>
                                     <span className="font-medium">{pass.visitorMobile}</span>
                                 </div>
                             )}
 
                             {pass.visitorRelation && (
                                 <div>
-                                    <span className="text-sm text-slate-500 block">Relation</span>
+                                    <span className="text-sm text-muted-foreground block">Relation</span>
                                     <span className="font-medium">{pass.visitorRelation}</span>
                                 </div>
                             )}
 
                             {pass.hostelName && (
                                 <div>
-                                    <span className="text-sm text-slate-500 block">Hostel</span>
+                                    <span className="text-sm text-muted-foreground block">Hostel</span>
                                     <span className="font-medium">{pass.hostelName}</span>
                                 </div>
                             )}
 
                             {pass.visitorIdType && (
                                 <div className="sm:col-span-2">
-                                    <span className="text-sm text-slate-500 block">Identity Proof</span>
+                                    <span className="text-sm text-muted-foreground block">Identity Proof</span>
                                     <span className="font-medium">{pass.visitorIdType} - {pass.visitorIdNumber}</span>
                                 </div>
                             )}
 
                             <div className="sm:col-span-2">
-                                <span className="text-sm text-slate-500 block">Purpose</span>
+                                <span className="text-sm text-muted-foreground block">Purpose</span>
                                 <span className="font-medium">{pass.purpose}</span>
                             </div>
                         </div>
@@ -203,19 +203,19 @@ export function PassDetail({ pass, role }: PassDetailProps) {
                         <h3 className="text-lg font-semibold mb-4 border-b pb-2 flex items-center gap-2">
                             <CalendarIcon className="h-5 w-5" /> Validity Period
                         </h3>
-                        <div className="flex items-center justify-between bg-slate-50 p-4 rounded-md border">
+                        <div className="flex items-center justify-between bg-background p-4 rounded-md border">
                             <div className="space-y-1">
-                                <span className="text-xs font-semibold text-slate-500 uppercase">Valid From</span>
-                                <div className="font-medium text-slate-900">{format(new Date(pass.visitFrom), 'PPP')}</div>
-                                <div className="text-sm text-slate-500">{format(new Date(pass.visitFrom), 'p')}</div>
+                                <span className="text-xs font-semibold text-muted-foreground uppercase">Valid From</span>
+                                <div className="font-medium text-foreground">{format(new Date(pass.visitFrom), 'PPP')}</div>
+                                <div className="text-sm text-muted-foreground">{format(new Date(pass.visitFrom), 'p')}</div>
                             </div>
 
-                            <div className="h-px bg-slate-300 w-16 mx-4"></div>
+                            <div className="h-px bg-secondary w-16 mx-4"></div>
 
                             <div className="space-y-1 text-right">
-                                <span className="text-xs font-semibold text-slate-500 uppercase">Valid Until</span>
-                                <div className="font-medium text-slate-900">{format(new Date(pass.visitTo), 'PPP')}</div>
-                                <div className="text-sm text-slate-500">{format(new Date(pass.visitTo), 'p')}</div>
+                                <span className="text-xs font-semibold text-muted-foreground uppercase">Valid Until</span>
+                                <div className="font-medium text-foreground">{format(new Date(pass.visitTo), 'PPP')}</div>
+                                <div className="text-sm text-muted-foreground">{format(new Date(pass.visitTo), 'p')}</div>
                             </div>
                         </div>
                     </section>
@@ -227,20 +227,20 @@ export function PassDetail({ pass, role }: PassDetailProps) {
                         </h3>
 
                         {(!pass.scanLogs || pass.scanLogs.length === 0) ? (
-                            <div className="text-sm text-slate-500 py-4 italic">No scans recorded yet.</div>
+                            <div className="text-sm text-muted-foreground py-4 italic">No scans recorded yet.</div>
                         ) : (
                             <div className="space-y-4 relative before:absolute before:inset-0 before:ml-5 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-slate-300 before:to-transparent">
                                 {pass.scanLogs.map((log: any, i: number) => (
                                     <div key={log.id || i} className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
-                                        <div className="flex items-center justify-center w-10 h-10 rounded-full border border-white bg-slate-300 group-[.is-active]:bg-blue-500 text-slate-50 group-[.is-active]:text-emerald-50 shadow shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 z-10">
+                                        <div className="flex items-center justify-center w-10 h-10 rounded-full border border-white bg-secondary group-[.is-active]:bg-blue-500 text-slate-50 group-[.is-active]:text-emerald-50 shadow shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 z-10">
                                             <Clock className="h-4 w-4" />
                                         </div>
-                                        <div className="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] bg-slate-50 p-4 rounded-md border shadow-sm">
+                                        <div className="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] bg-background p-4 rounded-md border shadow-sm">
                                             <div className="flex items-center justify-between space-x-2 mb-1">
-                                                <div className="font-bold text-slate-900">{log.scanType}</div>
-                                                <time className="font-mono text-xs text-blue-600">{format(new Date(log.scannedAt), 'p')}</time>
+                                                <div className="font-bold text-foreground">{log.scanType}</div>
+                                                <time className="font-mono text-xs text-primary">{format(new Date(log.scannedAt), 'p')}</time>
                                             </div>
-                                            <div className="text-slate-500 text-sm">Gate: {log.gateLocation || 'Main Gate'}</div>
+                                            <div className="text-muted-foreground text-sm">Gate: {log.gateLocation || 'Main Gate'}</div>
                                         </div>
                                     </div>
                                 ))}
@@ -251,24 +251,24 @@ export function PassDetail({ pass, role }: PassDetailProps) {
 
                 {/* Right Column: QR and Actions */}
                 <div className="flex flex-col items-center space-y-6">
-                    <div className="w-full bg-slate-50 p-6 rounded-xl border flex flex-col items-center justify-center min-h-[300px] text-center">
+                    <div className="w-full bg-background p-6 rounded-xl border flex flex-col items-center justify-center min-h-[300px] text-center">
                         {pass.status === 'ACTIVE' ? (
                             <>
                                 <PassQRCode dataUrl={qrUrl} size={200} className="mb-4" />
-                                <p className="text-xs text-slate-500 mt-2 max-w-xs mx-auto">
+                                <p className="text-xs text-muted-foreground mt-2 max-w-xs mx-auto">
                                     Show this QR code at the security gate for entry and exit.
                                 </p>
                             </>
                         ) : pass.status === 'PENDING_APPROVAL' ? (
-                            <div className="text-slate-500 space-y-3">
+                            <div className="text-muted-foreground space-y-3">
                                 <Clock className="w-12 h-12 mx-auto text-yellow-500 opacity-50" />
-                                <p className="font-medium text-slate-700">Pending Approval</p>
+                                <p className="font-medium text-foreground">Pending Approval</p>
                                 <p className="text-sm">QR Code will be generated once the pass is approved.</p>
                             </div>
                         ) : (
-                            <div className="text-slate-500 space-y-3">
+                            <div className="text-muted-foreground space-y-3">
                                 <UserX className="w-12 h-12 mx-auto text-red-500 opacity-50" />
-                                <p className="font-medium text-slate-700">Pass Inactive</p>
+                                <p className="font-medium text-foreground">Pass Inactive</p>
                                 <p className="text-sm">This pass is {pass.status.toLowerCase().replace('_', ' ')}.</p>
                             </div>
                         )}
@@ -283,25 +283,25 @@ export function PassDetail({ pass, role }: PassDetailProps) {
 
                     {/* Signatures on Record */}
                     {(pass.visitorSignatureUrl || pass.securitySignatureUrl || pass.hostSignatureUrl) && (
-                        <div className="w-full bg-slate-50 p-4 rounded-xl border">
+                        <div className="w-full bg-background p-4 rounded-xl border">
                             <h4 className="text-sm font-semibold mb-3">Signatures on Record</h4>
                             <div className="grid grid-cols-3 gap-3">
                                 {pass.visitorSignatureUrl && (
                                     <div className="text-center">
-                                        <img src={pass.visitorSignatureUrl} alt="Visitor Signature" className="h-14 mx-auto border rounded bg-white object-contain" />
-                                        <span className="text-[10px] text-slate-400 mt-1 block">Visitor</span>
+                                        <img src={pass.visitorSignatureUrl} alt="Visitor Signature" className="h-14 mx-auto border rounded bg-card object-contain" />
+                                        <span className="text-[10px] text-muted-foreground mt-1 block">Visitor</span>
                                     </div>
                                 )}
                                 {pass.securitySignatureUrl && (
                                     <div className="text-center">
-                                        <img src={pass.securitySignatureUrl} alt="Security Signature" className="h-14 mx-auto border rounded bg-white object-contain" />
-                                        <span className="text-[10px] text-slate-400 mt-1 block">Security</span>
+                                        <img src={pass.securitySignatureUrl} alt="Security Signature" className="h-14 mx-auto border rounded bg-card object-contain" />
+                                        <span className="text-[10px] text-muted-foreground mt-1 block">Security</span>
                                     </div>
                                 )}
                                 {pass.hostSignatureUrl && (
                                     <div className="text-center">
-                                        <img src={pass.hostSignatureUrl} alt="Host Signature" className="h-14 mx-auto border rounded bg-white object-contain" />
-                                        <span className="text-[10px] text-slate-400 mt-1 block">Host</span>
+                                        <img src={pass.hostSignatureUrl} alt="Host Signature" className="h-14 mx-auto border rounded bg-card object-contain" />
+                                        <span className="text-[10px] text-muted-foreground mt-1 block">Host</span>
                                     </div>
                                 )}
                             </div>

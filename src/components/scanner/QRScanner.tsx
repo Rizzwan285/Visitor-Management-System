@@ -91,20 +91,20 @@ export function QRScanner({ onScanSuccess }: QRScannerProps) {
             {/* Required ID for html5-qrcode */}
             <div
                 id="qr-reader"
-                className={`w-full bg-slate-100 rounded-xl overflow-hidden shadow-inner ${!isScanning ? 'hidden' : 'block'}`}
+                className={`w-full bg-muted rounded-xl overflow-hidden shadow-inner ${!isScanning ? 'hidden' : 'block'}`}
             ></div>
 
             {!isScanning && (
-                <div className="w-full aspect-square max-w-[300px] bg-slate-100 rounded-xl border-2 border-dashed border-slate-300 flex flex-col items-center justify-center p-6 text-center space-y-4">
-                    <Camera className="w-12 h-12 text-slate-400" />
+                <div className="w-full aspect-square max-w-[300px] bg-muted rounded-xl border-2 border-dashed border-border flex flex-col items-center justify-center p-6 text-center space-y-4">
+                    <Camera className="w-12 h-12 text-muted-foreground" />
                     {hasPermission === false ? (
                         <div className="text-red-500 space-y-2">
                             <AlertCircle className="w-6 h-6 mx-auto" />
                             <p className="text-sm">Camera access denied.</p>
-                            <p className="text-xs text-slate-500">Please allow camera access in your browser settings to scan passes.</p>
+                            <p className="text-xs text-muted-foreground">Please allow camera access in your browser settings to scan passes.</p>
                         </div>
                     ) : (
-                        <p className="text-sm text-slate-500">Camera is inactive. Click below to start scanning.</p>
+                        <p className="text-sm text-muted-foreground">Camera is inactive. Click below to start scanning.</p>
                     )}
                 </div>
             )}

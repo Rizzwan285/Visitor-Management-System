@@ -40,7 +40,7 @@ export default function AdminDashboardPage() {
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <div>
                     <h1 className="text-3xl font-bold tracking-tight">System Admin</h1>
-                    <p className="text-slate-500">Overview of all campus visitor activity.</p>
+                    <p className="text-muted-foreground">Overview of all campus visitor activity.</p>
                 </div>
                 <div className="flex gap-2">
                     <Link href="/admin/approvals">
@@ -58,7 +58,7 @@ export default function AdminDashboardPage() {
             {isLoading ? (
                 <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
                     {[1, 2, 3, 4].map((i) => (
-                        <div key={i} className="h-24 bg-slate-100 rounded-xl animate-pulse" />
+                        <div key={i} className="h-24 bg-muted rounded-xl animate-pulse" />
                     ))}
                 </div>
             ) : (
@@ -72,7 +72,7 @@ export default function AdminDashboardPage() {
                 <div className="lg:col-span-3 space-y-6">
                     <div className="rounded-xl border bg-card text-card-foreground shadow p-6">
                         <h3 className="font-semibold leading-none tracking-tight mb-4">Approval Queue</h3>
-                        <p className="text-sm text-slate-500 mb-4">
+                        <p className="text-sm text-muted-foreground mb-4">
                             {stats?.pendingApproval
                                 ? `You have ${stats.pendingApproval} guest pass${stats.pendingApproval !== 1 ? 'es' : ''} waiting for your approval.`
                                 : 'No pending approvals.'}

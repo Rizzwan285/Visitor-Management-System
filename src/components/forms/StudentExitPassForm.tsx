@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { DateTimePicker } from '@/components/ui/date-time-picker';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -64,7 +65,7 @@ export function StudentExitPassForm() {
             <div className="space-y-4">
                 <div className="space-y-2 opacity-70">
                     <Label htmlFor="studentName">Student Name (Auto-filled)</Label>
-                    <Input id="studentName" value={studentName} readOnly className="bg-slate-100" />
+                    <Input id="studentName" value={studentName} readOnly className="bg-muted" />
                 </div>
 
                 <div className="space-y-2">
@@ -91,11 +92,11 @@ export function StudentExitPassForm() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 border p-4 rounded-md">
                     <div className="space-y-2">
                         <Label htmlFor="visitFrom">Exit Date & Time</Label>
-                        <Input id="visitFrom" name="visitFrom" type="datetime-local" required />
+                        <DateTimePicker name="visitFrom" required />
                     </div>
                     <div className="space-y-2">
                         <Label htmlFor="visitTo">Expected Return Date & Time</Label>
-                        <Input id="visitTo" name="visitTo" type="datetime-local" required />
+                        <DateTimePicker name="visitTo" required />
                     </div>
                 </div>
             </div>

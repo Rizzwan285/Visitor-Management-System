@@ -28,26 +28,26 @@ export default function WardenDashboardPage() {
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <div>
                     <h1 className="text-3xl font-bold tracking-tight">Assistant Warden Portal</h1>
-                    <p className="text-slate-500">Read-only monitoring of Student Exits and Guests.</p>
+                    <p className="text-muted-foreground">Read-only monitoring of Student Exits and Guests.</p>
                 </div>
             </div>
 
             {/* Warden Metrics */}
             <div className="grid gap-4 md:grid-cols-3">
                 <div className="rounded-xl border bg-card text-card-foreground shadow p-6 flex flex-col gap-1">
-                    <div className="flex items-center gap-2 text-sm font-medium text-slate-500">
+                    <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
                         <ShieldAlert className="h-4 w-4" /> Active Exits
                     </div>
                     <div className="text-3xl font-bold">{isLoading ? '--' : activeExits}</div>
                 </div>
                 <div className="rounded-xl border bg-card text-card-foreground shadow p-6 flex flex-col gap-1">
-                    <div className="flex items-center gap-2 text-sm font-medium text-slate-500">
+                    <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
                         <Clock className="h-4 w-4" /> Pending Guests
                     </div>
                     <div className="text-3xl font-bold">{isLoading ? '--' : pendingGuests}</div>
                 </div>
                 <div className="rounded-xl border bg-card text-card-foreground shadow p-6 flex flex-col gap-1">
-                    <div className="flex items-center gap-2 text-sm font-medium text-slate-500">
+                    <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
                         <FileText className="h-4 w-4" /> Total Monitored
                     </div>
                     <div className="text-3xl font-bold">{isLoading ? '--' : totalPasses}</div>
@@ -61,11 +61,11 @@ export default function WardenDashboardPage() {
                 </div>
                 <div className="p-6">
                     {isLoading ? (
-                        <div className="p-12 text-center text-slate-500">Loading tracking data...</div>
+                        <div className="p-12 text-center text-muted-foreground">Loading tracking data...</div>
                     ) : isError ? (
                         <div className="p-12 text-center text-red-500">Failed to load passes.</div>
                     ) : passes.length === 0 ? (
-                        <div className="p-12 text-center text-slate-500 border border-dashed rounded-xl">
+                        <div className="p-12 text-center text-muted-foreground border border-dashed rounded-xl">
                             No student passes logged yet.
                         </div>
                     ) : (

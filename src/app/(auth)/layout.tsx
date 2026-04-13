@@ -3,17 +3,17 @@ import Image from 'next/image';
 
 export default function AuthLayout({ children }: { children: ReactNode }) {
     return (
-        <div className="min-h-screen flex items-center justify-center bg-slate-50 p-4 sm:p-8">
-            <div className="w-full max-w-md bg-white rounded-2xl shadow-xl border border-slate-100 overflow-hidden">
+        <div className="min-h-screen flex items-center justify-center bg-background p-4 sm:p-8">
+            <div className="w-full max-w-md bg-card rounded-2xl shadow-xl border border-border overflow-hidden">
 
                 {/* Branding Header Area - Clean Fedena Style */}
-                <div className="bg-white px-8 pt-8 pb-5 flex flex-col items-center justify-center text-center relative border-b border-slate-100">
+                <div className="bg-card px-8 pt-8 pb-5 flex flex-col items-center justify-center text-center relative border-b border-border">
                     <div className="relative z-10 w-64 h-24 flex items-center justify-center mb-2">
                         <div className="relative w-full h-full flex items-center justify-center">
                             <Image src="/logo.jpg" alt="IIT Palakkad Logo" fill className="object-contain" priority />
                         </div>
                     </div>
-                    <h2 className="text-xs sm:text-sm font-medium tracking-wider text-slate-500 uppercase mt-1">
+                    <h2 className="text-xs sm:text-sm font-medium tracking-wider text-muted-foreground uppercase mt-1">
                         Campus Security & Visitor Management
                     </h2>
                 </div>
@@ -24,8 +24,8 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
                 </div>
 
                 {/* Footer Area */}
-                <div className="bg-slate-50 px-8 py-4 border-t border-slate-200 text-center">
-                    <p className="text-xs text-slate-500">
+                <div className="bg-background px-8 py-4 border-t border-border text-center">
+                    <p className="text-xs text-muted-foreground">
                         Nurturing Minds For a Better World
                     </p>
                 </div>

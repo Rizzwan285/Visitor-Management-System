@@ -48,91 +48,91 @@
 }
 
 :root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
+  --background: #ffffff;
+  --foreground: #0a0a0a;
+  --card: #ffffff;
+  --card-foreground: #0a0a0a;
+  --popover: #ffffff;
+  --popover-foreground: #0a0a0a;
   
-  /* Primary: IIT Palakkad Golden Orange (#F7A11A) */
-  --primary: oklch(0.75 0.18 75);
-  --primary-foreground: oklch(0.985 0 0);
+  /* Primary: Violet-600 from devmittal.me */
+  --primary: #7c3aed; 
+  --primary-foreground: #ffffff;
   
-  /* Secondary/Muted: Professional Grey (#7A7879) */
-  --secondary: oklch(0.6 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.96 0 0);
-  --muted-foreground: oklch(0.6 0 0);
+  --secondary: #f5f5f5; /* neutral-100 */
+  --secondary-foreground: #171717; /* neutral-900 */
+  --muted: #f5f5f5;
+  --muted-foreground: #525252; /* neutral-500 */
   
-  --accent: oklch(0.96 0 0);
-  --accent-foreground: oklch(0.75 0.18 75);
+  --accent: #f5f5f5;
+  --accent-foreground: #7c3aed; /* violet-600 */
   
-  --destructive: oklch(0.577 0.245 27.325);
+  --destructive: #ef4444; /* red-500 */
   
-  --border: oklch(0.92 0 0);
-  --input: oklch(0.92 0 0);
-  --ring: oklch(0.75 0.18 75);
+  --border: #e5e5e5; /* neutral-200 */
+  --input: #e5e5e5;
+  --ring: #7c3aed;
   
   --radius: 0.5rem;
   
-  --chart-1: oklch(0.75 0.18 75);
-  --chart-2: oklch(0.6 0 0);
-  --chart-3: oklch(0.398 0.07 227.392);
-  --chart-4: oklch(0.828 0.189 84.429);
-  --chart-5: oklch(0.769 0.188 70.08);
+  --chart-1: #7c3aed;
+  --chart-2: #8b5cf6;
+  --chart-3: #ef4444;
+  --chart-4: #f59e0b;
+  --chart-5: #3b82f6;
   
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.75 0.18 75);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.75 0.18 75);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.75 0.18 75);
+  /* Sidebar dark bluish thing in white mode */
+  --sidebar: #0f172a; /* slate-900 (Dark Blue) */
+  --sidebar-foreground: #ffffff;
+  --sidebar-primary: #7c3aed;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #1e293b; /* slate-800 */
+  --sidebar-accent-foreground: #ffffff;
+  --sidebar-border: #1e293b;
+  --sidebar-ring: #7c3aed;
 }
 
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
+  /* Exact devmittal.me palette */
+  --background: #0a0a0a; /* neutral-950 */
+  --foreground: #ffffff;
+  --card: #171717; /* neutral-900 */
+  --card-foreground: #ffffff;
+  --popover: #171717;
+  --popover-foreground: #ffffff;
   
-  /* Primary: IIT Palakkad Golden Orange (#F7A11A) */
-  --primary: oklch(0.75 0.18 75);
-  --primary-foreground: oklch(0.145 0 0);
+  --primary: #7c3aed; /* violet-600 */
+  --primary-foreground: #ffffff; 
   
-  /* Secondary/Muted: Professional Grey (#7A7879) */
-  --secondary: oklch(0.3 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.25 0 0);
-  --muted-foreground: oklch(0.65 0 0);
+  --secondary: #262626; /* neutral-800 */
+  --secondary-foreground: #ffffff;
+  --muted: #262626;
+  --muted-foreground: #a3a3a3; /* neutral-400 */
   
-  --accent: oklch(0.25 0 0);
-  --accent-foreground: oklch(0.75 0.18 75);
+  --accent: #262626;
+  --accent-foreground: #7c3aed;
   
-  --destructive: oklch(0.704 0.191 22.216);
+  --destructive: #ef4444; 
   
-  --border: oklch(0.3 0 0);
-  --input: oklch(0.3 0 0);
-  --ring: oklch(0.75 0.18 75);
+  --border: #262626; /* neutral-800 */
+  --input: #262626;
+  --ring: #a78bfa; /* violet-400 */
   
-  --chart-1: oklch(0.75 0.18 75);
-  --chart-2: oklch(0.6 0 0);
-  --chart-3: oklch(0.769 0.188 70.08);
-  --chart-4: oklch(0.627 0.265 303.9);
-  --chart-5: oklch(0.645 0.246 16.439);
+  --chart-1: #7c3aed;
+  --chart-2: #8b5cf6;
+  --chart-3: #ef4444;
+  --chart-4: #f59e0b;
+  --chart-5: #3b82f6;
   
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.75 0.18 75);
-  --sidebar-primary-foreground: oklch(0.145 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.75 0.18 75);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.75 0.18 75);
+  /* Sidebar matching exact devmittal background */
+  --sidebar: #0a0a0a; 
+  --sidebar-foreground: #ffffff;
+  --sidebar-primary: #7c3aed;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #171717; /* hover states */
+  --sidebar-accent-foreground: #ffffff;
+  --sidebar-border: #262626; /* neutral-800 separator */
+  --sidebar-ring: #a78bfa; /* violet-400 focus */
 }
 
 @layer base {

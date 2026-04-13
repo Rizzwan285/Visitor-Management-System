@@ -31,16 +31,16 @@ export function ApprovalCard({ pass }: { pass: VisitorPassWithDetails }) {
     };
 
     return (
-        <Card className="border-slate-200">
+        <Card className="border-border">
             <CardContent className="p-5">
                 <div className="flex justify-between items-start mb-4">
                     <div className="flex gap-4">
-                        <div className="w-12 h-12 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center font-bold">
+                        <div className="w-12 h-12 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold">
                             <User className="h-6 w-6" />
                         </div>
                         <div>
                             <h4 className="font-bold text-lg leading-none mb-1">{pass.visitorName}</h4>
-                            <p className="text-sm font-medium text-slate-500">{pass.passType.replace('_', ' ')}</p>
+                            <p className="text-sm font-medium text-muted-foreground">{pass.passType.replace('_', ' ')}</p>
                         </div>
                     </div>
 
@@ -49,33 +49,33 @@ export function ApprovalCard({ pass }: { pass: VisitorPassWithDetails }) {
                     </Badge>
                 </div>
 
-                <div className="grid grid-cols-2 gap-y-4 gap-x-2 text-sm mb-6 border-t border-b py-4 border-slate-100">
+                <div className="grid grid-cols-2 gap-y-4 gap-x-2 text-sm mb-6 border-t border-b py-4 border-border">
                     <div>
-                        <span className="block text-slate-400 font-medium text-xs uppercase relative mb-1">Requested By</span>
+                        <span className="block text-muted-foreground font-medium text-xs uppercase relative mb-1">Requested By</span>
                         <span className="font-semibold">{pass.createdBy?.name || 'Unknown'}</span>
                     </div>
                     <div>
-                        <span className="block text-slate-400 font-medium text-xs uppercase relative mb-1">Purpose</span>
+                        <span className="block text-muted-foreground font-medium text-xs uppercase relative mb-1">Purpose</span>
                         <span>{pass.purpose}</span>
                     </div>
 
                     {pass.visitorRelation && (
                         <div>
-                            <span className="block text-slate-400 font-medium text-xs uppercase relative mb-1">Relation</span>
+                            <span className="block text-muted-foreground font-medium text-xs uppercase relative mb-1">Relation</span>
                             <span>{pass.visitorRelation}</span>
                         </div>
                     )}
 
                     {pass.visitorAge && (
                         <div>
-                            <span className="block text-slate-400 font-medium text-xs uppercase relative mb-1">Visitor Age</span>
+                            <span className="block text-muted-foreground font-medium text-xs uppercase relative mb-1">Visitor Age</span>
                             <span>{pass.visitorAge}</span>
                         </div>
                     )}
 
                     <div className="col-span-2">
-                        <span className="block text-slate-400 font-medium text-xs uppercase relative mb-1">Visit Schedule</span>
-                        <span className="font-medium text-slate-700">
+                        <span className="block text-muted-foreground font-medium text-xs uppercase relative mb-1">Visit Schedule</span>
+                        <span className="font-medium text-foreground">
                             {format(new Date(pass.visitFrom), 'MMM d, h:mm a')} &mdash; {format(new Date(pass.visitTo), 'MMM d, h:mm a')}
                         </span>
                     </div>
@@ -91,7 +91,7 @@ export function ApprovalCard({ pass }: { pass: VisitorPassWithDetails }) {
                         </Button>
                     </div>
                 ) : (
-                    <div className="text-sm text-slate-500 italic">
+                    <div className="text-sm text-muted-foreground italic">
                         Decision made on {approvalRequest?.decidedAt ? format(new Date(approvalRequest.decidedAt), 'MMM d, yyyy') : 'N/A'}
                     </div>
                 )}

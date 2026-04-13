@@ -15,6 +15,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet';
 import { Sidebar } from './Sidebar';
+import { ThemeToggle } from '@/components/theme-toggle';
 
 export function Header() {
     const { data: session } = useSession();
@@ -27,7 +28,7 @@ export function Header() {
         : 'U';
 
     return (
-        <header className="sticky top-0 z-30 flex h-16 w-full items-center justify-between border-b bg-white px-4 sm:px-6">
+        <header className="sticky top-0 z-30 flex h-16 w-full items-center justify-between border-b bg-background px-4 sm:px-6 shadow-sm">
             <div className="flex items-center">
                 <Sheet open={isSidebarOpen} onOpenChange={setSidebarOpen}>
                     <Button
@@ -39,7 +40,7 @@ export function Header() {
                         <Menu className="h-5 w-5" />
                         <span className="sr-only">Toggle sidebar</span>
                     </Button>
-                    <SheetContent side="left" className="p-0 w-64 border-r-0 bg-slate-900">
+                    <SheetContent side="left" className="p-0 w-64 border-r-0 bg-sidebar text-sidebar-foreground">
                         <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
                         <Sidebar />
                     </SheetContent>
@@ -49,13 +50,14 @@ export function Header() {
                 </span>
             </div>
 
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-2 sm:space-x-4">
+                <ThemeToggle />
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                         <Button variant="ghost" className="relative h-9 w-9 rounded-full">
                             <Avatar className="h-9 w-9">
                                 <AvatarImage src={user?.image || ''} alt={user?.name || ''} />
-                                <AvatarFallback className="bg-slate-100 text-slate-800">
+                                <AvatarFallback className="bg-muted text-foreground">
                                     {initials}
                                 </AvatarFallback>
                             </Avatar>
@@ -69,7 +71,7 @@ export function Header() {
                                     {user?.email}
                                 </p>
                                 <div className="flex items-center pt-1">
-                                    <span className="inline-flex items-center rounded-md bg-slate-100 px-2 py-1 text-xs font-medium text-slate-600 ring-1 ring-inset ring-slate-500/10">
+                                    <span className="inline-flex items-center rounded-md bg-muted px-2 py-1 text-xs font-medium text-muted-foreground ring-1 ring-inset ring-slate-500/10">
                                         {role}
                                     </span>
                                 </div>

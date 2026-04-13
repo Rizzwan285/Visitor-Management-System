@@ -21,15 +21,15 @@ export function PassCard({ pass }: PassCardProps) {
     };
 
     return (
-        <Card className="hover:bg-slate-50 transition-colors cursor-pointer border-slate-200">
+        <Card className="hover:bg-background transition-colors cursor-pointer border-border">
             <CardContent className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div className="flex items-center gap-4">
-                    <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 flex-shrink-0">
+                    <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center text-muted-foreground flex-shrink-0">
                         <User className="w-5 h-5" />
                     </div>
                     <div className="space-y-1">
                         <h4 className="font-semibold leading-none">{pass.visitorName}</h4>
-                        <p className="text-sm text-slate-500 line-clamp-1">
+                        <p className="text-sm text-muted-foreground line-clamp-1">
                             {pass.passType.replace('_', ' ')} &mdash; {pass.purpose}
                         </p>
                     </div>
@@ -39,7 +39,7 @@ export function PassCard({ pass }: PassCardProps) {
                     <Badge variant={getStatusColor(pass.status)} className="w-fit">
                         {pass.status.replace('_', ' ')}
                     </Badge>
-                    <div className="flex items-center text-xs text-slate-500 gap-1 mt-1">
+                    <div className="flex items-center text-xs text-muted-foreground gap-1 mt-1">
                         <Clock className="w-3 h-3" />
                         <span>{format(new Date(pass.visitFrom), 'MMM d, h:mm a')}</span>
                     </div>

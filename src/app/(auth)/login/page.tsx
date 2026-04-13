@@ -81,7 +81,7 @@ function LoginForm() {
         <div className="flex flex-col w-full space-y-6">
             <form onSubmit={onCredentialsSignIn} className="space-y-5">
                 <div className="space-y-1.5 text-left">
-                    <Label htmlFor="email" className="text-sm font-semibold text-slate-700">Email Address</Label>
+                    <Label htmlFor="email" className="text-sm font-semibold text-foreground">Email Address</Label>
                     <Input
                         id="email"
                         type="email"
@@ -90,11 +90,11 @@ function LoginForm() {
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         disabled={isCredentialsLoading || isGoogleLoading}
-                        className="h-12 border-slate-200 focus:ring-primary/20 shadow-sm transition-all"
+                        className="h-12 border-border focus:ring-primary/20 shadow-sm transition-all"
                     />
                 </div>
                 <div className="space-y-1.5 text-left">
-                    <Label htmlFor="password" className="text-sm font-semibold text-slate-700">Password</Label>
+                    <Label htmlFor="password" className="text-sm font-semibold text-foreground">Password</Label>
                     <Input
                         id="password"
                         type="password"
@@ -102,7 +102,7 @@ function LoginForm() {
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         disabled={isCredentialsLoading || isGoogleLoading}
-                        className="h-12 border-slate-200 focus:ring-primary/20 shadow-sm transition-all"
+                        className="h-12 border-border focus:ring-primary/20 shadow-sm transition-all"
                     />
                 </div>
                 <Button
@@ -119,10 +119,10 @@ function LoginForm() {
 
             <div className="relative py-2">
                 <div className="absolute inset-0 flex items-center">
-                    <Separator className="w-full bg-slate-200" />
+                    <Separator className="w-full bg-muted/80" />
                 </div>
                 <div className="relative flex justify-center text-xs uppercase">
-                    <span className="bg-white px-4 text-slate-500 font-semibold tracking-wider">
+                    <span className="bg-card px-4 text-muted-foreground font-semibold tracking-wider">
                         Or continue with
                     </span>
                 </div>
@@ -134,7 +134,7 @@ function LoginForm() {
                 type="button"
                 disabled={isGoogleLoading || isCredentialsLoading}
                 onClick={onGoogleSignIn}
-                className="w-full h-12 text-base font-semibold bg-white flex items-center justify-center gap-3 border border-slate-200 hover:bg-slate-50 hover:text-slate-900 shadow-sm transition-all"
+                className="w-full h-12 text-base font-semibold bg-card flex items-center justify-center gap-3 border border-border hover:bg-background hover:text-foreground shadow-sm transition-all"
             >
                 {isGoogleLoading ? (
                     <span className="animate-spin inline-block w-4 h-4 border-2 border-current border-t-transparent rounded-full" />
@@ -167,7 +167,7 @@ function LoginForm() {
 
 export default function LoginPage() {
     return (
-        <Suspense fallback={<div className="p-12 text-center text-slate-500 animate-pulse">Loading secure sign in...</div>}>
+        <Suspense fallback={<div className="p-12 text-center text-muted-foreground animate-pulse">Loading secure sign in...</div>}>
             <LoginForm />
         </Suspense>
     );

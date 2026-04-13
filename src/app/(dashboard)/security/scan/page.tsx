@@ -46,12 +46,12 @@ export default function SecurityScanPage() {
         <div className="max-w-4xl mx-auto space-y-8">
             <div>
                 <h1 className="text-3xl font-bold tracking-tight">QR Scanner</h1>
-                <p className="text-slate-500">Scan visitor and student passes at the gate to verify and log entry/exit.</p>
+                <p className="text-muted-foreground">Scan visitor and student passes at the gate to verify and log entry/exit.</p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                 <div className="md:col-span-2">
-                    <div className="bg-white p-6 rounded-xl border shadow-sm h-full">
+                    <div className="bg-card p-6 rounded-xl border shadow-sm h-full">
                         <h2 className="text-xl font-semibold mb-6 flex items-center gap-2">
                             <Scan className="h-5 w-5" /> Live Camera Feed
                         </h2>
@@ -60,9 +60,9 @@ export default function SecurityScanPage() {
                 </div>
 
                 <div className="space-y-6">
-                    <div className="bg-white p-6 rounded-xl border shadow-sm">
-                        <h3 className="font-semibold mb-2 flex items-center gap-2"><ShieldAlert className="h-4 w-4 text-blue-500" /> Instructions</h3>
-                        <ul className="text-sm text-slate-600 space-y-3 list-disc pl-4">
+                    <div className="bg-card p-6 rounded-xl border shadow-sm">
+                        <h3 className="font-semibold mb-2 flex items-center gap-2"><ShieldAlert className="h-4 w-4 text-primary" /> Instructions</h3>
+                        <ul className="text-sm text-muted-foreground space-y-3 list-disc pl-4">
                             <li>Click <strong>Start Scanner</strong> and grant camera permissions.</li>
                             <li>Point the camera at the visitor&apos;s digital or printed QR code.</li>
                             <li>The scanner will automatically pause when a code is detected.</li>

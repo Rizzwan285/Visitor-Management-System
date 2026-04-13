@@ -40,7 +40,7 @@ export default function StudentDashboardPage() {
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <div>
                     <h1 className="text-3xl font-bold tracking-tight">Student Dashboard</h1>
-                    <p className="text-slate-500">Request guest passes or out-passes.</p>
+                    <p className="text-muted-foreground">Request guest passes or out-passes.</p>
                 </div>
                 <div className="flex gap-2">
                     <Link href="/student/passes/guest">
@@ -55,7 +55,7 @@ export default function StudentDashboardPage() {
             {isLoading ? (
                 <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
                     {[1, 2, 3, 4].map((i) => (
-                        <div key={i} className="h-24 bg-slate-100 rounded-xl animate-pulse" />
+                        <div key={i} className="h-24 bg-muted rounded-xl animate-pulse" />
                     ))}
                 </div>
             ) : (

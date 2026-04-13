@@ -43,7 +43,7 @@ export function ScanResultModal({ isOpen, onClose, passData }: ScanResultModalPr
                             {isActive ? '\u2713' : '\u2717'}
                         </div>
                         <h3 className="text-xl font-bold">{passData.visitorName}</h3>
-                        <p className="text-sm font-medium text-slate-500 uppercase tracking-wider">{passData.passType.replace('_', ' ')}</p>
+                        <p className="text-sm font-medium text-muted-foreground uppercase tracking-wider">{passData.passType.replace('_', ' ')}</p>
 
                         <div className={`inline-block px-3 py-1 rounded-full text-sm font-bold mt-2 ${isActive ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
                             {passData.status}
@@ -52,55 +52,55 @@ export function ScanResultModal({ isOpen, onClose, passData }: ScanResultModalPr
 
                     <div className="w-full grid grid-cols-2 gap-4 text-sm">
                         <div className="space-y-1">
-                            <span className="text-slate-500 font-semibold block">Host / To Visit</span>
+                            <span className="text-muted-foreground font-semibold block">Host / To Visit</span>
                             <span>{passData.pointOfContact || passData.hostProfessor?.name || passData.createdBy?.name || 'N/A'}</span>
                         </div>
                         <div className="space-y-1">
-                            <span className="text-slate-500 font-semibold block">Purpose</span>
+                            <span className="text-muted-foreground font-semibold block">Purpose</span>
                             <span>{passData.purpose}</span>
                         </div>
 
                         {passData.visitorSex && (
                             <div className="space-y-1">
-                                <span className="text-slate-500 font-semibold block">Sex</span>
+                                <span className="text-muted-foreground font-semibold block">Sex</span>
                                 <span className="capitalize">{passData.visitorSex.toLowerCase()}</span>
                             </div>
                         )}
                         {passData.visitorAge && (
                             <div className="space-y-1">
-                                <span className="text-slate-500 font-semibold block">Age</span>
+                                <span className="text-muted-foreground font-semibold block">Age</span>
                                 <span>{passData.visitorAge} years</span>
                             </div>
                         )}
                         {passData.visitorRelation && (
                             <div className="space-y-1">
-                                <span className="text-slate-500 font-semibold block">Relation</span>
+                                <span className="text-muted-foreground font-semibold block">Relation</span>
                                 <span>{passData.visitorRelation}</span>
                             </div>
                         )}
                         {passData.hostelName && (
                             <div className="space-y-1">
-                                <span className="text-slate-500 font-semibold block">Hostel</span>
+                                <span className="text-muted-foreground font-semibold block">Hostel</span>
                                 <span>{passData.hostelName}</span>
                             </div>
                         )}
                         {passData.visitorIdType && (
                             <div className="space-y-1 col-span-2">
-                                <span className="text-slate-500 font-semibold block">ID Proof Provided</span>
+                                <span className="text-muted-foreground font-semibold block">ID Proof Provided</span>
                                 <span>{passData.visitorIdType} - {passData.visitorIdNumber}</span>
                             </div>
                         )}
 
                         {passData.visitorMobile && (
                             <div className="space-y-1 col-span-2">
-                                <span className="text-slate-500 font-semibold block">Visitor Mobile</span>
+                                <span className="text-muted-foreground font-semibold block">Visitor Mobile</span>
                                 <span>{passData.visitorMobile}</span>
                             </div>
                         )}
 
                         {passData.visitorPhotoUrl && (
                             <div className="col-span-2 mt-2">
-                                <span className="text-slate-500 font-semibold block mb-2">Visitor Photo</span>
+                                <span className="text-muted-foreground font-semibold block mb-2">Visitor Photo</span>
                                 <div className="w-32 h-32 rounded-lg overflow-hidden border">
                                     <img 
                                         src={passData.visitorPhotoUrl.startsWith('data:') ? passData.visitorPhotoUrl : `/api/passes/${passData.id}/photo`} 
@@ -114,24 +114,24 @@ export function ScanResultModal({ isOpen, onClose, passData }: ScanResultModalPr
                         {/* Signatures */}
                         {(passData.visitorSignatureUrl || passData.securitySignatureUrl || passData.hostSignatureUrl) && (
                             <div className="col-span-2 mt-3 pt-3 border-t">
-                                <span className="text-slate-500 font-semibold block mb-2">Signatures on Record</span>
+                                <span className="text-muted-foreground font-semibold block mb-2">Signatures on Record</span>
                                 <div className="grid grid-cols-3 gap-3">
                                     {passData.visitorSignatureUrl && (
                                         <div className="text-center">
-                                            <img src={passData.visitorSignatureUrl} alt="Visitor" className="h-12 mx-auto border rounded object-contain bg-white" />
-                                            <span className="text-[10px] text-slate-400 mt-1 block">Visitor</span>
+                                            <img src={passData.visitorSignatureUrl} alt="Visitor" className="h-12 mx-auto border rounded object-contain bg-card" />
+                                            <span className="text-[10px] text-muted-foreground mt-1 block">Visitor</span>
                                         </div>
                                     )}
                                     {passData.securitySignatureUrl && (
                                         <div className="text-center">
-                                            <img src={passData.securitySignatureUrl} alt="Security" className="h-12 mx-auto border rounded object-contain bg-white" />
-                                            <span className="text-[10px] text-slate-400 mt-1 block">Security</span>
+                                            <img src={passData.securitySignatureUrl} alt="Security" className="h-12 mx-auto border rounded object-contain bg-card" />
+                                            <span className="text-[10px] text-muted-foreground mt-1 block">Security</span>
                                         </div>
                                     )}
                                     {passData.hostSignatureUrl && (
                                         <div className="text-center">
-                                            <img src={passData.hostSignatureUrl} alt="Host" className="h-12 mx-auto border rounded object-contain bg-white" />
-                                            <span className="text-[10px] text-slate-400 mt-1 block">Host</span>
+                                            <img src={passData.hostSignatureUrl} alt="Host" className="h-12 mx-auto border rounded object-contain bg-card" />
+                                            <span className="text-[10px] text-muted-foreground mt-1 block">Host</span>
                                         </div>
                                     )}
                                 </div>
@@ -145,11 +145,11 @@ export function ScanResultModal({ isOpen, onClose, passData }: ScanResultModalPr
                                 <Button onClick={() => handleLogScan('STUDENT_EXIT_AUTO')} className="w-full bg-indigo-600 hover:bg-indigo-700" size="lg" disabled={logScan.isPending}>
                                     Log Student Gate Scan
                                 </Button>
-                                <p className="text-xs text-center text-slate-500">The system will automatically log an Exit or Return based on current state.</p>
+                                <p className="text-xs text-center text-muted-foreground">The system will automatically log an Exit or Return based on current state.</p>
                             </div>
                         ) : (
                             <div className="w-full flex flex-col gap-3 pt-4 border-t">
-                                <Button onClick={() => handleLogScan('ENTRY')} className="w-full bg-blue-600 hover:bg-blue-700" size="lg" disabled={logScan.isPending}>
+                                <Button onClick={() => handleLogScan('ENTRY')} className="w-full bg-primary hover:bg-blue-700" size="lg" disabled={logScan.isPending}>
                                     Log Entry
                                 </Button>
                                 <div className="grid grid-cols-2 gap-3">
