@@ -58,5 +58,4 @@ logs/
 *.txt
 !README.md
 *.log
-project_details.md
 prompt.md
