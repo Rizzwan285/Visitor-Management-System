@@ -3,7 +3,8 @@
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { RefreshCcw, FileText, Download } from 'lucide-react';
+import { RefreshCcw, FileText, Download, ChevronDown } from 'lucide-react';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { toast } from 'sonner';
 
 type SummaryData = {
@@ -140,6 +141,35 @@ export default function ReportsPage() {
         document.body.removeChild(link);
     };
 
+    const exportToPDF = async () => {
+        if (!passes || passes.length === 0) {
+            toast.error('No data to export');
+            return;
+        }
+
+        const id = toast.loading('Generating PDF...');
+        
+        try {
+            const { pdf } = await import('@react-pdf/renderer');
+            const { ReportPDF } = await import('./ReportPDF');
+            
+            const blob = await pdf(<ReportPDF summary={summary} passes={passes} />).toBlob();
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.href = url;
+            link.download = `VMS_Report_${new Date().toISOString().split('T')[0]}.pdf`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+
+            toast.success('PDF downloaded successfully', { id });
+        } catch (error) {
+            console.error('PDF Generation Error:', error);
+            toast.error('Failed to generate PDF', { id });
+        }
+    };
+
     return (
         <div className="p-6 max-w-7xl mx-auto space-y-6">
             <div className="flex flex-col md:flex-row justify-between md:items-center gap-4">
@@ -153,10 +183,23 @@ export default function ReportsPage() {
                         <RefreshCcw className="h-4 w-4 mr-2" />
                         Refresh
                     </Button>
-                    <Button onClick={exportToCSV} disabled={passes.length === 0 || isLoading}>
-                        <Download className="h-4 w-4 mr-2" />
-                        Export CSV
-                    </Button>
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button disabled={passes.length === 0 || isLoading}>
+                                <Download className="h-4 w-4 mr-2" />
+                                Export
+                                <ChevronDown className="h-4 w-4 ml-2" />
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                            <DropdownMenuItem onClick={exportToCSV} className="cursor-pointer">
+                                Export as CSV
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={exportToPDF} className="cursor-pointer">
+                                Export as PDF
+                            </DropdownMenuItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
                 </div>
             </div>
 
