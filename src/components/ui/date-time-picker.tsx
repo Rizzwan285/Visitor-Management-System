@@ -46,6 +46,12 @@ export function DateTimePicker({ name, required }: DateTimePickerProps) {
     setDate(newDate)
   }
 
+  const handleSetNow = () => {
+    const now = new Date()
+    setDate(now)
+    setTime(`${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`)
+  }
+
   return (
     <>
       <input 
@@ -73,16 +79,22 @@ export function DateTimePicker({ name, required }: DateTimePickerProps) {
             selected={date}
             onSelect={handleSelect}
             initialFocus
+            disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
             className="pointer-events-auto"
           />
-          <div className="p-3 border-t border-border flex items-center gap-2">
-              <Clock className="h-4 w-4 text-muted-foreground" />
-              <Input 
-                  type="time" 
-                  value={time}
-                  onChange={handleTimeChange}
-                  className="flex-1 border-input bg-background focus-visible:ring-ring"
-              />
+          <div className="p-3 border-t border-border flex items-center justify-between gap-2">
+              <div className="flex flex-1 items-center gap-2">
+                  <Clock className="h-4 w-4 text-muted-foreground block" />
+                  <Input 
+                      type="time" 
+                      value={time}
+                      onChange={handleTimeChange}
+                      className="flex-1 border-input bg-background focus-visible:ring-ring"
+                  />
+              </div>
+              <Button size="sm" variant="secondary" onClick={handleSetNow} type="button">
+                  Now
+              </Button>
           </div>
         </PopoverContent>
       </Popover>

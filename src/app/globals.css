@@ -145,6 +145,12 @@
 }
 
 @media print {
+  @page {
+    margin: 1cm;
+  }
+  a::after {
+    content: none !important;
+  }
   nav, header, aside, .no-print, [data-sonner-toaster], #sonner-toaster {
     display: none !important;
   }

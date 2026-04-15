@@ -16,9 +16,11 @@ export function PassPrintLayout({ pass }: PassPrintLayoutProps) {
             {/* Header */}
             <div className="flex justify-between items-center border-b-4 border-border pb-6 mb-8">
                 <div className="flex items-center gap-4">
-                    <div className="w-20 h-20 bg-black rounded-full flex items-center justify-center text-white text-2xl font-bold">
-                        IIT
-                    </div>
+                    <img 
+                      src="/logo.jpg" 
+                      alt="IIT Palakkad" 
+                      className="w-20 h-20 object-contain" 
+                    />
                     <div>
                         <h1 className="text-3xl font-bold uppercase tracking-wider text-foreground">Indian Institute of Technology Palakkad</h1>
                         <h2 className="text-xl font-semibold mt-1 text-foreground uppercase">{pass.passType.replace('_', ' ')} PASS</h2>
@@ -40,15 +42,25 @@ export function PassPrintLayout({ pass }: PassPrintLayoutProps) {
                             <span className="text-2xl font-bold uppercase block">{pass.visitorName}</span>
                         </div>
 
-                        <div>
-                            <span className="text-sm font-bold uppercase text-muted-foreground block mb-1">Age / Sex</span>
-                            <span className="text-lg uppercase">{pass.visitorAge || 'N/A'} / {pass.visitorSex}</span>
-                        </div>
+                        {(pass.visitorAge || pass.visitorSex) && (
+                          <div>
+                            <span className="text-sm font-bold uppercase text-muted-foreground block mb-1">
+                              Age / Sex
+                            </span>
+                            <span className="text-lg uppercase">
+                              {pass.visitorAge ?? 'N/A'} / {pass.visitorSex ?? 'N/A'}
+                            </span>
+                          </div>
+                        )}
 
-                        <div>
-                            <span className="text-sm font-bold uppercase text-muted-foreground block mb-1">Mobile</span>
-                            <span className="text-lg">{pass.visitorMobile || 'N/A'}</span>
-                        </div>
+                        {pass.visitorMobile && (
+                          <div>
+                            <span className="text-sm font-bold uppercase text-muted-foreground block mb-1">
+                              Mobile
+                            </span>
+                            <span className="text-lg">{pass.visitorMobile}</span>
+                          </div>
+                        )}
 
                         <div className="col-span-2">
                             <span className="text-sm font-bold uppercase text-muted-foreground block mb-1">Purpose of Visit</span>
