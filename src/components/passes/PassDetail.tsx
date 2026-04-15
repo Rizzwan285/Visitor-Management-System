@@ -277,7 +277,7 @@ export function PassDetail({ pass, role }: PassDetailProps) {
                     {pass.visitorPhotoUrl && (
                         <div className="w-full">
                             <h4 className="text-sm font-semibold mb-2">Visitor Photo</h4>
-                            <img src={pass.visitorPhotoUrl.startsWith('data:') ? pass.visitorPhotoUrl : `/api/passes/${pass.id}/photo`} alt="Visitor" className="w-full aspect-video object-cover rounded-md border" />
+                            <img src={pass.visitorPhotoUrl} alt="Visitor" className="w-full aspect-video object-cover rounded-md border" />
                         </div>
                     )}
 

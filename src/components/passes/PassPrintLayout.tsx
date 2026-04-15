@@ -105,7 +105,7 @@ export function PassPrintLayout({ pass }: PassPrintLayoutProps) {
 
                     {pass.visitorPhotoUrl && (
                         <div className="w-48 h-48 bg-muted/80 border-2 border-border mb-6 overflow-hidden flex items-center justify-center">
-                            <img src={pass.visitorPhotoUrl.startsWith('data:') ? pass.visitorPhotoUrl : `/api/passes/${pass.id}/photo`} alt="Visitor" className="w-full h-full object-cover" />
+                            <img src={pass.visitorPhotoUrl} alt="Visitor" className="w-full h-full object-cover" />
                         </div>
                     )}
 

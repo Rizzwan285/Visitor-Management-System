@@ -7,9 +7,9 @@ import { supabase } from '@/lib/supabase';
  * Fetches an image securely from the internal Supabase private bucket.
  * Auth: Requires any valid session.
  */
-export const GET = withAuth(async (req: NextRequest, { params }: { params: { filename: string } }) => {
+export const GET = withAuth(async (req: NextRequest, context: { params: Promise<{ filename: string }> }) => {
     try {
-        const { filename } = params;
+        const { filename } = await context.params;
         
         if (!filename) {
             return new NextResponse('Missing filename', { status: 400 });
