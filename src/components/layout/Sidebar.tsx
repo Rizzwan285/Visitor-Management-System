@@ -103,11 +103,11 @@ export function Sidebar() {
     return (
         <div className={cn(
             "flex h-full flex-col border-r border-sidebar-border bg-sidebar text-sidebar-foreground transition-all duration-300",
-            isCollapsed ? "w-16" : "w-64"
+            isCollapsed ? "w-16" : "w-56"
         )}>
-            <div className="p-4 flex items-center justify-between border-b border-sidebar-border/50 min-h-[73px]">
+            <div className="px-3 py-4 flex items-center justify-between border-b border-sidebar-border/50 min-h-[73px]">
                 {!isCollapsed && (
-                    <div className="flex items-center space-x-3 overflow-hidden">
+                    <div className="flex items-center space-x-3 overflow-hidden pl-1">
                         <div className="w-8 h-8 flex-shrink-0 bg-sidebar-primary text-sidebar-primary-foreground rounded-md flex items-center justify-center font-bold">
                             V
                         </div>
@@ -116,7 +116,10 @@ export function Sidebar() {
                 )}
                 <button 
                     onClick={toggleSidebar} 
-                    className="p-1 hover:bg-sidebar-accent/50 rounded-md text-sidebar-foreground mx-auto"
+                    className={cn(
+                        "p-1.5 hover:bg-sidebar-accent/50 rounded-md text-sidebar-foreground",
+                        isCollapsed ? "mx-auto" : "ml-auto mr-0.5"
+                    )}
                 >
                     <Menu className="h-5 w-5" />
                 </button>
