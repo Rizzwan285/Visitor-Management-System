@@ -10,6 +10,7 @@ export type AuditAction =
     | 'SCAN_ENTRY'
     | 'SCAN_EXIT'
     | 'SCAN_INTERMEDIATE_EXIT'
+    | 'SCAN_INTERMEDIATE_ENTRY'
     | 'SCAN_FINAL_EXIT'
     | 'SCAN_STUDENT_EXIT_OUT'
     | 'SCAN_STUDENT_EXIT_RETURN'
