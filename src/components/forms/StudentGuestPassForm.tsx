@@ -37,6 +37,7 @@ export function StudentGuestPassForm() {
             visitorAge: parseInt(formData.get('visitorAge') as string, 10),
             purpose: formData.get('purpose') as string,
             visitorRelation: formData.get('visitorRelation') as string,
+            visitorIdNumber: formData.get('visitorIdNumber') as string,
             visitFrom: new Date(formData.get('visitFrom') as string).toISOString(),
             visitTo: new Date(formData.get('visitTo') as string).toISOString(),
             approverId,

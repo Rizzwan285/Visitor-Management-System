@@ -55,14 +55,12 @@ const getNavLinks = (role: Role) => {
             break;
         case 'OIC_STUDENT_SECTION':
             links.push(
-                { title: 'Dashboard', href: '/oic', icon: LayoutDashboard },
-                { title: 'Approvals', href: '/oic', icon: ListChecks }
+                { title: 'Dashboard', href: '/oic', icon: LayoutDashboard }
             );
             break;
         case 'ASSISTANT_WARDEN':
             links.push(
-                { title: 'Dashboard', href: '/warden', icon: LayoutDashboard },
-                { title: 'Student Logs', href: '/warden', icon: FileText }
+                { title: 'Dashboard', href: '/warden', icon: LayoutDashboard }
             );
             break;
         case 'ADMIN':

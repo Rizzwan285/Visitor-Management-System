@@ -13,6 +13,7 @@ interface QRScannerProps {
 
 export function QRScanner({ onScanSuccess }: QRScannerProps) {
     const scannerRef = useRef<Html5Qrcode | null>(null);
+    const lastScannedRef = useRef<{ text: string; time: number } | null>(null);
     const [hasPermission, setHasPermission] = useState<boolean | null>(null);
     const [isScanning, setIsScanning] = useState(false);
     const [scannerError, setScannerError] = useState('');
@@ -44,6 +45,15 @@ export function QRScanner({ onScanSuccess }: QRScannerProps) {
                     qrbox: { width: 250, height: 250 },
                 },
                 (decodedText) => {
+                    const scanTime = Date.now();
+                    const lastScan = lastScannedRef.current;
+                    
+                    if (lastScan && lastScan.text === decodedText && (scanTime - lastScan.time) < 3000) {
+                        return; // Ignore duplicate scan within 3 seconds
+                    }
+                    
+                    lastScannedRef.current = { text: decodedText, time: scanTime };
+
                     // Pause scanning to prevent rapid-fire success callbacks
                     if (scannerRef.current?.isScanning) {
                         scannerRef.current.pause();

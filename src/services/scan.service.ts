@@ -109,9 +109,9 @@ export const ScanService = {
 
         const lastLog = pass.scanLogs[0];
         if (lastLog) {
-            // Debounce: 60 seconds
-            if (now.getTime() - lastLog.scannedAt.getTime() < 60000) {
-                throw new Error('Scan cooldown active. Please wait 60 seconds before scanning again.');
+            // Debounce: 1 second
+            if (now.getTime() - lastLog.scannedAt.getTime() < 1000) {
+                throw new Error('Scan debounce active. Please wait 1 second before scanning again.');
             }
         }
 
@@ -125,14 +125,30 @@ export const ScanService = {
             }
         }
 
-        // STRICT SEQUENCE VALIDATION FOR STUDENT EXIT
-        if (finalScanType === 'STUDENT_EXIT_OUT') {
+        // STRICT SEQUENCE VALIDATION FOR EXITS
+        if (finalScanType === 'ENTRY') {
+            if (lastLog && lastLog.scanType !== 'FINAL_EXIT') {
+                throw new Error('Visitor is already inside. Cannot log another entry.');
+            }
+        } else if (finalScanType === 'STUDENT_EXIT_OUT') {
             if (lastLog?.scanType === 'STUDENT_EXIT_OUT') {
                 throw new Error('Cannot exit. Student has not returned from previous exit.');
             }
         } else if (finalScanType === 'STUDENT_EXIT_RETURN') {
             if (lastLog?.scanType !== 'STUDENT_EXIT_OUT') {
                  throw new Error('Cannot return. Student has not logged an exit.');
+            }
+        } else if (finalScanType === 'INTERMEDIATE_ENTRY') {
+            if (lastLog?.scanType !== 'INTERMEDIATE_EXIT') {
+                throw new Error('Cannot log intermediate entry. Visitor has not logged an intermediate exit.');
+            }
+        } else if (finalScanType === 'INTERMEDIATE_EXIT') {
+            if (lastLog?.scanType === 'INTERMEDIATE_EXIT') {
+                throw new Error('Cannot log intermediate exit. Visitor is already checked out.');
+            }
+        } else if (finalScanType === 'FINAL_EXIT') {
+            if (lastLog?.scanType === 'INTERMEDIATE_EXIT') {
+                throw new Error('Cannot log final exit. Visitor must return from intermediate exit first.');
             }
         }
 

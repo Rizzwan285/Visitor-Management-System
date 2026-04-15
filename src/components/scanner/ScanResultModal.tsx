@@ -20,6 +20,7 @@ export function ScanResultModal({ isOpen, onClose, passData }: ScanResultModalPr
     const now = new Date();
     const isEarly = new Date(passData.visitFrom) > now;
     const isLate = new Date(passData.visitTo) < now;
+    const lastScanType = passData.scanLogs?.[0]?.scanType ?? null;
 
     const handleLogScan = async (scanType: 'ENTRY' | 'INTERMEDIATE_EXIT' | 'FINAL_EXIT' | 'STUDENT_EXIT_OUT' | 'STUDENT_EXIT_RETURN' | 'STUDENT_EXIT_AUTO') => {
         try {
@@ -35,9 +36,6 @@ export function ScanResultModal({ isOpen, onClose, passData }: ScanResultModalPr
             toast.error(err.message || `Failed to log ${scanType.replace('_', ' ').toLowerCase()}`);
         }
     };
-
-    const isActive = passData.status === 'ACTIVE';
-
     return (
         <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
             <DialogContent className="sm:max-w-md">
@@ -176,10 +174,10 @@ export function ScanResultModal({ isOpen, onClose, passData }: ScanResultModalPr
                             {passData.passType === 'STUDENT_EXIT' ? (
                                 <div className="w-full flex flex-col gap-3 border-t pt-4">
                                     <div className="grid grid-cols-2 gap-3">
-                                        <Button onClick={() => handleLogScan('STUDENT_EXIT_OUT')} className="w-full" size="lg" disabled={logScan.isPending}>
+                                        <Button onClick={() => handleLogScan('STUDENT_EXIT_OUT')} className="w-full" size="lg" disabled={logScan.isPending || lastScanType === 'STUDENT_EXIT_OUT'}>
                                             Exit (Out)
                                         </Button>
-                                        <Button onClick={() => handleLogScan('STUDENT_EXIT_RETURN')} className="w-full bg-indigo-600 hover:bg-indigo-700" size="lg" disabled={logScan.isPending}>
+                                        <Button onClick={() => handleLogScan('STUDENT_EXIT_RETURN')} className="w-full bg-indigo-600 hover:bg-indigo-700" size="lg" disabled={logScan.isPending || lastScanType !== 'STUDENT_EXIT_OUT'}>
                                             Entry (Return)
                                         </Button>
                                     </div>
@@ -190,13 +188,16 @@ export function ScanResultModal({ isOpen, onClose, passData }: ScanResultModalPr
                                         Log Entry
                                     </Button>
                                     <div className="grid grid-cols-2 gap-3">
-                                        <Button onClick={() => handleLogScan('INTERMEDIATE_EXIT')} className="w-full bg-slate-600 hover:bg-slate-700" size="lg" disabled={logScan.isPending}>
+                                        <Button onClick={() => handleLogScan('INTERMEDIATE_EXIT')} className="w-full bg-slate-600 hover:bg-slate-700" size="sm" disabled={logScan.isPending || lastScanType === 'INTERMEDIATE_EXIT'}>
                                             Intermediate Exit
                                         </Button>
-                                        <Button onClick={() => handleLogScan('FINAL_EXIT')} variant="destructive" className="w-full" size="lg" disabled={logScan.isPending}>
-                                            Final Exit
+                                        <Button onClick={() => handleLogScan('INTERMEDIATE_ENTRY')} className="w-full bg-indigo-600 hover:bg-indigo-700" size="sm" disabled={logScan.isPending || lastScanType !== 'INTERMEDIATE_EXIT'}>
+                                            Return (Entry)
                                         </Button>
                                     </div>
+                                    <Button onClick={() => handleLogScan('FINAL_EXIT')} variant="destructive" className="w-full mt-1" size="lg" disabled={logScan.isPending || lastScanType === 'INTERMEDIATE_EXIT'}>
+                                        Final Exit
+                                    </Button>
                                 </div>
                             )}
                         </>

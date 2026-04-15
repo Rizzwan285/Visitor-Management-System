@@ -145,7 +145,7 @@
 }
 
 @media print {
-  nav, header, aside, .no-print {
+  nav, header, aside, .no-print, [data-sonner-toaster], #sonner-toaster {
     display: none !important;
   }
   main {

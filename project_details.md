@@ -333,6 +333,7 @@ model WhitelistedEmail {
 ### Event Tracking & Security Logic
 * **Scans Mapping:**
   * `ScanLog` acts as the definitive historical ledger. Passes transitioning out track via `ScanType: FINAL_EXIT`. Passes stepping out briefly track `INTERMEDIATE_EXIT`.
+  * Users returning from an intermediate exit track `INTERMEDIATE_ENTRY`. This multi-cycle exit/entry behavior allows consecutive out/in logs but strictly prohibits duplicate logic natively (cannot exit if currently exited, and cannot log final exit until returning first).
 * **Scan Logic Update:**
   * Scans are legally allowed outside time window parameters.
   * EARLY/LATE detection evaluates natively handled in backend logic rather than client timestamps.
@@ -340,6 +341,10 @@ model WhitelistedEmail {
 * **Student Exit Flow:**
   * Strict alternating sequence manually enforced purely by Backend: OUT → RETURN → OUT → RETURN.
   * Sequences block natively to stop out-of-sync duplicate gate actions.
+* **Security QR Scanner Handling:**
+  * The frontend manual QR scanner heavily debounces streams directly through UI refs against rapid consecutive triggers mapping identical strings within ~3000ms. Lengthy backend cooldowns have been replaced by these faster debounce cycles to allow rapid clearance of multiple unique visitors cleanly.
+* **PDF Render Behavior Requirements:**
+  * Sonner toast notifications and generic overlays dynamically hide themselves utilizing `[data-sonner-toaster]` mapped against standard CSS `@media print` rules, ensuring generated QR Passes render pure documents mapping zero active UI frames.
 * **Known Edge Case — OIC Student Section:**
   * When an officer logged into the `/oic` path handles an approval/rejection request, the request immediately terminates from visibility across their interface.
   * Currently, the system lacks an isolated historical table specific for OIC view history; treating tasks as purely inbox (zero-sum) processing.
