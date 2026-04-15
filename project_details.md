@@ -333,6 +333,13 @@ model WhitelistedEmail {
 ### Event Tracking & Security Logic
 * **Scans Mapping:**
   * `ScanLog` acts as the definitive historical ledger. Passes transitioning out track via `ScanType: FINAL_EXIT`. Passes stepping out briefly track `INTERMEDIATE_EXIT`.
+* **Scan Logic Update:**
+  * Scans are legally allowed outside time window parameters.
+  * EARLY/LATE detection evaluates natively handled in backend logic rather than client timestamps.
+  * `deviationReason` is optionally tracked per scan if out of bounds sequentially.
+* **Student Exit Flow:**
+  * Strict alternating sequence manually enforced purely by Backend: OUT → RETURN → OUT → RETURN.
+  * Sequences block natively to stop out-of-sync duplicate gate actions.
 * **Known Edge Case — OIC Student Section:**
   * When an officer logged into the `/oic` path handles an approval/rejection request, the request immediately terminates from visibility across their interface.
   * Currently, the system lacks an isolated historical table specific for OIC view history; treating tasks as purely inbox (zero-sum) processing.

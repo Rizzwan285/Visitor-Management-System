@@ -27,7 +27,7 @@ export const POST = withAuth(
                 const ipAddress =
                     req.headers.get('x-forwarded-for') || undefined;
 
-                const { scanType, gateLocation, notes } = validatedData;
+                const { scanType, gateLocation, notes, deviationReason } = validatedData;
 
                 const scanLog = await ScanService.logScan(
                     passId,
@@ -35,7 +35,8 @@ export const POST = withAuth(
                     scanType as ScanType,
                     gateLocation,
                     notes,
-                    ipAddress
+                    ipAddress,
+                    deviationReason
                 );
 
                 return NextResponse.json(successResponse(scanLog), { status: 201 });

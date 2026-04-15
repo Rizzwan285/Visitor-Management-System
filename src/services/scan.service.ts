@@ -80,7 +80,8 @@ export const ScanService = {
         scanType: ScanType | 'STUDENT_EXIT_AUTO',
         gateLocation?: string,
         notes?: string,
-        ipAddress?: string
+        ipAddress?: string,
+        deviationReason?: string
     ): Promise<ScanLogWithRelations> {
         // ENFORCE STATE MACHINE: Backend must independently validate before any action
         const pass = await prisma.visitorPass.findUnique({
@@ -95,17 +96,15 @@ export const ScanService = {
         }
 
         const now = new Date();
+        let isOutOfTime = false;
+        let timeDeviationType: string | null = null;
+        
         if (now > pass.visitTo) {
-            // Auto-expire dynamically right before scanning if time exceeded
-            await prisma.visitorPass.update({
-                where: { id: passId },
-                data: { status: 'EXPIRED' }
-            });
-            throw new Error('Pass validity period has expired and the pass was automatically closed.');
-        }
-
-        if (now < pass.visitFrom) {
-            throw new Error('Pass visit window has not started yet.');
+            isOutOfTime = true;
+            timeDeviationType = 'LATE';
+        } else if (now < pass.visitFrom) {
+            isOutOfTime = true;
+            timeDeviationType = 'EARLY';
         }
 
         const lastLog = pass.scanLogs[0];
@@ -126,6 +125,17 @@ export const ScanService = {
             }
         }
 
+        // STRICT SEQUENCE VALIDATION FOR STUDENT EXIT
+        if (finalScanType === 'STUDENT_EXIT_OUT') {
+            if (lastLog?.scanType === 'STUDENT_EXIT_OUT') {
+                throw new Error('Cannot exit. Student has not returned from previous exit.');
+            }
+        } else if (finalScanType === 'STUDENT_EXIT_RETURN') {
+            if (lastLog?.scanType !== 'STUDENT_EXIT_OUT') {
+                 throw new Error('Cannot return. Student has not logged an exit.');
+            }
+        }
+
         const scanLog = (await prisma.scanLog.create({
             data: {
                 passId,
@@ -133,6 +143,9 @@ export const ScanService = {
                 scanType: finalScanType as ScanType,
                 gateLocation: gateLocation ?? null,
                 notes: notes ?? null,
+                isOutOfTime,
+                timeDeviationType,
+                deviationReason: deviationReason ?? null
             },
             include: {
                 scannedBy: true,

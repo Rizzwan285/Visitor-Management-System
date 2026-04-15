@@ -27,6 +27,7 @@ const studentGuestObject = z.object({
     ...baseFields,
     visitorRelation: z.string().min(1, 'Visitor relation is required'),
     visitorAge: z.number().int().positive('Age must be positive'),
+    visitorIdNumber: z.string().length(12, 'Aadhar must be exactly 12 digits').regex(/^\d+$/, 'Aadhar must be numeric only'),
     approverId: z.uuid('Invalid approver ID'),
 });
 

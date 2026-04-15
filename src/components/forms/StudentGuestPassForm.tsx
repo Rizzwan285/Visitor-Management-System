@@ -117,6 +117,11 @@ export function StudentGuestPassForm() {
                 </div>
 
                 <div className="space-y-2">
+                    <Label htmlFor="visitorIdNumber">Aadhar Number</Label>
+                    <Input id="visitorIdNumber" name="visitorIdNumber" placeholder="12-digit Aadhar number" required pattern="\d{12}" maxLength={12} />
+                </div>
+
+                <div className="space-y-2">
                     <Label htmlFor="visitorRelation">Relation to Student</Label>
                     <Input id="visitorRelation" name="visitorRelation" placeholder="e.g., Father, Mother, Brother" required />
                 </div>

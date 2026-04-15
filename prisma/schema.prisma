@@ -162,6 +162,9 @@ model ScanLog {
   scannedAt    DateTime  @default(now()) @map("scanned_at")
   gateLocation String?   @map("gate_location")
   notes        String?
+  isOutOfTime       Boolean   @default(false) @map("is_out_of_time")
+  timeDeviationType String?   @map("time_deviation_type")
+  deviationReason   String?   @map("deviation_reason")
 
   // Relations
   pass      VisitorPass @relation(fields: [passId], references: [id])
