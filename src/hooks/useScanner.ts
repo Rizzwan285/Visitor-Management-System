@@ -17,11 +17,11 @@ export function useScanner() {
     });
 
     const logScan = useMutation({
-        mutationFn: async ({ passId, scanType, gateLocation }: { passId: string, scanType: 'ENTRY' | 'INTERMEDIATE_EXIT' | 'FINAL_EXIT' | 'STUDENT_EXIT_OUT' | 'STUDENT_EXIT_RETURN' | 'STUDENT_EXIT_AUTO', gateLocation: string }) => {
+        mutationFn: async ({ passId, scanType, gateLocation, deviationReason }: { passId: string, scanType: 'ENTRY' | 'INTERMEDIATE_EXIT' | 'INTERMEDIATE_ENTRY' | 'FINAL_EXIT' | 'STUDENT_EXIT_OUT' | 'STUDENT_EXIT_RETURN' | 'STUDENT_EXIT_AUTO', gateLocation: string, deviationReason?: string }) => {
             const res = await fetch(`/api/passes/${passId}/scan`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ scanType, gateLocation }),
+                body: JSON.stringify({ scanType, gateLocation, deviationReason }),
             });
             const json = await res.json();
 
