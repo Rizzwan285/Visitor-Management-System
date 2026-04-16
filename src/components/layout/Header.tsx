@@ -40,7 +40,7 @@ export function Header() {
                         <Menu className="h-5 w-5" />
                         <span className="sr-only">Toggle sidebar</span>
                     </Button>
-                    <SheetContent side="left" className="p-0 w-64 border-r-0 bg-sidebar text-sidebar-foreground">
+                    <SheetContent side="left" showCloseButton={false} className="p-0 w-64 border-r-0 bg-sidebar text-sidebar-foreground">
                         <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
                         <Sidebar />
                     </SheetContent>

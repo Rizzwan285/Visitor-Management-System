@@ -102,8 +102,8 @@ export function Sidebar() {
 
     return (
         <div className={cn(
-            "flex h-full flex-col border-r border-sidebar-border bg-sidebar text-sidebar-foreground transition-all duration-300",
-            isCollapsed ? "w-16" : "w-56"
+            "relative h-screen flex flex-col border-r border-sidebar-border bg-sidebar text-sidebar-foreground transition-all duration-300 overflow-hidden",
+            isCollapsed ? "w-16" : "w-64"
         )}>
             <div className="px-3 py-4 flex items-center justify-between border-b border-sidebar-border/50 min-h-[73px]">
                 {!isCollapsed && (
