@@ -5,7 +5,7 @@ export function useScanner() {
 
     const verifyQR = useMutation({
         mutationFn: async (qrData: string) => {
-            const res = await fetch(`/api/passes/verify?code=${encodeURIComponent(qrData)}`);
+            const res = await fetch(`/api/passes/verify?code=${encodeURIComponent(qrData)}`, { cache: 'no-store' });
             const json = await res.json();
 
             if (!res.ok) {

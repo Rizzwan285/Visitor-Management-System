@@ -57,16 +57,6 @@ export const ScanService = {
         }
 
         const now = new Date();
-        if (now < pass.visitFrom) {
-            throw new Error(
-                `Pass visit window has not started yet (valid from: ${pass.visitFrom.toISOString()})`
-            );
-        }
-        if (now > pass.visitTo) {
-            throw new Error(
-                `Pass has expired (valid until: ${pass.visitTo.toISOString()})`
-            );
-        }
 
         return pass;
     },

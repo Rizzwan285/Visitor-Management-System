@@ -77,21 +77,25 @@ export function QRScanner({ onScanSuccess }: QRScannerProps) {
         }
     };
 
-    // Exported method to allow parent to resume after a success modal closes
+    // Exported method to allow parent to attempt a resume if needed
     const resumeScanner = () => {
-        if (scannerRef.current && scannerRef.current.getState() === 2) { // 2 = PAUSED
-            scannerRef.current.resume();
-        } else if (!isScanning) {
-            startScanner();
+        try {
+            // Html5QrcodeScannerState: 1 = NOT_STARTED, 2 = SCANNING, 3 = PAUSED
+            if (scannerRef.current && scannerRef.current.getState() === 3) { 
+                scannerRef.current.resume();
+            } else if (!isScanning && scannerRef.current?.getState() === 1) {
+                startScanner();
+            }
+        } catch (e) {
+            console.debug('Scanner resume skipped:', e);
         }
     };
 
-    // Attach resume method to window for easy access by parent (simplified approach)
-    // In a real app we'd use forwardRef, but this is simpler for the scaffold
+    // Attach resume method to window for easy access by parent
     useEffect(() => {
         (window as any).__resumeQRScanner = resumeScanner;
         return () => { delete (window as any).__resumeQRScanner; };
-    });
+    }, [isScanning]);
 
     return (
         <div className="w-full max-w-md mx-auto flex flex-col items-center">

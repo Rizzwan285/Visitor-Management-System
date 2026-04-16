@@ -147,16 +147,13 @@ export function ScanResultModal({ isOpen, onClose, passData }: ScanResultModalPr
 
                     {isActive ? (
                         <>
-                            {(isEarly || isLate) && (
-                                <div className={`w-full p-4 rounded text-sm ${isEarly ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800'} mb-4`}>
-                                    <p className="font-bold flex items-center gap-2">
-                                        <span className={`px-2 py-0.5 rounded text-xs ${isEarly ? 'bg-yellow-500 text-white' : 'bg-red-500 text-white'}`}>
-                                            {isEarly ? 'EARLY' : 'LATE'}
-                                        </span>
-                                        Visitor is {isEarly ? 'EARLY' : 'LATE'}
+                            {(passData.isOutOfTime || isEarly || isLate) && (
+                                <div className={`w-full p-4 rounded text-sm font-medium ${isEarly ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800'} mb-4 border ${isEarly ? 'border-yellow-200' : 'border-red-200'}`}>
+                                    <p>
+                                        Visitor is arriving {isEarly ? 'before' : 'after'} the scheduled time
                                     </p>
-                                    <p className="mt-1 opacity-90">
-                                        Allowed time: {new Date(passData.visitFrom).toLocaleString()} - {new Date(passData.visitTo).toLocaleString()}
+                                    <p className="mt-1 opacity-80 text-xs">
+                                        Allowed Time: {new Intl.DateTimeFormat('en-US', { hour: '2-digit', minute: '2-digit', hour12: true }).format(new Date(passData.visitFrom))} &rarr; {new Intl.DateTimeFormat('en-US', { hour: '2-digit', minute: '2-digit', hour12: true }).format(new Date(passData.visitTo))}
                                     </p>
                                     <div className="mt-3">
                                         <label className="block text-xs font-semibold mb-1 opacity-90">Reason (optional)</label>
