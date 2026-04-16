@@ -48,17 +48,15 @@ export function QRScanner({ onScanSuccess }: QRScannerProps) {
                     const scanTime = Date.now();
                     const lastScan = lastScannedRef.current;
                     
-                    if (lastScan && lastScan.text === decodedText && (scanTime - lastScan.time) < 3000) {
-                        return; // Ignore duplicate scan within 3 seconds
+                    if (lastScan && lastScan.text === decodedText && (scanTime - lastScan.time) < 1000) {
+                        return; // Ignore duplicate scan within 1 second
                     }
                     
                     lastScannedRef.current = { text: decodedText, time: scanTime };
 
-                    // Pause scanning to prevent rapid-fire success callbacks
-                    if (scannerRef.current?.isScanning) {
-                        scannerRef.current.pause();
-                        onScanSuccess(decodedText);
-                    }
+                    // Fire a simple scanned success toast to provide feedback instead of pausing
+                    toast.success('QR Scanned Successfully');
+                    onScanSuccess(decodedText);
                 },
                 (errorMessage) => {
                     // Html5Qrcode fires this continuously when no QR is found, so we ignore it unless it's a real failure

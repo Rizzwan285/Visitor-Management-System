@@ -65,7 +65,6 @@ export default function SecurityScanPage() {
                         <ul className="text-sm text-muted-foreground space-y-3 list-disc pl-4">
                             <li>Click <strong>Start Scanner</strong> and grant camera permissions.</li>
                             <li>Point the camera at the visitor&apos;s digital or printed QR code.</li>
-                            <li>The scanner will automatically pause when a code is detected.</li>
                             <li>Verify the visitor&apos;s physical identity against the photo shown on screen.</li>
                             <li>Log the matching action (Entry or Exit).</li>
                         </ul>
