@@ -50,7 +50,8 @@ const getNavLinks = (role: Role) => {
             links.push(
                 { title: 'Dashboard', href: '/security', icon: LayoutDashboard },
                 { title: 'Scan QR', href: '/security/scan', icon: ScanLine },
-                { title: 'Walk-in Pass', href: '/security/walkin', icon: UserPlus }
+                { title: 'Walk-in Pass', href: '/security/walkin', icon: UserPlus },
+                { title: 'My Walk-ins', href: '/security/passes', icon: FileText }
             );
             break;
         case 'OIC_STUDENT_SECTION':

@@ -38,12 +38,12 @@ export function ScanResultModal({ isOpen, onClose, passData }: ScanResultModalPr
     };
     return (
         <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-            <DialogContent className="sm:max-w-md">
+            <DialogContent className="sm:max-w-md max-h-[90vh] flex flex-col">
                 <DialogHeader>
                     <DialogTitle>Scan Result</DialogTitle>
                 </DialogHeader>
 
-                <div className="flex flex-col items-center space-y-6 pt-4">
+                <div className="flex flex-col items-center space-y-6 pt-4 overflow-y-auto max-h-[70vh] pr-1">
                     <div className="text-center space-y-2 w-full border-b pb-4">
                         <div className={`w-16 h-16 rounded-full mx-auto flex items-center justify-center font-bold text-2xl mb-2 ${isActive ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
                             {isActive ? '\u2713' : '\u2717'}
@@ -108,10 +108,10 @@ export function ScanResultModal({ isOpen, onClose, passData }: ScanResultModalPr
                             <div className="col-span-2 mt-2">
                                 <span className="text-muted-foreground font-semibold block mb-2">Visitor Photo</span>
                                 <div className="w-32 h-32 rounded-lg overflow-hidden border">
-                                    <img 
-                                        src={passData.visitorPhotoUrl.startsWith('data:') ? passData.visitorPhotoUrl : `/api/passes/${passData.id}/photo`} 
-                                        alt={`Photo of ${passData.visitorName}`} 
-                                        className="w-full h-full object-cover" 
+                                    <img
+                                        src={passData.visitorPhotoUrl}
+                                        alt={`Photo of ${passData.visitorName}`}
+                                        className="w-full h-full object-cover"
                                     />
                                 </div>
                             </div>
@@ -181,18 +181,22 @@ export function ScanResultModal({ isOpen, onClose, passData }: ScanResultModalPr
                                 </div>
                             ) : (
                                 <div className="w-full flex flex-col gap-3 pt-4 border-t">
+                                    {/* Log Entry: only when no scans yet, or after a Final Exit */}
                                     <Button onClick={() => handleLogScan('ENTRY')} className="w-full bg-primary hover:bg-blue-700" size="lg" disabled={logScan.isPending || (lastScanType !== null && lastScanType !== 'FINAL_EXIT')}>
                                         Log Entry
                                     </Button>
                                     <div className="grid grid-cols-2 gap-3">
-                                        <Button onClick={() => handleLogScan('INTERMEDIATE_EXIT')} className="w-full bg-slate-600 hover:bg-slate-700" size="sm" disabled={logScan.isPending || lastScanType === 'INTERMEDIATE_EXIT'}>
+                                        {/* Intermediate Exit: only when visitor is inside (after ENTRY or INTERMEDIATE_ENTRY) */}
+                                        <Button onClick={() => handleLogScan('INTERMEDIATE_EXIT')} className="w-full bg-slate-600 hover:bg-slate-700" size="sm" disabled={logScan.isPending || (lastScanType !== 'ENTRY' && lastScanType !== 'INTERMEDIATE_ENTRY')}>
                                             Intermediate Exit
                                         </Button>
+                                        {/* Return (Entry): only when visitor is outside on intermediate exit */}
                                         <Button onClick={() => handleLogScan('INTERMEDIATE_ENTRY')} className="w-full bg-indigo-600 hover:bg-indigo-700" size="sm" disabled={logScan.isPending || lastScanType !== 'INTERMEDIATE_EXIT'}>
                                             Return (Entry)
                                         </Button>
                                     </div>
-                                    <Button onClick={() => handleLogScan('FINAL_EXIT')} variant="destructive" className="w-full mt-1" size="lg" disabled={logScan.isPending || lastScanType === 'INTERMEDIATE_EXIT'}>
+                                    {/* Final Exit: requires visitor to be inside (after ENTRY or INTERMEDIATE_ENTRY) */}
+                                    <Button onClick={() => handleLogScan('FINAL_EXIT')} variant="destructive" className="w-full mt-1" size="lg" disabled={logScan.isPending || (lastScanType !== 'ENTRY' && lastScanType !== 'INTERMEDIATE_ENTRY')}>
                                         Final Exit
                                     </Button>
                                 </div>

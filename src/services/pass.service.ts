@@ -303,7 +303,7 @@ export const PassService = {
         page = 1,
         limit = 20
     ) {
-        const { passType, status, search, dateFrom, dateTo } = filters;
+        const { passType, status, search, dateFrom, dateTo, createdByMe } = filters;
 
         // Build base where clause scoped to role
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -312,7 +312,12 @@ export const PassService = {
         if (role === 'EMPLOYEE' || role === 'STUDENT' || role === 'OFFICIAL') {
             baseWhere.createdById = userId;
         } else if (role === 'SECURITY') {
-            baseWhere.status = 'ACTIVE';
+            if (createdByMe) {
+                // "My Walk-ins" view: show only passes created by this guard, all statuses
+                baseWhere.createdById = userId;
+            } else {
+                baseWhere.status = 'ACTIVE';
+            }
         } else if (role === 'ASSISTANT_WARDEN') {
             baseWhere.passType = { in: ['STUDENT_GUEST', 'STUDENT_EXIT'] };
         }
@@ -320,7 +325,7 @@ export const PassService = {
 
         // Apply filters
         if (passType) baseWhere.passType = passType;
-        if (status && role !== 'SECURITY') baseWhere.status = status; // security always sees ACTIVE
+        if (status && !(role === 'SECURITY' && !createdByMe)) baseWhere.status = status;
         if (search) {
             baseWhere.visitorName = { contains: search, mode: 'insensitive' };
         }

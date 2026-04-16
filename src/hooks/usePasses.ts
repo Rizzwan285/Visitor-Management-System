@@ -22,12 +22,13 @@ export function usePasses(filters?: PassFilters) {
     return useQuery({
         queryKey: ['passes', filters],
         queryFn: async (): Promise<{ data: VisitorPassWithDetails[]; meta: PaginationMeta }> => {
-            const params: Record<string, string | number | undefined> = {};
+            const params: Record<string, string | number | boolean | undefined> = {};
             if (filters?.passType) params.passType = filters.passType;
             if (filters?.status) params.status = filters.status;
             if (filters?.search) params.search = filters.search;
             if (filters?.page) params.page = filters.page;
             if (filters?.limit) params.limit = filters.limit;
+            if (filters?.createdByMe) params.createdByMe = true;
 
             const response = await api.getWithMeta<VisitorPassWithDetails[]>('/api/passes', params);
             return {

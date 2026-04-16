@@ -133,11 +133,14 @@ export const ScanService = {
                 throw new Error('Cannot log intermediate entry. Visitor has not logged an intermediate exit.');
             }
         } else if (finalScanType === 'INTERMEDIATE_EXIT') {
-            if (lastLog?.scanType === 'INTERMEDIATE_EXIT') {
-                throw new Error('Cannot log intermediate exit. Visitor is already checked out.');
+            if (!lastLog || (lastLog.scanType !== 'ENTRY' && lastLog.scanType !== 'INTERMEDIATE_ENTRY')) {
+                throw new Error('Cannot log intermediate exit. Visitor must be inside (logged entry) first.');
             }
         } else if (finalScanType === 'FINAL_EXIT') {
-            if (lastLog?.scanType === 'INTERMEDIATE_EXIT') {
+            if (!lastLog) {
+                throw new Error('Cannot log final exit. Visitor has not entered yet.');
+            }
+            if (lastLog.scanType === 'INTERMEDIATE_EXIT') {
                 throw new Error('Cannot log final exit. Visitor must return from intermediate exit first.');
             }
         }

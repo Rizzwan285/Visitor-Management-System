@@ -20,9 +20,11 @@ interface PassListProps {
     showTypeFilter?: boolean;
     /** Title above the list */
     title?: string;
+    /** Scope list to passes created by the current user (used for Security's walk-ins view) */
+    createdByMe?: boolean;
 }
 
-export function PassList({ basePath, defaultPassType, showTypeFilter = true, title = 'My Passes' }: PassListProps) {
+export function PassList({ basePath, defaultPassType, showTypeFilter = true, title = 'My Passes', createdByMe }: PassListProps) {
     const [page, setPage] = useState(1);
     const [search, setSearch] = useState('');
     const [statusFilter, setStatusFilter] = useState<string>('');
@@ -34,6 +36,7 @@ export function PassList({ basePath, defaultPassType, showTypeFilter = true, tit
         ...(search ? { search } : {}),
         ...(statusFilter ? { status: statusFilter as any } : {}),
         ...(typeFilter ? { passType: typeFilter as any } : {}),
+        ...(createdByMe ? { createdByMe: true } : {}),
     };
 
     const { data, isLoading, isError } = usePasses(filters);

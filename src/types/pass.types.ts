@@ -41,4 +41,5 @@ export interface PassFilters {
     dateTo?: string;
     page?: number;
     limit?: number;
+    createdByMe?: boolean;
 }
