@@ -1,98 +1,262 @@
-# Visitor Management System - Complete Developer Context & Architecture Dump
+# Visitor Management System — Complete Developer Context & Architecture Dump
 
-This document serves as a comprehensive **Knowledge Base and Context Dump** for the Visitor Management System. It is designed to be fed directly into an LLM (Large Language Model) to give it 100% awareness of the project's logic, underlying technologies, file structure, configurations, and core constraints. 
-
-If you are an LLM reading this, treat this document as the supreme source of truth regarding the application’s current state.
+> **For any AI reading this:** Treat this document as the authoritative source of truth for the project's current state. Read this before exploring the codebase. All schemas, routes, and business rules here reflect the actual code as of April 2026.
 
 ---
 
-## 1. Project Objective and Overview
+## 1. Project Overview
+
 **Name:** IIT Palakkad Visitor Management System  
-**Goal:** Digitize the logging, request, and tracking of visitors (Guests, Officials, Walk-ins) and inter-campus movement of students using QR-code-based passes.
-**Current Hosting:** The application is deployed on **Render** utilizing a **Supabase PostgreSQL** instance for the database.
-**Auth Provider:** Exclusively Google OAuth.
-**Mail Provider:** Resend SDK.
+**Goal:** Digitize the lifecycle of visitor passes — drafting → multi-level approval → QR generation → security scanning — and track inter-campus student movement.  
+**Hosting:** Deployed on **Render** (backend) with **Supabase PostgreSQL** as the database and **Supabase Object Storage** for photos/signatures.  
+**Auth Providers:** Google OAuth (primary) + Credentials (Security staff only).  
+**Mail Provider:** Resend SDK (`resend`).
 
 ---
 
-## 2. Technology Stack & Dependencies
-This project is built as a Full-Stack application using the **Next.js App Router (v14/15)**.
+## 2. Technology Stack
 
-* **Core Framework:** Next.js, React 19.
-* **Language:** TypeScript (`strict` mode).
-* **Styling Ecosystem:**
-  * Tailwind CSS (v4) via `@tailwindcss/postcss`.
-  * Components are structured using **Shadcn UI**, **Radix UI**, and `class-variance-authority`.
-  * Merging utilities: `clsx`, `tailwind-merge`.
-  * Icons: `lucide-react`.
-* **State Management & Data Fetching:**
-  * Client-side State: `zustand`
-  * API / Async State: `@tanstack/react-query`
-* **Authentication:** NextAuth (`next-auth@5.0.0-beta.30`) securely wired with `@auth/prisma-adapter`.
-* **Database & ORM:** PostgreSQL managed via **Prisma ORM** (`@prisma/client` and `prisma` dev dependency).
-* **Form Logic & Validation:**
-  * `react-hook-form`
-  * `zod` schema validations and `@hookform/resolvers`
-* **Mailing:** `resend` SDK.
-* **Additional Utilities:**
-  * `qrcode` & `html5-qrcode` (For code code generation and device camera scanning).
-  * `date-fns` (time manipulation).
-  * `@react-pdf/renderer` (Document issuance).
-  * `react-signature-canvas` (Capturing security/visitor signatures directly on frontend).
+| Layer | Tech |
+|---|---|
+| Framework | Next.js App Router (v15.x), React 19 |
+| Language | TypeScript (strict mode) |
+| Styling | Tailwind CSS v4, shadcn/ui, Radix UI, `clsx`, `tailwind-merge`, `class-variance-authority` |
+| Icons | `lucide-react` |
+| Client State | Zustand |
+| Server State | `@tanstack/react-query` |
+| Auth | NextAuth v5 (`next-auth@5.0.0-beta.30`) + `@auth/prisma-adapter` |
+| Database | PostgreSQL via Prisma ORM (`@prisma/client`) |
+| File Storage | Supabase Object Storage (proxied via `/api/secure-image`) |
+| Email | Resend SDK |
+| QR Codes | `qrcode` (generation) + `html5-qrcode` (camera scanning) |
+| Forms | `react-hook-form` + `zod` + `@hookform/resolvers` |
+| PDF | `@react-pdf/renderer` |
+| Signatures | `react-signature-canvas` |
+| Date | `date-fns`, `react-day-picker` |
+| Toasts | `sonner` |
+| Unique IDs | `uuid` |
+| Theming | `next-themes` |
 
----
-
-## 3. Directory & Routing Architecture
-
-The Next.js App Router (`src/app`) splits routing aggressively based on Access Roles.
-
-### Key Directories
-* `src/app/api/`: Holds backend endpoints executing Prisma queries (`auth`, `dashboard`, `passes`, `reports`, `scan-logs`, `security`, `upload`, `users`, `warden`).
-* `src/app/(auth)`: Holds unauthenticated logic or callback routes (e.g. `/login`).
-* `src/app/(dashboard)`: Houses protected interfaces for exact roles.
-  - `/admin`: Root system administrators.
-  - `/employee`: Standard faculty/staff routing.
-  - `/official`: External/Internal generic VIP routing.
-  - `/oic`: Officer In Charge dashboards (Student section).
-  - `/security`: Security gate dashboard (Scanning UI, manual entries, out logic).
-  - `/student`: Student dashboard (Initiating guest passes, exit passes).
-  - `/warden`: Assistant Warden interfaces (Approving student guest passes).
-* `src/components/`: Reusable React components (Atoms, Forms, Modals).
-* `src/hooks/`: Custom React hooks mapping to React-Query endpoints.
-* `src/lib/`: Essential non-react code (`auth.config.ts`, `prisma.ts`, `email.ts`, `auth-utils.ts`, `qr.ts`).
-* `src/schemas/`: `Zod` validation definitions explicitly separating frontend validation logic from DB logic.
+**npm Scripts:**
+```
+npm run dev          # Start dev server
+npm run build        # Production build
+npm run start        # Start production server
+npm run db:migrate   # npx prisma migrate dev
+npm run db:seed      # npx prisma db seed
+npm run db:reset     # npx prisma migrate reset
+npm run db:studio    # npx prisma studio
+npm run lint         # ESLint
+npm run type-check   # tsc --noEmit
+```
 
 ---
 
-## 4. Authentication Flow & Middleware Restrictions
+## 3. Complete Directory & File Structure
 
-Authentication is driven completely by **Google Auth** mapping users to predefined roles.
+```
+Visitor-Management-System/
+├── .env                          # Secrets (see §7)
+├── .gitignore
+├── .prettierrc
+├── components.json               # shadcn/ui config
+├── eslint.config.mjs
+├── next.config.ts
+├── package.json
+├── postcss.config.mjs
+├── prisma/
+│   └── schema.prisma             # Canonical DB schema (see §5)
+├── public/                       # Static assets
+├── reskin.js                     # Styling utility
+├── scripts/                      # Utility scripts
+├── set-admin-pwd.ts              # One-time admin password setup
+├── tsconfig.json
+├── update-pwd.ts                 # Password update utility
+└── src/
+    ├── app/
+    │   ├── layout.tsx            # Root layout (providers, theme)
+    │   ├── page.tsx              # Root → redirects to role dashboard
+    │   ├── (auth)/
+    │   │   ├── layout.tsx
+    │   │   └── login/page.tsx    # Google OAuth + credentials login
+    │   ├── (dashboard)/
+    │   │   ├── layout.tsx        # Protected layout (session gate)
+    │   │   ├── admin/
+    │   │   │   ├── page.tsx              # Admin dashboard (stats, actions)
+    │   │   │   ├── approvals/page.tsx    # Manage all approval requests
+    │   │   │   ├── logs/page.tsx         # Audit log viewer
+    │   │   │   ├── passes/
+    │   │   │   │   ├── page.tsx          # All passes list
+    │   │   │   │   └── [id]/page.tsx     # Pass detail / management
+    │   │   │   └── reports/
+    │   │   │       ├── page.tsx          # Report generation UI
+    │   │   │       └── ReportPDF.tsx     # PDF layout for reports
+    │   │   ├── employee/
+    │   │   │   ├── page.tsx
+    │   │   │   └── passes/
+    │   │   │       ├── page.tsx
+    │   │   │       ├── new/page.tsx      # Create employee guest pass
+    │   │   │       └── [id]/page.tsx
+    │   │   ├── official/
+    │   │   │   ├── page.tsx
+    │   │   │   └── passes/
+    │   │   │       ├── page.tsx
+    │   │   │       ├── new/page.tsx      # Create official pass
+    │   │   │       └── [id]/page.tsx
+    │   │   ├── oic/
+    │   │   │   └── page.tsx             # OIC inbox — approve/reject student passes
+    │   │   ├── security/
+    │   │   │   ├── page.tsx             # Security dashboard (scan stats, overstaying)
+    │   │   │   ├── scan/page.tsx        # QR scanner interface
+    │   │   │   ├── walkin/page.tsx      # Manual walk-in pass creation
+    │   │   │   └── passes/
+    │   │   │       ├── page.tsx         # "My Passes" — passes created by this security guard
+    │   │   │       └── [id]/page.tsx    # Pass detail view
+    │   │   ├── student/
+    │   │   │   ├── page.tsx
+    │   │   │   └── passes/
+    │   │   │       ├── guest/page.tsx   # Create student guest pass
+    │   │   │       ├── exit/page.tsx    # Create student exit pass
+    │   │   │       └── [id]/page.tsx
+    │   │   └── (roles)/
+    │   │       └── warden/
+    │   │           ├── page.tsx                    # Warden dashboard
+    │   │           └── passes/[id]/page.tsx        # Approve/reject from warden view
+    │   └── api/
+    │       ├── auth/[...nextauth]/route.ts          # NextAuth handler
+    │       ├── dashboard/route.ts                   # GET stats for dashboard
+    │       ├── passes/
+    │       │   ├── route.ts                         # POST (create), GET (list — role-scoped)
+    │       │   ├── verify/route.ts                  # POST — verify QR payload hash
+    │       │   └── [id]/
+    │       │       ├── route.ts                     # GET (single), PATCH (update), DELETE
+    │       │       ├── approve/route.ts             # POST — approve or reject pass
+    │       │       ├── forward/route.ts             # POST — forward pass to another approver
+    │       │       ├── photo/route.ts               # POST — attach photo to pass
+    │       │       ├── qr/route.ts                  # GET — retrieve/regenerate QR code
+    │       │       └── scan/route.ts                # POST — log a gate scan
+    │       ├── reports/route.ts                     # GET — CSV report generation
+    │       ├── scan-logs/route.ts                   # GET — scan history
+    │       ├── secure-image/[filename]/route.ts     # GET — serve Supabase images via session-gated proxy
+    │       ├── security/
+    │       │   └── overstaying/route.ts             # GET — visitors who exceeded visit window
+    │       ├── upload/
+    │       │   └── photo/route.ts                   # POST — upload photo to Supabase storage
+    │       ├── users/
+    │       │   ├── route.ts                         # GET — list users (admin)
+    │       │   └── me/route.ts                      # GET — current user profile
+    │       └── warden/
+    │           └── passes/route.ts                  # GET — passes pending warden approval
+    ├── components/
+    │   ├── providers.tsx                            # QueryClient + ThemeProvider wrapper
+    │   ├── theme-toggle.tsx                         # Light/dark switcher
+    │   ├── dashboard/
+    │   │   ├── StatsCards.tsx
+    │   │   ├── RecentActivity.tsx
+    │   │   └── OverstayingAlerts.tsx
+    │   ├── forms/
+    │   │   ├── EmployeePassForm.tsx
+    │   │   ├── OfficialPassForm.tsx
+    │   │   ├── StudentGuestPassForm.tsx
+    │   │   ├── StudentExitPassForm.tsx
+    │   │   └── WalkinPassForm.tsx                   # Photo + 3-signature + ID capture
+    │   ├── layout/
+    │   │   └── Sidebar.tsx                          # Role-aware navigation sidebar
+    │   ├── passes/
+    │   │   └── PassList.tsx                         # Reusable pass listing component
+    │   ├── scanner/
+    │   │   └── ScanResultModal.tsx                  # Result overlay after QR scan
+    │   └── ui/                                      # shadcn/ui primitives (Button, Card, etc.)
+    ├── config/
+    │   ├── domains.ts            # Email domain → role mapping + whitelist logic
+    │   ├── email-config.ts       # Email sender addresses + subjects
+    │   └── feature-flags.ts     # Approval-required flags per pass type
+    ├── hooks/
+    │   ├── usePasses.ts          # Pass CRUD + list queries
+    │   ├── useDashboard.ts       # Dashboard stats
+    │   ├── useApprovals.ts       # Approval request operations
+    │   ├── useScanner.ts         # QR scanner state and submit
+    │   └── useUsers.ts           # User list / profile
+    ├── lib/
+    │   ├── auth.ts               # NextAuth full config (Google + Credentials providers)
+    │   ├── auth.config.ts        # Edge-safe auth config (used in middleware)
+    │   ├── auth-utils.ts         # Session helpers (getServerSession wrappers)
+    │   ├── api-middleware.ts     # withAuth / withRole / withValidation chain
+    │   ├── prisma.ts             # Prisma client singleton
+    │   ├── email.ts              # Resend client instance
+    │   ├── qr.ts                 # QR image generation
+    │   ├── qr-and-id.ts          # HMAC-encrypted QR payload + pass number generation
+    │   ├── supabase.ts           # Supabase JS client (for object storage)
+    │   ├── utils.ts              # General utilities (cn, formatters)
+    │   └── email-templates/      # HTML email template files per pass type
+    ├── schemas/
+    │   ├── pass.schema.ts        # Zod schemas for pass creation (discriminated union per type)
+    │   ├── scan.schema.ts        # Zod schema for scan log submission
+    │   └── user.schema.ts        # Zod schema for user operations
+    ├── services/
+    │   ├── pass.service.ts       # Core: create, list, update, approve passes
+    │   ├── approval.service.ts   # Approval request creation and resolution
+    │   ├── email.service.ts      # Email dispatch with templates
+    │   ├── scan.service.ts       # Gate scan state-machine + overstaying calculation
+    │   ├── audit.service.ts      # Audit log writes
+    │   └── api.ts                # Client-side fetch wrapper (used by hooks)
+    ├── stores/
+    │   └── ui.store.ts           # Zustand: sidebar open/close
+    ├── types/
+    │   ├── api.types.ts          # API response shapes + pagination types
+    │   ├── pass.types.ts         # Pass-related TypeScript types
+    │   └── user.types.ts         # User types
+    └── proxy.ts                  # Email image proxy utility
+```
 
-### Allowed Domains
-1. `@iitpkd.ac.in` inherently map to `EMPLOYEE` logic or designated administration roles.
-2. `@smail.iitpkd.ac.in` inherently map to `STUDENT` logic.
-3. *Exceptions:* Generic institutional emails (`office_cs@iitpkd.ac.in`) are checked against a **Whitelist** (`WhitelistedEmail` table) bypassing domain locks.
+---
 
-### Route Protection Middleware (`src/middleware.ts`)
-The `ROUTE_ROLE_MAP` configures hard gates across navigation:
+## 4. Authentication & Route Protection
+
+### Auth Providers (`src/lib/auth.ts`)
+1. **Google OAuth** — primary login for all roles except Security.  
+   - `@iitpkd.ac.in` → `EMPLOYEE`  
+   - `@smail.iitpkd.ac.in` → `STUDENT`  
+   - Specific whitelisted emails (e.g. `office_cs@iitpkd.ac.in`) are matched against `WhitelistedEmail` table and assigned a custom role.
+2. **Credentials Provider** — Security staff log in with email + bcrypt password. Role is hard-coded to `SECURITY` from DB.
+
+### JWT Session Shape
+```typescript
+// Fields added to token in jwt() callback:
+{
+  id: string;
+  role: Role;
+  rollNumber: string | null;
+  uniqueId: string | null;
+}
+```
+
+### Route Guard Middleware (`src/middleware.ts`)
 ```typescript
 const ROUTE_ROLE_MAP: Record<string, string[]> = {
-    '/employee': ['EMPLOYEE', 'ADMIN'],
-    '/student':  ['STUDENT', 'ADMIN'],
-    '/official': ['OFFICIAL', 'ADMIN'],
-    '/security': ['SECURITY', 'ADMIN'],
-    '/admin':    ['ADMIN'],
-    '/oic':      ['OIC_STUDENT_SECTION', 'ADMIN'],
-    '/warden':   ['ASSISTANT_WARDEN', 'ADMIN'],
+  '/employee': ['EMPLOYEE', 'ADMIN'],
+  '/student':  ['STUDENT', 'ADMIN'],
+  '/official': ['OFFICIAL', 'ADMIN'],
+  '/security': ['SECURITY', 'ADMIN'],
+  '/admin':    ['ADMIN'],
+  '/oic':      ['OIC_STUDENT_SECTION', 'ADMIN'],
+  '/warden':   ['ASSISTANT_WARDEN', 'ADMIN'],
 };
 ```
-If a NextAuth session lacks the specific `session.user.role`, it generates a `307 Redirect` to `/login?error=AccessDenied`. Custom JWT session assignment happens in `src/lib/auth.config.ts`.
+Unauthorized access → `307` redirect to `/login?error=AccessDenied`.
+
+### API Middleware Chain (`src/lib/api-middleware.ts`)
+All API routes are wrapped in composable middleware:
+- `withAuth(handler)` — enforces active NextAuth session
+- `withRole(roles, handler)` — restricts to specific roles
+- `withValidation(schema, handler)` — validates body against Zod schema  
+Typical pattern: `withAuth(withRole(['SECURITY'], withValidation(scanSchema, handler)))`
 
 ---
 
-## 5. Complete Database Schema (Prisma)
+## 5. Complete Database Schema
 
-LLM context rule: The exact underlying database structure is defined by the following `schema.prisma`. All logic you write must adhere to these exact relations.
+The canonical schema is at `prisma/schema.prisma`. Copy it exactly when writing Prisma queries.
 
 ```prisma
 generator client {
@@ -104,7 +268,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// ─── Enums ──────────────────────────────────────────────
 enum Role {
   EMPLOYEE
   STUDENT
@@ -142,6 +305,7 @@ enum ApprovalStatus {
 enum ScanType {
   ENTRY
   INTERMEDIATE_EXIT
+  INTERMEDIATE_ENTRY   // visitor briefly exits and re-enters
   FINAL_EXIT
   STUDENT_EXIT_OUT
   STUDENT_EXIT_RETURN
@@ -153,72 +317,71 @@ enum Sex {
   OTHER
 }
 
-// ─── Models ─────────────────────────────────────────────
 model User {
-  id           String   @id @default(uuid())
-  email        String   @unique
+  id           String    @id @default(uuid())
+  email        String    @unique
   name         String?
   role         Role
-  rollNumber   String?  @map("roll_number")
-  uniqueId     String?  @map("unique_id")
+  rollNumber   String?   @map("roll_number")
+  uniqueId     String?   @map("unique_id")
   department   String?
-  passwordHash String?  @map("password_hash") // Used primarily for seeder/local dev
-  avatarUrl    String?  @map("avatar_url")
-  createdAt    DateTime @default(now()) @map("created_at")
-  updatedAt    DateTime @updatedAt @map("updated_at")
+  passwordHash String?   @map("password_hash")
+  avatarUrl    String?   @map("avatar_url")
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
   deletedAt    DateTime? @map("deleted_at")
 
-  createdPasses     VisitorPass[]      @relation("CreatedPasses")
-  hostedPasses      VisitorPass[]      @relation("HostedPasses")
-  approvalRequests  ApprovalRequest[]  @relation("RequestedApprovals")
-  approvedRequests  ApprovalRequest[]  @relation("ApprovedRequests")
-  scanLogs          ScanLog[]
-  auditLogs         AuditLog[]
+  createdPasses    VisitorPass[]     @relation("CreatedPasses")
+  hostedPasses     VisitorPass[]     @relation("HostedPasses")
+  approvalRequests ApprovalRequest[] @relation("RequestedApprovals")
+  approvedRequests ApprovalRequest[] @relation("ApprovedRequests")
+  scanLogs         ScanLog[]
+  auditLogs        AuditLog[]
 
   @@map("users")
 }
 
 model VisitorPass {
-  id                String      @id @default(uuid())
-  passNumber        String      @unique @map("pass_number")
-  passType          PassType    @map("pass_type")
-  status            PassStatus  @default(DRAFT)
-  createdById       String      @map("created_by_id")
-  visitorName       String      @map("visitor_name")
-  visitorSex        Sex         @map("visitor_sex")
-  purpose           String
-  visitFrom         DateTime    @map("visit_from")
-  visitTo           DateTime    @map("visit_to")
-  visitorRelation   String?     @map("visitor_relation")
-  visitorAge        Int?        @map("visitor_age")
-  visitorMobile     String?     @map("visitor_mobile")
-  visitorIdType     String?     @map("visitor_id_type")
-  visitorIdNumber   String?     @map("visitor_id_number")
-  visitorPhotoUrl   String?     @map("visitor_photo_url")
-  phoneConfirmedBy  String?     @map("phone_confirmed_by")
-  pointOfContact    String?     @map("point_of_contact")
-  pocMobile         String?     @map("poc_mobile")
-  hostelName        String?     @map("hostel_name")
-  qrCodeData        String      @map("qr_code_data")
-  qrCodeUrl         String?     @map("qr_code_url")
-  approvalRequired  Boolean     @default(false) @map("approval_required")
-  hostProfessorId   String?     @map("host_professor_id")
-  ccEmails          Json?       @default("[]") @map("cc_emails")
-  emailSentTo       Json?       @default("[]") @map("email_sent_to")
-  emailSent         Boolean     @default(false) @map("email_sent")
-  
-  // Signatures
-  visitorSignatureUrl  String?  @map("visitor_signature_url")
-  securitySignatureUrl String?  @map("security_signature_url")
-  hostSignatureUrl     String?  @map("host_signature_url")
-  countersignUrl       String?  @map("countersign_url")
-  
-  createdAt         DateTime    @default(now()) @map("created_at")
-  updatedAt         DateTime    @updatedAt @map("updated_at")
-  deletedAt         DateTime?   @map("deleted_at")
+  id               String     @id @default(uuid())
+  passNumber       String     @unique @map("pass_number")
+  passType         PassType   @map("pass_type")
+  status           PassStatus @default(DRAFT)
+  createdById      String     @map("created_by_id")
+  visitorName      String     @map("visitor_name")
+  visitorSex       Sex        @map("visitor_sex")
+  purpose          String
+  visitFrom        DateTime   @map("visit_from")
+  visitTo          DateTime   @map("visit_to")
+  visitorRelation  String?    @map("visitor_relation")
+  visitorAge       Int?       @map("visitor_age")
+  visitorMobile    String?    @map("visitor_mobile")
+  visitorIdType    String?    @map("visitor_id_type")
+  visitorIdNumber  String?    @map("visitor_id_number")
+  visitorPhotoUrl  String?    @map("visitor_photo_url")   // Supabase storage key
+  phoneConfirmedBy String?    @map("phone_confirmed_by")
+  pointOfContact   String?    @map("point_of_contact")
+  pocMobile        String?    @map("poc_mobile")
+  hostelName       String?    @map("hostel_name")
+  qrCodeData       String     @map("qr_code_data")        // HMAC-encrypted payload
+  qrCodeUrl        String?    @map("qr_code_url")
+  approvalRequired Boolean    @default(false) @map("approval_required")
+  hostProfessorId  String?    @map("host_professor_id")
+  ccEmails         Json?      @default("[]") @map("cc_emails")
+  emailSentTo      Json?      @default("[]") @map("email_sent_to")
+  emailSent        Boolean    @default(false) @map("email_sent")
 
-  createdBy       User              @relation("CreatedPasses", fields: [createdById], references: [id])
-  hostProfessor   User?             @relation("HostedPasses", fields: [hostProfessorId], references: [id])
+  // Signatures (stored as Supabase storage keys)
+  visitorSignatureUrl  String? @map("visitor_signature_url")
+  securitySignatureUrl String? @map("security_signature_url")
+  hostSignatureUrl     String? @map("host_signature_url")
+  countersignUrl       String? @map("countersign_url")
+
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  createdBy       User             @relation("CreatedPasses", fields: [createdById], references: [id])
+  hostProfessor   User?            @relation("HostedPasses", fields: [hostProfessorId], references: [id])
   approvalRequest ApprovalRequest?
   scanLogs        ScanLog[]
   emailLogs       EmailLog[]
@@ -227,19 +390,20 @@ model VisitorPass {
   @@index([status])
   @@index([createdById])
   @@index([hostProfessorId])
+  @@index([createdAt])
   @@map("visitor_passes")
 }
 
 model ApprovalRequest {
-  id            String          @id @default(uuid())
-  passId        String          @unique @map("pass_id")
-  requestedById String          @map("requested_by_id")
-  approverId    String?         @map("approver_id")
-  status        ApprovalStatus  @default(PENDING)
+  id            String         @id @default(uuid())
+  passId        String         @unique @map("pass_id")
+  requestedById String         @map("requested_by_id")
+  approverId    String?        @map("approver_id")
+  status        ApprovalStatus @default(PENDING)
   remarks       String?
-  decidedAt     DateTime?       @map("decided_at")
-  createdAt     DateTime        @default(now()) @map("created_at")
-  updatedAt     DateTime        @updatedAt @map("updated_at")
+  decidedAt     DateTime?      @map("decided_at")
+  createdAt     DateTime       @default(now()) @map("created_at")
+  updatedAt     DateTime       @updatedAt @map("updated_at")
 
   pass        VisitorPass @relation(fields: [passId], references: [id])
   requestedBy User        @relation("RequestedApprovals", fields: [requestedById], references: [id])
@@ -249,17 +413,22 @@ model ApprovalRequest {
 }
 
 model ScanLog {
-  id           String    @id @default(uuid())
-  passId       String    @map("pass_id")
-  scannedById  String    @map("scanned_by_id")
-  scanType     ScanType  @map("scan_type")
-  scannedAt    DateTime  @default(now()) @map("scanned_at")
-  gateLocation String?   @map("gate_location")
-  notes        String?
+  id                String   @id @default(uuid())
+  passId            String   @map("pass_id")
+  scannedById       String   @map("scanned_by_id")
+  scanType          ScanType @map("scan_type")
+  scannedAt         DateTime @default(now()) @map("scanned_at")
+  gateLocation      String?  @map("gate_location")
+  notes             String?
+  isOutOfTime       Boolean  @default(false) @map("is_out_of_time")
+  timeDeviationType String?  @map("time_deviation_type")  // "EARLY" | "LATE"
+  deviationReason   String?  @map("deviation_reason")
 
   pass      VisitorPass @relation(fields: [passId], references: [id])
   scannedBy User        @relation(fields: [scannedById], references: [id])
 
+  @@index([passId])
+  @@index([scannedAt])
   @@map("scan_logs")
 }
 
@@ -290,6 +459,8 @@ model AuditLog {
 
   user User? @relation(fields: [userId], references: [id])
 
+  @@index([entityType, entityId])
+  @@index([createdAt])
   @@map("audit_logs")
 }
 
@@ -304,11 +475,11 @@ model FeatureFlag {
 }
 
 model WhitelistedEmail {
-  id          String   @id @default(uuid())
-  email       String   @unique
-  department  String?
-  addedBy     String?
-  createdAt   DateTime @default(now()) @map("created_at")
+  id         String   @id @default(uuid())
+  email      String   @unique
+  department String?
+  addedBy    String?
+  createdAt  DateTime @default(now()) @map("created_at")
 
   @@map("whitelisted_emails")
 }
@@ -316,80 +487,177 @@ model WhitelistedEmail {
 
 ---
 
-## 6. Business Logic & Feature Constraints
+## 6. Business Logic & Feature Rules
 
-### Visitor Flow Specifications
-* **Student Passes (Student Guest / Student Exit):**
-  * When a student issues a request, `VisitorPass` receives status `PENDING_APPROVAL` and generates a mapped `ApprovalRequest`.
-  * The `ASSISTANT_WARDEN` role intercepts this request in their dashboard. When approved, a QR pass is formally generated and dispatched via the Resend API to both the student and the Warden automatically.
-  * *Important Context:* Signatures are historically skipped for student workflows as logic verifies approval explicitly against the DB.
-* **Employee / Internal Operations (VIP / Officials):**
-  * Typically, the frontend logic bypasses initial approval workflows based on the active role issuing the pass. (`approvalRequired = false`).
-  * CC Logic: Emails are automatically duplicated (`cc_addresses`) corresponding to designated office/head constraints via generic arrays.
-* **Walk-In Visitors:**
-  * Issued uniquely by `SECURITY` with instantaneous approval.
-  * Involves heavy UI elements tracking manual uploads of face captures (`visitorPhotoUrl`), validating identity documents (`visitorIdType`), taking physical user signatures digitally (`react-signature-canvas`), and generating an immediate QR entry point representation.
+### Pass Types & Workflows
 
-### Event Tracking & Security Logic
-* **Scans Mapping:**
-  * `ScanLog` acts as the definitive historical ledger. Passes transitioning out track via `ScanType: FINAL_EXIT`. Passes stepping out briefly track `INTERMEDIATE_EXIT`.
-  * Users returning from an intermediate exit track `INTERMEDIATE_ENTRY`. This multi-cycle exit/entry behavior allows consecutive out/in logs but strictly prohibits duplicate logic natively (cannot exit if currently exited, and cannot log final exit until returning first).
-* **Scan Logic Update:**
-  * Scans are legally allowed outside time window parameters.
-  * EARLY/LATE detection evaluates natively handled in backend logic rather than client timestamps.
-  * `deviationReason` is optionally tracked per scan if out of bounds sequentially.
-* **Student Exit Flow:**
-  * Strict alternating sequence manually enforced purely by Backend: OUT → RETURN → OUT → RETURN.
-  * Sequences block natively to stop out-of-sync duplicate gate actions.
-* **Security QR Scanner Handling:**
-  * The frontend manual QR scanner heavily debounces streams directly through UI refs against rapid consecutive triggers mapping identical strings within ~3000ms. Lengthy backend cooldowns have been replaced by these faster debounce cycles to allow rapid clearance of multiple unique visitors cleanly.
-* **PDF Render Behavior Requirements:**
-  * Sonner toast notifications and generic overlays dynamically hide themselves utilizing `[data-sonner-toaster]` mapped against standard CSS `@media print` rules, ensuring generated QR Passes render pure documents mapping zero active UI frames.
-* **Known Edge Case — OIC Student Section:**
-  * When an officer logged into the `/oic` path handles an approval/rejection request, the request immediately terminates from visibility across their interface.
-  * Currently, the system lacks an isolated historical table specific for OIC view history; treating tasks as purely inbox (zero-sum) processing.
+| Pass Type | Created By | Approval Required | Approver |
+|---|---|---|---|
+| `EMPLOYEE_GUEST` | Employee | No (by default) | — |
+| `OFFICIAL` | Official | No (by default) | — |
+| `STUDENT_GUEST` | Student | Yes | OIC_STUDENT_SECTION or ASSISTANT_WARDEN |
+| `WALKIN` | Security | No | — (immediate) |
+| `STUDENT_EXIT` | Student | Yes | OIC_STUDENT_SECTION |
+
+Approval requirement per pass type is controlled by `FeatureFlag` entries in the DB (managed by Admin). The `src/config/feature-flags.ts` maps flag keys to pass types.
+
+### Pass Status Machine
+```
+DRAFT → PENDING_APPROVAL → APPROVED → ACTIVE → EXPIRED
+                         ↘ REJECTED
+APPROVED / ACTIVE → CANCELLED
+```
+- `WALKIN` passes skip `PENDING_APPROVAL` and go directly to `APPROVED`/`ACTIVE`.
+- Once a QR is scanned for first ENTRY, status moves to `ACTIVE`.
+
+### Gate Scan State Machine (`src/services/scan.service.ts`)
+The scan service enforces strict sequential integrity — you cannot log an impossible transition:
+
+**Visitor (non-student) scan sequence:**
+```
+ENTRY → [INTERMEDIATE_EXIT → INTERMEDIATE_ENTRY]* → FINAL_EXIT
+```
+- Multiple intermediate exits allowed.
+- Cannot FINAL_EXIT while currently outside (pending INTERMEDIATE_ENTRY).
+- Cannot scan ENTRY twice.
+
+**Student exit scan sequence:**
+```
+STUDENT_EXIT_OUT → STUDENT_EXIT_RETURN → STUDENT_EXIT_OUT → ...
+```
+Strictly alternating. Backend blocks any duplicate or out-of-order state.
+
+**Timing deviation tracking:**
+- `isOutOfTime: true` when scan happens outside the `visitFrom`–`visitTo` window.
+- `timeDeviationType`: `"EARLY"` or `"LATE"`.
+- `deviationReason`: optional note captured at scan time.
+- Scans are still allowed outside the time window (not blocked); deviation is just recorded.
+
+### Overstaying Detection (`src/app/api/security/overstaying/route.ts`)
+- Finds passes where `visitTo` has passed, status is `ACTIVE`, and no `FINAL_EXIT` scan exists.
+- Security dashboard polls this endpoint and shows real-time alerts with a click-to-call link on the POC mobile number.
+
+### Walk-in Pass (`src/components/forms/WalkinPassForm.tsx`)
+- Created exclusively by `SECURITY`.
+- Requires: webcam photo capture (uploaded to Supabase), visitor ID (Aadhaar validated), visitor & security signatures (captured via `react-signature-canvas`).
+- Approved instantly — no approval workflow.
+
+### Security "My Passes" Feature (`src/app/(dashboard)/security/passes/page.tsx`)
+- Security guards can view passes they personally created (filtered by `createdById`).
+- Added in commit `7c2777e` (April 2026).
+- Uses `PassList` component with a security-scoped query.
+
+### QR Code System (`src/lib/qr-and-id.ts`)
+- Payload is HMAC-signed using `NEXTAUTH_SECRET` as the key.
+- `/api/passes/verify` endpoint validates the HMAC before accepting any scan.
+- `qrCodeUrl` stores the data URI of the rendered QR image.
+
+### Photo Storage (`src/lib/supabase.ts`, `/api/secure-image/[filename]`)
+- Photos and signatures are uploaded to Supabase Object Storage via `/api/upload/photo`.
+- Stored file keys (not full URLs) are saved in DB (`visitorPhotoUrl`, `*SignatureUrl`).
+- Frontend fetches images through `/api/secure-image/[filename]` which validates the session before proxying the Supabase signed URL. This prevents direct unauthenticated access.
+
+### Email System (`src/services/email.service.ts`)
+- Templates per pass type in `src/lib/email-templates/`.
+- `EMAIL_TESTING_MODE=true` (env var) reroutes all outgoing emails to a single test address.
+- Sending never throws — errors are caught and logged to `EmailLog`.
+- CC logic: specific pass types automatically CC institutional office addresses (configured in `src/config/email-config.ts`).
+
+### PDF Generation
+- Admin reports use `@react-pdf/renderer` (see `src/app/(dashboard)/admin/reports/ReportPDF.tsx`).
+- Print CSS rules hide all Sonner toasts and UI overlays via `[data-sonner-toaster] { display: none }` in `@media print`, so PDFs render cleanly.
+- IIT Palakkad institutional logo header is included in the print layout.
+
+### Feature Flags
+- Stored in `FeatureFlag` DB table, managed via Admin UI.
+- Keys map to pass-type approval requirements.
+- `src/config/feature-flags.ts` contains the key constants.
 
 ---
 
-## 7. Environment Requirements (.env Setup)
-
-To spin up this repository locally (and identical parameters required inside **Render**'s deployment portal):
+## 7. Environment Variables
 
 ```env
-# Database Connections
+# PostgreSQL (Supabase)
 DATABASE_URL="postgres://postgres.xxx:xxx@xxx.pooler.supabase.com:5432/postgres"
 
-# Next Auth Secrets
+# NextAuth
 NEXTAUTH_URL="http://localhost:3000"
-NEXTAUTH_SECRET="A highly secure random string generated locally"
+NEXTAUTH_SECRET="<random secure string>"
 
-# Google Client Credentials for Login
+# Google OAuth
 GOOGLE_CLIENT_ID="xxx.apps.googleusercontent.com"
 GOOGLE_CLIENT_SECRET="GOCSPX-xxx"
 
-# Mail Transaction Logic
+# Email
 RESEND_API_KEY="re_xxx"
+
+# Supabase (for file storage)
+NEXT_PUBLIC_SUPABASE_URL="https://xxx.supabase.co"
+NEXT_PUBLIC_SUPABASE_ANON_KEY="eyJ..."
+SUPABASE_SERVICE_ROLE_KEY="eyJ..."  # Used server-side for secure uploads
+
+# Optional
+EMAIL_TESTING_MODE="true"           # Reroutes all emails to test address
+EMAIL_TEST_RECIPIENT="dev@example.com"
 ```
 
-## 8. Terminal Commands Executed
+---
 
-* Installed Dependencies: `npm install`
-* Synced Database Schema: `npx prisma generate` (to build types). The Database is remote, thus `migrate deploy` commands act directly against Supabase.
-* Startup routine: `npm run dev`
+## 8. Common Development Commands
+
+```bash
+npm install                  # Install dependencies
+npx prisma generate          # Regenerate Prisma client after schema changes
+npx prisma migrate dev       # Run migrations against DB
+npx prisma studio            # Open Prisma Studio GUI
+npm run dev                  # Start local dev server on :3000
+```
 
 ---
 
-## 9. Recent Architectural & Production Upgrades (April 2026 Phase)
+## 9. Architectural Patterns to Follow
 
-The application underwent rigorous hardening and aesthetic upgrades directly matching the developer's personal layout aesthetics, plus advanced state-machine validations:
-* **Supabase Object Storage Migration:** Ripped out local ephemeral `/public/uploads` usage. Now dynamically proxies photo buffers leveraging `@supabase/supabase-js` via a bespoke highly secured `/api/secure-image` routing bridge requiring active session validations.
-* **Chronological Integrity Constraints:** Upgraded schemas logically with Zod and strictly added database-level constraints `check_visit_dates` ensuring `visitTo` strictly sequentially follows `visitFrom`.
-* **Component Engine Substitution:** Gutted ugly native browser generic `datetime-local` blocks across five major form components, replacing them entirely with a custom Radix-powered, `date-fns` supported Calendar layout. Added hard barriers to prevent past-date selection natively inside grids, and added a quick "Now" toggle bypassing clunky clock interactions.
-* **Scanner Interop and State Rules:** Rebuilt the `ScanService.logScan` into a hardcore sequential state-machine preventing redundant entries or impossible exits. Moved EARLY/LATE timing diagnostics natively into Prisma writes rather than frontend spoofing. Bound `INTERMEDIATE_ENTRY` globally into Zod payload verifications and Prisma sequences allowing clean back-and-forth transitions mid-pass prior to `FINAL_EXIT`.
-* **Camera Optimization:** Decoupled the `html5-qrcode` `pause()` triggers. Bypassed UI-blocking manual start/stop sequences to foster rapid continuous multi-scan environments, leaning purely into a hyper-optimized `1000ms` dual frontend-backend debounce lock to catch duplicate frames dynamically.
-* **Print PDF Rendering:** Blanked all overlay interactions and browser injected wrappers during Physical Print jobs manually via scoped `@media print` + `@page` structures, preventing Toast notifications from burning onto papers. Re-engineered layout natively integrating Institutional logo headers and intelligently tearing down empty DOM properties like arbitrary Mobile blocks to save space.
-* **Layout Mathematics:** Overhauled `globals.css` base UI/UX variables matching developer preferences natively leveraging native tailwind 4 inline configs. Adjusted `<aside>` wrappers dynamically matching Flex-basis shrinking metrics for the Sidebar. Shaved `256px` side panels down to `w-56 (224px)` natively enforcing pixel-perfect padding alignments against header logos.
-* **Signature Deprecation:** Safely severed all frontend demands for the generic manual user signature input canvases, simplifying security inputs cleanly.
+1. **API pattern:** All route handlers wrap with `withAuth` / `withRole` / `withValidation` from `src/lib/api-middleware.ts`. Never skip this chain.
+2. **Data fetching:** Use React Query hooks in `src/hooks/`. Don't call `fetch()` directly from components.
+3. **Validation:** Define Zod schemas in `src/schemas/`, use them on both frontend (react-hook-form) and backend (withValidation).
+4. **DB access:** All Prisma logic lives in `src/services/`. API routes call services, not Prisma directly.
+5. **Soft deletes:** Set `deletedAt` rather than hard-deleting records. Filter `deletedAt: null` in queries.
+6. **State:** Zustand only for minimal UI state. All server data goes through React Query.
+7. **Images:** Always upload via `/api/upload/photo` and serve via `/api/secure-image/[filename]`. Never serve Supabase URLs directly to the client.
+8. **Emails:** Always use `email.service.ts` — never call Resend directly from routes or services.
+9. **Scanner debounce:** The QR scanner debounces duplicate scans on the frontend (~1000ms ref-based debounce). The backend scan service also enforces idempotency via state-machine checks — do not add additional cooldown timers.
+10. **Path alias:** `@/*` maps to `src/*` (configured in `tsconfig.json`). Always use this for imports.
 
 ---
-**End of Project Knowledge Base.**
+
+## 10. Role Dashboard Summary
+
+| Role | Dashboard Path | Key Actions |
+|---|---|---|
+| `ADMIN` | `/admin` | Full system view, user management, reports, logs, feature flags |
+| `EMPLOYEE` | `/employee` | Create & manage own guest passes |
+| `OFFICIAL` | `/official` | Create & manage official passes |
+| `STUDENT` | `/student` | Create guest & exit passes (requires approval) |
+| `SECURITY` | `/security` | Scan QR codes, create walk-in passes, view own passes, see overstaying alerts |
+| `OIC_STUDENT_SECTION` | `/oic` | Approve/reject pending student pass requests (inbox model) |
+| `ASSISTANT_WARDEN` | `/warden` | Approve student guest passes, receive overstaying alerts |
+
+---
+
+## 11. Recent Changes (April 2026)
+
+- **Supabase Object Storage:** Photos and signatures moved from local `/public/uploads` to Supabase. Served via session-gated `/api/secure-image` proxy.
+- **Scan State Machine Hardening:** `ScanService.logScan` rebuilt as a strict state machine. EARLY/LATE deviation tracking written to DB, not computed client-side. `INTERMEDIATE_ENTRY` added to full scan sequence.
+- **Date Picker Overhaul:** Native `datetime-local` inputs replaced with Radix + `date-fns` calendar component across all forms. Past-date selection is blocked. "Now" shortcut added.
+- **Scanner Debounce Optimization:** Replaced backend cooldown timers with ~1000ms frontend debounce using refs, enabling faster multi-visitor clearance.
+- **Print/PDF Fixes:** `@media print` + `@page` CSS hides toasts and UI chrome. Institutional logo added to printed pass layout.
+- **Security "My Passes":** New page at `/security/passes` lets security guards view their own created passes.
+- **Scan Result Modal:** Updated UI for the post-scan result display.
+- **Aadhaar Validation:** Walk-in form validates Aadhaar number format before submission.
+- **Sidebar Fix:** Resolved sidebar rendering bugs across multiple iterations.
+- **Signature Deprecation:** Manual signature canvas inputs removed from some flows to simplify UX.
+
+---
+
+*End of project knowledge base. Last updated: April 2026.*

@@ -1,66 +1,247 @@
-# Visitor Management System (VMS)
+# IIT Palakkad — Visitor Management System
 
-A robust, full-stack Next.js application designed to manage, track, and approve visitor passes efficiently.
+A full-stack Next.js application that digitizes the complete lifecycle of campus visitor passes: drafting → multi-level approval → encrypted QR generation → security gate scanning.
 
-## Project Overview
-The VMS digitizes the entire lifecycle of visitor passes—from drafting and multi-level approval to QR code generation and live security gate scanning. It offers specialized dashboards tailored to different roles (Admin, Security, Student, Employee, Official) to streamline operations, enhance campus security, and provide real-time reporting on pass lifecycles.
+---
 
-## Implemented Features
-- **Role-Based Dashboards:** Unique UI views and features for Admins, Security, Employees, Officials, Students, and the distinct **Officer-in-Charge (OIC)**.
-- **Dynamic Pass Generation:** Different workflows for Guest Passes, Exit Passes, and Walk-ins.
-- **Multi-Level Approvals:** Granular permission system for passing pending requests through required approvers (e.g. Host professors and Student Section Officiants).
-- **Advanced Walk-in Capture:** Physical webcam implementations combined with a multi-tiered **3-signature digital pad** (Visitor, Security, Host) tracking physical walk-in validity securely.
-- **Secure QR Code Generation:** Real-time generation of encrypted QR codes distributed via Email API to visitors for seamless security scanning, explicitly bypassing email image strippers via direct raw-byte proxies.
-- **Scanner Workflows:** Security guards can scan QR codes logging both `ENTRY`, `INTERMEDIATE_EXIT`, and `FINAL_EXIT`. Dedicated overlays allow isolating **`STUDENT_EXIT_OUT`** and **`STUDENT_EXIT_RETURN`** pipelines completely explicitly alerting Assistant Wardens automatically.
-- **Security Analytics & Alerts:** Security Dashboard includes real-time feeds of gate operations and a highly optimized, background-polling active alert tracker for Overstaying Visitors (featuring click-to-call action links and real-time overdue calculations).
-- **Admin Reporting Engine:** A powerful data visualization UI for exporting custom-timeline analytical CSV reports.
+## Features
+
+- **Role-based dashboards** — 7 distinct interfaces (Admin, Employee, Official, Student, Security, OIC, Assistant Warden)
+- **Pass types** — Employee Guest, Official, Student Guest, Walk-in, Student Exit
+- **Multi-level approval** — OIC/Warden inbox with approve/reject + remarks
+- **Encrypted QR codes** — HMAC-signed payloads sent via email; scanned at gate
+- **Gate scan state machine** — ENTRY → INTERMEDIATE_EXIT ↔ INTERMEDIATE_ENTRY → FINAL_EXIT; prevents impossible transitions
+- **Walk-in capture** — Webcam photo, Aadhaar validation, digital signatures
+- **Overstaying alerts** — Real-time polling dashboard with click-to-call links
+- **Supabase file storage** — Photos and signatures stored securely; served via session-gated proxy
+- **PDF reports** — Admin CSV export and printable pass PDFs
+- **Audit trail** — Every action logged with user + IP
+- **Feature flags** — Admin can toggle approval requirements per pass type
+
+---
 
 ## Tech Stack
-- **Frontend Framework:** Next.js 14 (App Router)
-- **UI & Styling:** Tailwind CSS, shadcn/ui components, Lucide icons
-- **State & Data Fetching:** React Query (@tanstack/react-query)
-- **Backend Architecture:** Next.js API Routes (Serverless)
-- **Database & ORM:** PostgreSQL managed via Prisma ORM
-- **Authentication:** NextAuth.js (v5) securely handling Google OAuth and local credential sign-ins.
-- **Email Delivery:** Resend API
 
-## Setup and Installation
+| Layer | Technology |
+|---|---|
+| Framework | Next.js 16 (App Router), React 19 |
+| Language | TypeScript (strict) |
+| Styling | Tailwind CSS v4, shadcn/ui, Radix UI |
+| State | Zustand (UI), React Query (server data) |
+| Auth | NextAuth v5 — Google OAuth + Credentials |
+| Database | PostgreSQL + Prisma ORM |
+| File Storage | Supabase Object Storage |
+| Email | Resend |
+| QR Codes | `qrcode` + `html5-qrcode` |
+| Forms | React Hook Form + Zod |
+| PDF | `@react-pdf/renderer` |
 
-1. **Clone the repository:**
+---
+
+## Prerequisites
+
+Before running the project, make sure you have the following set up.
+
+**System requirements:**
+- Node.js 20 or higher
+- npm 10 or higher
+
+**External services (all free tiers work):**
+- A **PostgreSQL** database — [Supabase](https://supabase.com) recommended (free tier)
+- A **Supabase** project — for object storage (photos/signatures)
+- A **Google Cloud** project with OAuth 2.0 credentials
+- A **Resend** account with a verified sending domain
+
+See [requirements.txt](requirements.txt) for a full checklist.
+
+---
+
+## Local Setup
+
+### 1. Clone the repository
+
+```bash
+git clone <repository_url>
+cd Visitor-Management-System
+```
+
+### 2. Install dependencies
+
+```bash
+npm install
+```
+
+### 3. Configure environment variables
+
+Create a `.env` file in the root directory with the following keys:
+
+```env
+# ── Database ────────────────────────────────────────────────────────────────
+# Your PostgreSQL connection string (Supabase recommended)
+DATABASE_URL="postgres://postgres.<project-ref>:<password>@<host>.pooler.supabase.com:5432/postgres"
+
+# ── NextAuth ─────────────────────────────────────────────────────────────────
+NEXTAUTH_URL="http://localhost:3000"
+# Generate with: openssl rand -base64 32
+NEXTAUTH_SECRET="<your-random-secret>"
+
+# ── Google OAuth ─────────────────────────────────────────────────────────────
+# From Google Cloud Console → APIs & Services → Credentials
+GOOGLE_CLIENT_ID="<your-id>.apps.googleusercontent.com"
+GOOGLE_CLIENT_SECRET="GOCSPX-<your-secret>"
+
+# ── Resend (email) ───────────────────────────────────────────────────────────
+RESEND_API_KEY="re_<your-key>"
+
+# ── Supabase (file storage) ──────────────────────────────────────────────────
+NEXT_PUBLIC_SUPABASE_URL="https://<project-ref>.supabase.co"
+NEXT_PUBLIC_SUPABASE_ANON_KEY="eyJ..."
+SUPABASE_SERVICE_ROLE_KEY="eyJ..."
+
+# ── Optional ─────────────────────────────────────────────────────────────────
+# Redirect all outgoing emails to one address (useful during development)
+EMAIL_TESTING_MODE="true"
+EMAIL_TEST_RECIPIENT="dev@example.com"
+```
+
+### 4. Set up the database
+
+Push the Prisma schema to your database and generate the Prisma client:
+
+```bash
+npx prisma generate
+npx prisma db push
+```
+
+Or if you prefer migrations:
+
+```bash
+npx prisma migrate dev --name init
+```
+
+### 5. Seed the database (optional but recommended)
+
+Creates initial users, feature flags, and test data:
+
+```bash
+npm run db:seed
+```
+
+### 6. Create a Security staff account
+
+Security guards log in with email + password (not Google). Run this script to create one:
+
+```bash
+npx tsx set-admin-pwd.ts
+```
+
+### 7. Start the development server
+
+```bash
+npm run dev
+```
+
+Open [http://localhost:3000](http://localhost:3000). You will be redirected to `/login`.
+
+---
+
+## How Authentication Works
+
+| Login Method | Who uses it | Role assigned |
+|---|---|---|
+| Google OAuth (`@iitpkd.ac.in`) | Faculty / Staff | `EMPLOYEE` |
+| Google OAuth (`@smail.iitpkd.ac.in`) | Students | `STUDENT` |
+| Google OAuth (whitelisted email) | Officials, OIC, Warden, Admin | Role from DB |
+| Email + Password | Security guards | `SECURITY` |
+
+After first Google login, the system auto-creates a user record. For special roles (OIC, Assistant Warden, Admin), add the email to the `WhitelistedEmail` table with the correct role via Prisma Studio:
+
+```bash
+npm run db:studio
+```
+
+---
+
+## Role Guide
+
+| Role | Dashboard | What they do |
+|---|---|---|
+| `ADMIN` | `/admin` | Full access — manage users, passes, reports, feature flags, audit logs |
+| `EMPLOYEE` | `/employee` | Create and manage employee guest passes |
+| `OFFICIAL` | `/official` | Create and manage official visitor passes |
+| `STUDENT` | `/student` | Request guest passes and exit passes (requires approval) |
+| `SECURITY` | `/security` | Scan QR codes at gate, create walk-in passes, view own passes, see overstaying alerts |
+| `OIC_STUDENT_SECTION` | `/oic` | Approve or reject pending student pass requests |
+| `ASSISTANT_WARDEN` | `/warden` | Approve student guest passes, view overstaying alerts |
+
+---
+
+## Available Scripts
+
+```bash
+npm run dev          # Start dev server (http://localhost:3000)
+npm run build        # Build for production
+npm run start        # Start production server
+npm run lint         # Run ESLint
+npm run type-check   # TypeScript type check (no emit)
+
+npm run db:migrate   # Run Prisma migrations (dev)
+npm run db:seed      # Seed the database
+npm run db:reset     # Reset DB and re-run migrations
+npm run db:studio    # Open Prisma Studio GUI
+```
+
+---
+
+## Project Structure (key directories)
+
+```
+src/
+├── app/
+│   ├── (auth)/login/         # Login page
+│   ├── (dashboard)/          # All role dashboards
+│   │   ├── admin/
+│   │   ├── employee/
+│   │   ├── official/
+│   │   ├── oic/
+│   │   ├── security/
+│   │   ├── student/
+│   │   └── (roles)/warden/
+│   └── api/                  # All backend API routes
+├── components/               # React components
+├── hooks/                    # React Query hooks
+├── lib/                      # Auth, Prisma, email, QR utilities
+├── schemas/                  # Zod validation schemas
+├── services/                 # Business logic (pass, scan, email, audit)
+├── stores/                   # Zustand stores
+└── types/                    # TypeScript types
+```
+
+For a complete file-by-file breakdown, see [project_details.md](project_details.md).
+
+---
+
+## Deployment (Render + Supabase)
+
+1. Push your code to GitHub.
+2. Create a new **Web Service** on [Render](https://render.com).
+   - Build command: `npm install && npx prisma generate && npm run build`
+   - Start command: `npm run start`
+3. Add all environment variables from the `.env` section above in Render's Environment tab.
+4. Your Supabase PostgreSQL `DATABASE_URL` goes in as well.
+5. Make sure your Google OAuth **Authorized redirect URIs** include your Render domain:
+   - `https://your-app.onrender.com/api/auth/callback/google`
+6. Run migrations on the remote DB after first deploy:
    ```bash
-   git clone <repository_url>
-   cd Visitor_Management_System
-   ```
-2. **Install Dependencies:**
-   ```bash
-   npm install
-   ```
-3. **Configure Environment Variables:**
-   Rename `.env.example` to `.env` and fill out your local values (refer to `todo.md` for specific service-level setups).
-
-4. **Initialize Database:**
-   ```bash
-   npx prisma generate
-   npx prisma db push
-   ```
-5. **Seed the database (Optional but recommended):**
-   ```bash
-   npx tsx prisma/seed.ts
+   npx prisma migrate deploy
    ```
 
-6. **Start the local server:**
-   ```bash
-   npm run dev
-   ```
+---
 
-## Usage Instructions
-- **Administrators**: Access `/admin` to view full analytical reports, override approval decisions, or monitor real-time event logs via the dashboard.
-- **Security Accounts**: Login via email/password combination on the root page. From the Security Dashboard `/security`, guards can issue walk-in passes with camera-captured photos or utilize the camera-scanner UI to log entries and final-exits.
-- **Host Officials/Students**: Utilize the "Create Pass" forms from your respective dashboards. Track the real-time approval status of pending passes.
+## Development Notes
 
-## Deployment Details
-This application is designed for serverless execution and scales effortlessly on **Render** or **Vercel** with a remotely hosted PostgreSQL database instance (such as **Supabase**).
-
-- **Database:** Connect your preferred PostgreSQL provider and export the `DATABASE_URL` during deployment.
-- **Email:** Create a **Resend** account and configure a verified domain to send email payloads (set `RESEND_API_KEY`).
-- Follow the manual deployment parameters and secrets instructions outlined entirely within `todo.md` (Not tracked by Git) internally inside the root folder to spin up production easily!
+- **Emails in development:** Set `EMAIL_TESTING_MODE=true` and `EMAIL_TEST_RECIPIENT` to redirect all emails to one inbox.
+- **Prisma Studio:** Run `npm run db:studio` to visually browse and edit database records.
+- **Photo serving:** All uploaded photos go to Supabase Storage and are served through `/api/secure-image/[filename]` — never expose Supabase URLs directly.
+- **Scanner debounce:** The QR scanner has a ~1000ms frontend debounce to prevent duplicate scans from the same frame. Do not add additional backend cooldowns.
+- **Print CSS:** Toasts and UI chrome are hidden via `@media print` rules. Use browser Print / Save as PDF for pass documents.
