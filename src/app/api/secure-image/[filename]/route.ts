@@ -5,9 +5,9 @@ import { supabase } from '@/lib/supabase';
 /**
  * GET /api/secure-image/[filename]
  * Fetches an image securely from the internal Supabase private bucket.
- * Auth: Requires any valid session.
+ * Auth: Unauthenticated (unguessable UUID capability URL)
  */
-export const GET = withAuth(async (req: NextRequest, context: { params: Promise<{ filename: string }> }) => {
+export const GET = async (req: NextRequest, context: { params: Promise<{ filename: string }> }) => {
     try {
         const { filename } = await context.params;
         
@@ -41,4 +41,4 @@ export const GET = withAuth(async (req: NextRequest, context: { params: Promise<
         console.error('[GET /api/secure-image] Server Error', err);
         return new NextResponse('Internal Server Error', { status: 500 });
     }
-});
+};
