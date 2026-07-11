@@ -29,8 +29,8 @@ export default function OicApprovalsPage() {
     return (
         <div className="max-w-5xl mx-auto space-y-6">
             <div>
-                <h1 className="text-3xl font-bold tracking-tight">OIC Student Section Dashboard</h1>
-                <p className="text-muted-foreground">Review and authorize pending student visitor requests explicitly assigned to you.</p>
+                <h1 className="text-3xl font-bold tracking-tight">Officer-in-Charge, Student Section Dashboard</h1>
+                <p className="text-slate-500">Review and authorize pending student visitor requests explicitly assigned to you.</p>
             </div>
 
             <Tabs defaultValue="pending" className="w-full">
