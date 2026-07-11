@@ -105,10 +105,12 @@ export const ScanService = {
             }
         }
 
-        let finalScanType = scanType;
+        let finalScanType: string = scanType;
+
+        const lastScanType: string | undefined = lastLog?.scanType;
 
         if (scanType === 'STUDENT_EXIT_AUTO') {
-            if (lastLog?.scanType === 'STUDENT_EXIT_OUT') {
+            if (lastScanType === 'STUDENT_EXIT_OUT') {
                 finalScanType = 'STUDENT_EXIT_RETURN';
             } else {
                 finalScanType = 'STUDENT_EXIT_OUT';
@@ -117,30 +119,30 @@ export const ScanService = {
 
         // STRICT SEQUENCE VALIDATION FOR EXITS
         if (finalScanType === 'ENTRY') {
-            if (lastLog && lastLog.scanType !== 'FINAL_EXIT') {
+            if (lastLog && lastScanType !== 'FINAL_EXIT') {
                 throw new Error('Visitor is already inside. Cannot log another entry.');
             }
         } else if (finalScanType === 'STUDENT_EXIT_OUT') {
-            if (lastLog?.scanType === 'STUDENT_EXIT_OUT') {
+            if (lastScanType === 'STUDENT_EXIT_OUT') {
                 throw new Error('Cannot exit. Student has not returned from previous exit.');
             }
         } else if (finalScanType === 'STUDENT_EXIT_RETURN') {
-            if (lastLog?.scanType !== 'STUDENT_EXIT_OUT') {
+            if (lastScanType !== 'STUDENT_EXIT_OUT') {
                  throw new Error('Cannot return. Student has not logged an exit.');
             }
         } else if (finalScanType === 'INTERMEDIATE_ENTRY') {
-            if (lastLog?.scanType !== 'INTERMEDIATE_EXIT') {
+            if (lastScanType !== 'INTERMEDIATE_EXIT') {
                 throw new Error('Cannot log intermediate entry. Visitor has not logged an intermediate exit.');
             }
         } else if (finalScanType === 'INTERMEDIATE_EXIT') {
-            if (!lastLog || (lastLog.scanType !== 'ENTRY' && lastLog.scanType !== 'INTERMEDIATE_ENTRY')) {
+            if (!lastLog || (lastScanType !== 'ENTRY' && lastScanType !== 'INTERMEDIATE_ENTRY')) {
                 throw new Error('Cannot log intermediate exit. Visitor must be inside (logged entry) first.');
             }
         } else if (finalScanType === 'FINAL_EXIT') {
             if (!lastLog) {
                 throw new Error('Cannot log final exit. Visitor has not entered yet.');
             }
-            if (lastLog.scanType === 'INTERMEDIATE_EXIT') {
+            if (lastScanType === 'INTERMEDIATE_EXIT') {
                 throw new Error('Cannot log final exit. Visitor must return from intermediate exit first.');
             }
         }
@@ -178,7 +180,8 @@ export const ScanService = {
 
         void AuditService.log({
             userId: securityId,
-            action: `SCAN_${finalScanType}`,
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            action: `SCAN_${finalScanType}` as any,
             entityType: 'ScanLog',
             entityId: scanLog.id,
             changes: { passId, scanType: finalScanType, gateLocation },

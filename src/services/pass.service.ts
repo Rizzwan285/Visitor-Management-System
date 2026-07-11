@@ -57,6 +57,7 @@ export type PassFilters = {
     dateTo?: string;
     page?: number;
     limit?: number;
+    createdByMe?: boolean | string;
 };
 
 // Full pass with all relations
